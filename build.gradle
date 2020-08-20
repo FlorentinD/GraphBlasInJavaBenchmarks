@@ -1,0 +1,85 @@
+plugins {
+    // TODO actually need this plugin?
+    id 'com.github.johnrengelman.shadow'            version '5.2.0'                 apply false
+    id "me.champeau.gradle.jmh"                     version "0.5.0"                 apply true
+    id 'java-library' apply true
+}
+
+apply from: 'gradle/dependencies.gradle'
+apply from: 'gradle/version.gradle'
+
+group 'org.florentind'
+version '1.0-SNAPSHOT'
+
+description = 'Benchmark GraphBLAS in Java'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    gradlePluginPortal()
+}
+
+dependencies {
+    annotationProcessor group: 'org.neo4j.gds',            name: 'annotations',        version: ver.gds
+    annotationProcessor group: 'org.neo4j.gds',            name: 'config-generator',   version: ver.gds
+    annotationProcessor group: 'org.immutables',           name: 'builder',            version: ver.'immutables'
+    annotationProcessor group: 'org.immutables',           name: 'value',              version: ver.'immutables'
+    annotationProcessor group: 'org.neo4j',                name: 'annotations',        version: ver.'neo4j'
+
+    compileOnly         group: 'org.immutables',           name: 'builder',            version: ver.'immutables'
+    compileOnly         group: 'org.immutables',           name: 'value-annotations',  version: ver.'immutables'
+    compileOnly         group: 'org.jetbrains',            name: 'annotations',        version: ver.'jetbrains-annotations'
+
+
+    compileOnly         group: 'org.ejml',                 name: 'ejml-all',        version: ver.ejml
+    implementation      group: 'org.neo4j.gds',            name: 'test-utils',      version: ver.gds
+    implementation      group: 'org.neo4j.gds',            name: 'core',            version: ver.gds
+
+
+    // jmh dependencies
+    // TODO: try out which ones can be removed
+    jmhAnnotationProcessor group: 'org.neo4j.gds',            name: 'annotations',        version: ver.gds
+    jmhAnnotationProcessor group: 'org.immutables',           name: 'builder',            version: ver.'immutables'
+    jmhAnnotationProcessor group: 'org.immutables',           name: 'value',              version: ver.'immutables'
+    jmhCompileOnly         group: 'org.immutables',           name: 'builder',            version: ver.'immutables'
+    jmhCompileOnly         group: 'org.immutables',           name: 'value-annotations',  version: ver.'immutables'
+    jmhCompile         group: 'org.neo4j.gds',                   name: 'pregel-example',      version: ver.gds
+    jmhImplementation         group: 'org.neo4j.gds',                   name: 'proc',      version: ver.gds
+    jmhCompile      group: 'org.neo4j.gds',            name: 'algo',      version: ver.gds
+    jmhImplementation             group: 'org.neo4j.gds',            name: 'alpha-algo',      version: ver.gds
+    jmhImplementation      group: 'org.neo4j.gds',            name: 'core',            version: ver.gds
+
+    jmh group: 'com.github.rvesse',       name: 'airline',                  version: ver.'airline'
+    jmh group: 'net.jodah',               name: 'failsafe',                 version: ver.'failsafe'
+    jmh group: 'commons-configuration',   name: 'commons-configuration',    version: '1.10'
+
+
+    jmh("org.openjdk.jmh:jmh-core:${ver.jmh}")
+    jmh("org.openjdk.jmh:jmh-generator-annprocess:${ver.jmh}")
+
+    testCompile (
+            platform(dep.junit5bom),
+            dep.junit5jupiter
+    )
+
+    testImplementation group: 'org.ejml',       name: 'ejml-all',           version: ver.'ejml'
+    testCompileOnly group: 'org.immutables',    name: 'value-annotations',  version: ver.'immutables'
+    testCompileOnly group: 'org.immutables',    name: 'builder',            version: ver.'immutables'
+    testCompileOnly group: 'org.jetbrains',     name: 'annotations',        version: ver.'jetbrains-annotations'
+}
+
+test {
+    useJUnitPlatform {
+        includeEngines 'junit-jupiter'
+    }
+}
+
+jmh {
+    zip64 = true
+    forceGC = true
+    // regExp which benchmarks to run
+    include = ['.*Pregel.*']
+    duplicateClassesStrategy = 'warn'
+    // ! increase -Xmx on server if needed .. f.i. "-Xmx32g"
+    jvmArgs = ["-Xms1024M","-XX:+UseSuperWord"]
+}
