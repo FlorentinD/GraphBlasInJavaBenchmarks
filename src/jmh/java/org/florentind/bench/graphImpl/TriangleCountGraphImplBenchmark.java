@@ -39,7 +39,6 @@ import org.openjdk.jmh.infra.Blackhole;
 
 import java.util.Optional;
 
-// TODO: Does not work as EjmlGraph does not support graph.intersect()
 public class TriangleCountGraphImplBenchmark extends GraphImplBaseBenchmark {
 
     private TriangleCountBaseConfig config;

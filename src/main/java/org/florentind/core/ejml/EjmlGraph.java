@@ -69,10 +69,7 @@ public final class EjmlGraph extends FilterGraph {
     public double relationshipProperty(long sourceId, long targetId, double fallbackValue) {
         int row = Math.toIntExact(targetId);
         int col = Math.toIntExact(sourceId);
-        // TODO: use "getOrDefault" in EJML (included in the next release e.g. 0.4.0)
-        // https://github.com/lessthanoptimal/ejml/pull/74
-        return transposedMatrix.isAssigned(row, col) ?
-            transposedMatrix.get(row, col) : fallbackValue;
+        return transposedMatrix.get(row, col, fallbackValue);
     }
 
     @Override
