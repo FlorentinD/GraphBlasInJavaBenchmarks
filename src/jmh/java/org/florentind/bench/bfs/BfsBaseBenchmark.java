@@ -11,7 +11,7 @@ import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.openjdk.jmh.annotations.Param;
 
 // TODO: converter from EJML-Graph to JNI-Graph
-public class BfsEjmlBaseBenchmark extends EjmlGraphBaseBenchmark {
+public class BfsBaseBenchmark extends EjmlGraphBaseBenchmark {
     @Param({"3000000"})
     int nodeCount;
 
@@ -23,6 +23,7 @@ public class BfsEjmlBaseBenchmark extends EjmlGraphBaseBenchmark {
 
     // TODO: retrieve actually run iterations
     @Param({"100"})
+    protected
     int maxIterations;
 
 

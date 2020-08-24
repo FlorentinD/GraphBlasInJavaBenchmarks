@@ -5,7 +5,7 @@ import org.ejml.sparse.csc.graphAlgos.BFS_DSCC;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.infra.Blackhole;
 
-public class BfsEjmlBenchmark extends BfsEjmlBaseBenchmark {
+public class BfsEjmlBenchmark extends BfsBaseBenchmark {
 
     @Param({"1"})
     private int concurrency;

@@ -12,7 +12,7 @@ import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.infra.Blackhole;
 
-public class BfsPregelBenchmark extends BfsEjmlBaseBenchmark {
+public class BfsPregelBenchmark extends BfsBaseBenchmark {
 
     @Param({"1", "8"})
     private int concurrency;
