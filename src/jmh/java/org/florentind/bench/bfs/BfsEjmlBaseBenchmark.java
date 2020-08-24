@@ -21,19 +21,15 @@ package org.florentind.bench.bfs;
 
 
 import org.florentind.bench.EjmlGraphBaseBenchmark;
-import org.neo4j.graphalgo.Orientation;
 import org.neo4j.graphalgo.api.CSRGraph;
 import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
-import org.neo4j.graphalgo.beta.generator.RandomGraphGeneratorBuilder;
 import org.neo4j.graphalgo.beta.generator.RelationshipDistribution;
 import org.neo4j.graphalgo.config.RandomGraphGeneratorConfig;
 import org.neo4j.graphalgo.core.Aggregation;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.openjdk.jmh.annotations.Param;
 
-import java.util.Optional;
-
-// TODO: setup own benchmark repo, containing converter from EJML-Graph to JNI-Graph
+// TODO: converter from EJML-Graph to JNI-Graph
 public class BfsEjmlBaseBenchmark extends EjmlGraphBaseBenchmark {
     @Param({"3000000"})
     int nodeCount;
@@ -51,18 +47,16 @@ public class BfsEjmlBaseBenchmark extends EjmlGraphBaseBenchmark {
 
     @Override
     protected CSRGraph getCSRGraph() {
-        return new RandomGraphGenerator(
-                nodeCount,
-                avgDegree,
-                RelationshipDistribution.POWER_LAW,
-                42L,
-                Optional.empty(),
-                Optional.empty(),
-                Aggregation.MAX,
-                Orientation.NATURAL,
-                RandomGraphGeneratorConfig.AllowSelfLoops.YES,
-                AllocationTracker.EMPTY
-        ).generate();
+        return RandomGraphGenerator.builder()
+                .nodeCount(nodeCount)
+                .averageDegree(avgDegree)
+                .seed(42L)
+                .aggregation(Aggregation.MAX)
+                .allocationTracker(AllocationTracker.EMPTY)
+                .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.YES)
+                .relationshipDistribution(RelationshipDistribution.POWER_LAW)
+                .build().generate();
+
     }
 
     // TODO add MSBFS benchmark

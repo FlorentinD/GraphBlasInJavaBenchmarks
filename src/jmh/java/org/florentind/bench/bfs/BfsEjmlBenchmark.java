@@ -24,7 +24,6 @@ import org.ejml.sparse.csc.graphAlgos.BFS_DSCC;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.infra.Blackhole;
 
-// TODO: setup own benchmark repo, containing converter from EJML-Graph to JNI-Graph
 public class BfsEjmlBenchmark extends BfsEjmlBaseBenchmark {
 
     @Param({"1"})

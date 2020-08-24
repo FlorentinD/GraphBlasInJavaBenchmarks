@@ -27,6 +27,7 @@ import org.neo4j.graphalgo.StoreLoaderBuilder;
 import org.neo4j.graphalgo.api.CSRGraph;
 import org.neo4j.graphalgo.compat.GdsGraphDatabaseAPI;
 import org.neo4j.graphalgo.core.Aggregation;
+import org.neo4j.graphalgo.core.GdsEdition;
 import org.openjdk.jmh.annotations.*;
 
 import java.util.concurrent.TimeUnit;
@@ -71,6 +72,10 @@ public class EjmlGraphBaseBenchmark {
 
         graph = EjmlGraph.create(hugeGraph);
         matrix = CommonOps_DSCC.transpose(graph.matrix(), null, null);
+
+        // for usage of higher concurrencies in gds benchmarks
+        GdsEdition.instance().setToEnterpriseEdition();
+
 
         hugeGraph.release();
     }
