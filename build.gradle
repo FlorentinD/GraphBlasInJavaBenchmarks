@@ -80,6 +80,7 @@ jmh {
     // regExp which benchmarks to run
     include = ['.*Pregel.*']
     duplicateClassesStrategy = 'warn'
-    // ! increase -Xmx on server if needed .. f.i. "-Xmx32g"
-    jvmArgs = ["-Xms1024M","-XX:+UseSuperWord"]
+
+    // ! increase -Xmx and set -Xms to equal value on server if needed .. f.i. "-Xmx32g"
+    jvmArgs = ["-Xms32g", "-Xmx32g", "-XX:+UseSuperWord"]
 }
