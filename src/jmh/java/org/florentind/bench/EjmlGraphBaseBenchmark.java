@@ -44,7 +44,7 @@ public class EjmlGraphBaseBenchmark {
             .getUnion();
     }
 
-    @Setup(Level.Invocation)
+    @Setup(Level.Trial)
     public void setup() {
 //        datasetManager = new DatasetManager(Path.of("/tmp"));
 

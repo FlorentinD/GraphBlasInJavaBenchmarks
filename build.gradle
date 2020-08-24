@@ -3,6 +3,9 @@ plugins {
     id 'com.github.johnrengelman.shadow'            version '5.2.0'                 apply false
     id "me.champeau.gradle.jmh"                     version "0.5.0"                 apply true
     id 'java-library' apply true
+
+    // to find unused dependencies
+    //id "ca.cutterslade.analyze" version "1.4.1" apply true
 }
 
 apply from: 'gradle/dependencies.gradle'
@@ -20,34 +23,35 @@ repositories {
 }
 
 dependencies {
-    annotationProcessor group: 'org.neo4j.gds',            name: 'annotations',        version: ver.gds
-    annotationProcessor group: 'org.neo4j.gds',            name: 'config-generator',   version: ver.gds
-    annotationProcessor group: 'org.immutables',           name: 'builder',            version: ver.'immutables'
-    annotationProcessor group: 'org.immutables',           name: 'value',              version: ver.'immutables'
-    annotationProcessor group: 'org.neo4j',                name: 'annotations',        version: ver.'neo4j'
+    annotationProcessor group: 'org.neo4j.gds',            name: 'annotations',         version: ver.gds
+    annotationProcessor group: 'org.neo4j.gds',            name: 'config-generator',    version: ver.gds
+    annotationProcessor group: 'org.immutables',           name: 'builder',             version: ver.'immutables'
+    annotationProcessor group: 'org.immutables',           name: 'value',               version: ver.'immutables'
+    annotationProcessor group: 'org.neo4j',                name: 'annotations',         version: ver.'neo4j'
 
-    compileOnly         group: 'org.immutables',           name: 'builder',            version: ver.'immutables'
-    compileOnly         group: 'org.immutables',           name: 'value-annotations',  version: ver.'immutables'
-    compileOnly         group: 'org.jetbrains',            name: 'annotations',        version: ver.'jetbrains-annotations'
+    compileOnly         group: 'org.immutables',           name: 'builder',             version: ver.'immutables'
+    compileOnly         group: 'org.immutables',           name: 'value-annotations',   version: ver.'immutables'
+    compileOnly         group: 'org.jetbrains',            name: 'annotations',         version: ver.'jetbrains-annotations'
 
 
     compileOnly         group: 'org.ejml',                 name: 'ejml-all',        version: ver.ejml
-    implementation      group: 'org.neo4j.gds',            name: 'test-utils',      version: ver.gds
     implementation      group: 'org.neo4j.gds',            name: 'core',            version: ver.gds
-
+    // TODO: find out why this is needed for the benchmarks
+    implementation      group: 'org.neo4j.gds',            name: 'test-utils',      version: ver.gds
 
     // jmh dependencies
     // TODO: try out which ones can be removed
-    jmhAnnotationProcessor group: 'org.neo4j.gds',            name: 'annotations',        version: ver.gds
-    jmhAnnotationProcessor group: 'org.immutables',           name: 'builder',            version: ver.'immutables'
-    jmhAnnotationProcessor group: 'org.immutables',           name: 'value',              version: ver.'immutables'
+    jmhAnnotationProcessor group: 'org.neo4j.gds',         name: 'annotations',         version: ver.gds
+    jmhAnnotationProcessor group: 'org.immutables',        name: 'value',               version: ver.'immutables'
     jmhCompileOnly         group: 'org.immutables',           name: 'builder',            version: ver.'immutables'
-    jmhCompileOnly         group: 'org.immutables',           name: 'value-annotations',  version: ver.'immutables'
-    jmhCompile         group: 'org.neo4j.gds',                   name: 'pregel-example',      version: ver.gds
-    jmhImplementation         group: 'org.neo4j.gds',                   name: 'proc',      version: ver.gds
-    jmhCompile      group: 'org.neo4j.gds',            name: 'algo',      version: ver.gds
-    jmhImplementation             group: 'org.neo4j.gds',            name: 'alpha-algo',      version: ver.gds
-    jmhImplementation      group: 'org.neo4j.gds',            name: 'core',            version: ver.gds
+
+    jmhCompileOnly         group: 'org.immutables',        name: 'value-annotations',   version: ver.'immutables'
+    jmhImplementation      group: 'org.neo4j.gds',         name: 'proc',                version: ver.gds
+    jmhImplementation      group: 'org.neo4j.gds',         name: 'alpha-algo',          version: ver.gds
+    jmhImplementation      group: 'org.neo4j.gds',         name: 'core',                version: ver.gds
+    jmhCompile             group: 'org.neo4j.gds',         name: 'pregel-example',      version: ver.gds
+    jmhCompile             group: 'org.neo4j.gds',         name: 'algo',                version: ver.gds
+
 
     jmh group: 'com.github.rvesse',       name: 'airline',                  version: ver.'airline'
     jmh group: 'net.jodah',               name: 'failsafe',                 version: ver.'failsafe'
@@ -66,11 +70,10 @@ dependencies {
     testCompileOnly group: 'org.immutables',    name: 'value-annotations',  version: ver.'immutables'
     testCompileOnly group: 'org.immutables',    name: 'builder',            version: ver.'immutables'
     testCompileOnly group: 'org.jetbrains',     name: 'annotations',        version: ver.'jetbrains-annotations'
+    testCompileOnly  group: 'org.neo4j.gds',    name: 'test-utils',          version: ver.gds
 
     // pregel/jmh tests (should be moved to a seperate jmhTest folder?!)
     testCompile         group: 'org.neo4j.gds',                   name: 'pregel-example',      version: ver.gds
-
-
 }
 
 test {
