@@ -17,8 +17,8 @@ import org.neo4j.graphalgo.pagerank.PageRankStreamConfig;
 import java.util.stream.LongStream;
 
 public class PageRankBenchmarkTest extends BaseBenchmarkTest {
-    private static final int NODE_COUNT = 30_000;
-    private static final int MAX_ITERATIONS = 30;
+    private static final int NODE_COUNT = 3_000_000;
+    private static final int MAX_ITERATIONS = 5;
 
     @Override
     long nodeCount() {
