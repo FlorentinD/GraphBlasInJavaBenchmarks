@@ -1,4 +1,4 @@
-package org.github.florentind.bench.bfs;
+package org.github.florentind.bench;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.neo4j.graphalgo.api.CSRGraph;

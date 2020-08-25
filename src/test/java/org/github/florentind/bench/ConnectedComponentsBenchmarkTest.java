@@ -1,4 +1,4 @@
-package org.github.florentind.bench.bfs;
+package org.github.florentind.bench;
 
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
@@ -7,7 +7,12 @@ import org.neo4j.graphalgo.beta.pregel.cc.ImmutableConnectedComponentsConfig;
 import org.neo4j.graphalgo.core.GdsEdition;
 import org.neo4j.graphalgo.core.concurrency.ParallelUtil;
 import org.neo4j.graphalgo.core.concurrency.Pools;
+import org.neo4j.graphalgo.core.utils.ProgressLogger;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
+import org.neo4j.graphalgo.core.utils.paged.dss.DisjointSetStruct;
+import org.neo4j.graphalgo.wcc.ImmutableWccStreamConfig;
+import org.neo4j.graphalgo.wcc.Wcc;
+import org.neo4j.graphalgo.wcc.WccStreamConfig;
 
 public class ConnectedComponentsBenchmarkTest extends BaseBenchmarkTest {
     private static final int NODE_COUNT = 30_000;
@@ -37,7 +42,7 @@ public class ConnectedComponentsBenchmarkTest extends BaseBenchmarkTest {
 
         int batchSize = (int) ParallelUtil.adjustedBatchSize(graph.nodeCount(), config.concurrency());
 
-        var bfsLevelJob = Pregel.create(
+        var connectedComponentsJob = Pregel.create(
                 graph,
                 config,
                 new ConnectedComponentsPregel(),
@@ -46,7 +51,24 @@ public class ConnectedComponentsBenchmarkTest extends BaseBenchmarkTest {
                 AllocationTracker.EMPTY
         );
 
-        var result = bfsLevelJob.run();
+        var result = connectedComponentsJob.run();
         System.out.println("result.ranIterations() = " + result.ranIterations());
+    }
+
+    @Test
+    void unweightedWccGds() {
+        WccStreamConfig config = ImmutableWccStreamConfig.builder().build();
+
+        DisjointSetStruct result = new Wcc(
+                graph,
+                Pools.DEFAULT,
+                ParallelUtil.DEFAULT_BATCH_SIZE,
+                config,
+                ProgressLogger.NULL_LOGGER,
+                AllocationTracker.EMPTY
+        ).compute();
+
+        System.out.println(result.setIdOf(NODE_COUNT - 1));
+        // TODO assert against ejml variation (ranIterations and result)
     }
 }

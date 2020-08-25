@@ -1,4 +1,4 @@
-package org.github.florentind.bench.bfs;
+package org.github.florentind.bench;
 
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
@@ -7,7 +7,14 @@ import org.neo4j.graphalgo.beta.pregel.pr.PageRankPregel;
 import org.neo4j.graphalgo.core.GdsEdition;
 import org.neo4j.graphalgo.core.concurrency.ParallelUtil;
 import org.neo4j.graphalgo.core.concurrency.Pools;
+import org.neo4j.graphalgo.core.utils.ProgressLogger;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
+import org.neo4j.graphalgo.pagerank.ImmutablePageRankStreamConfig;
+import org.neo4j.graphalgo.pagerank.PageRank;
+import org.neo4j.graphalgo.pagerank.PageRankAlgorithmType;
+import org.neo4j.graphalgo.pagerank.PageRankStreamConfig;
+
+import java.util.stream.LongStream;
 
 public class PageRankBenchmarkTest extends BaseBenchmarkTest {
     private static final int NODE_COUNT = 30_000;
@@ -29,7 +36,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
     void testPregel() {
         // TODO increase test heap space?
         GdsEdition.instance().setToEnterpriseEdition();
-        int concurrency = 16;
+        int concurrency = 1;
 
         var config = ImmutablePageRankPregelConfig.builder()
                 .maxIterations(MAX_ITERATIONS)
@@ -38,7 +45,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
 
         int batchSize = (int) ParallelUtil.adjustedBatchSize(graph.nodeCount(), config.concurrency());
 
-        var bfsLevelJob = Pregel.create(
+        var pageRankJob = Pregel.create(
                 graph,
                 config,
                 new PageRankPregel(),
@@ -47,7 +54,19 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
                 AllocationTracker.EMPTY
         );
 
-        var result = bfsLevelJob.run();
+        var result = pageRankJob.run();
         System.out.println("result.ranIterations() = " + result.ranIterations());
+    }
+
+    @Test
+    void testGdsUnweightedPageRank() {
+        PageRankStreamConfig config = ImmutablePageRankStreamConfig.builder()
+                .maxIterations(40).build();
+
+        PageRank pageRank = PageRankAlgorithmType.NON_WEIGHTED
+                .create(graph, config, LongStream.empty(), ProgressLogger.NULL_LOGGER)
+                .compute();
+
+        // TODO assert against ejml variation (ranIterations and result)
     }
 }
