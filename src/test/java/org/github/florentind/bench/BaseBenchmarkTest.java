@@ -6,6 +6,7 @@ import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
 import org.neo4j.graphalgo.beta.generator.RelationshipDistribution;
 import org.neo4j.graphalgo.config.RandomGraphGeneratorConfig;
 import org.neo4j.graphalgo.core.Aggregation;
+import org.neo4j.graphalgo.core.GdsEdition;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 
 public abstract class BaseBenchmarkTest {
@@ -18,6 +19,7 @@ public abstract class BaseBenchmarkTest {
 
     @BeforeEach
     void setup() {
+        GdsEdition.instance().setToEnterpriseEdition();
         graph = RandomGraphGenerator.builder()
                 .nodeCount(nodeCount())
                 .averageDegree(avgDegree())
