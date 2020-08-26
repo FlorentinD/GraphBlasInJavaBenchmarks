@@ -16,6 +16,9 @@ public class PageRankGdsBenchmark extends BfsBaseBenchmark {
     @Param({"1", "8"})
     private int concurrency;
 
+    @Param({"10"})
+    protected int maxIterations;
+
     private PageRankPregel.PageRankPregelConfig config;
 
     private int batchSize;

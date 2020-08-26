@@ -12,7 +12,7 @@ import org.openjdk.jmh.annotations.Param;
 
 // TODO: converter from EJML-Graph to JNI-Graph
 public class BfsBaseBenchmark extends EjmlGraphBaseBenchmark {
-    @Param({"30"})
+    @Param({"3000000"})
     int nodeCount;
 
     @Param({"4"})
@@ -23,8 +23,7 @@ public class BfsBaseBenchmark extends EjmlGraphBaseBenchmark {
 
     // TODO: retrieve actually run iterations
     @Param({"100"})
-    protected
-    int maxIterations;
+    protected int maxIterations;
 
 
     @Override
