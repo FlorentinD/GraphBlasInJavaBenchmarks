@@ -40,13 +40,10 @@ public class ConnectedComponentsBenchmarkTest extends BaseBenchmarkTest {
                 .concurrency(concurrency)
                 .build();
 
-        int batchSize = (int) ParallelUtil.adjustedBatchSize(graph.nodeCount(), config.concurrency());
-
         var connectedComponentsJob = Pregel.create(
                 graph,
                 config,
                 new ConnectedComponentsPregel(),
-                batchSize,
                 Pools.DEFAULT,
                 AllocationTracker.EMPTY
         );

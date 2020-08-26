@@ -21,8 +21,6 @@ public class PageRankGdsBenchmark extends BfsBaseBenchmark {
 
     private PageRankPregel.PageRankPregelConfig config;
 
-    private int batchSize;
-
     private Pregel<PageRankPregel.PageRankPregelConfig> pregel;
 
     @Override
@@ -34,14 +32,11 @@ public class PageRankGdsBenchmark extends BfsBaseBenchmark {
                 .concurrency(concurrency)
                 .build();
 
-        batchSize = (int) ParallelUtil.adjustedBatchSize(graph.nodeCount(), config.concurrency());
-
         // init Pregel structures beforehand
         pregel = Pregel.create(
                 graph,
                 config,
                 new PageRankPregel(),
-                batchSize,
                 Pools.DEFAULT,
                 AllocationTracker.EMPTY
         );

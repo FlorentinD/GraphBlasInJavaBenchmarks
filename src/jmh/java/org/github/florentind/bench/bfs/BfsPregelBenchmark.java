@@ -19,8 +19,6 @@ public class BfsPregelBenchmark extends BfsBaseBenchmark {
 
     private BFSPregelConfig config;
 
-    private int batchSize;
-
     private Pregel<BFSPregelConfig> bfsLevelJob;
 
     private Pregel<BFSPregelConfig> bfsParentJob;
@@ -36,14 +34,11 @@ public class BfsPregelBenchmark extends BfsBaseBenchmark {
                 .concurrency(concurrency)
                 .build();
 
-        batchSize = (int) ParallelUtil.adjustedBatchSize(graph.nodeCount(), config.concurrency());
-
         // init Pregel structures beforehand
         bfsLevelJob = Pregel.create(
                 graph,
                 config,
                 new BFSLevelPregel(),
-                batchSize,
                 Pools.DEFAULT,
                 AllocationTracker.EMPTY
         );
@@ -52,7 +47,6 @@ public class BfsPregelBenchmark extends BfsBaseBenchmark {
                 graph,
                 config,
                 new BFSParentPregel(),
-                batchSize,
                 Pools.DEFAULT,
                 AllocationTracker.EMPTY
         );

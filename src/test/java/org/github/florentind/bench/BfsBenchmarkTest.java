@@ -106,7 +106,6 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
                 graph,
                 config,
                 computation,
-                (int) ParallelUtil.adjustedBatchSize(graph.nodeCount(), config.concurrency()),
                 Pools.DEFAULT,
                 AllocationTracker.EMPTY
         );

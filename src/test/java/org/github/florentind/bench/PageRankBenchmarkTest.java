@@ -43,13 +43,10 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
                 .concurrency(concurrency)
                 .build();
 
-        int batchSize = (int) ParallelUtil.adjustedBatchSize(graph.nodeCount(), config.concurrency());
-
         var pageRankJob = Pregel.create(
                 graph,
                 config,
                 new PageRankPregel(),
-                batchSize,
                 Pools.DEFAULT,
                 AllocationTracker.EMPTY
         );

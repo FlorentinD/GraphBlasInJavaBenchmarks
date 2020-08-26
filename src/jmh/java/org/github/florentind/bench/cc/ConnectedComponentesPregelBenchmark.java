@@ -20,8 +20,6 @@ public class ConnectedComponentesPregelBenchmark extends BfsBaseBenchmark {
 
     private ConnectedComponentsConfig config;
 
-    private int batchSize;
-
     private Pregel<ConnectedComponentsConfig> sccJob;
 
     @Override
@@ -33,14 +31,11 @@ public class ConnectedComponentesPregelBenchmark extends BfsBaseBenchmark {
                 .concurrency(concurrency)
                 .build();
 
-        batchSize = (int) ParallelUtil.adjustedBatchSize(graph.nodeCount(), config.concurrency());
-
         // init Pregel structures beforehand
         sccJob = Pregel.create(
                 graph,
                 config,
                 new ConnectedComponentsPregel(),
-                batchSize,
                 Pools.DEFAULT,
                 AllocationTracker.EMPTY
         );
