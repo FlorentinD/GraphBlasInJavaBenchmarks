@@ -6,13 +6,10 @@ BfsEjmlBenchmark.ejmlSparseBfsBoolean,4,1,100,300000,0,avgt,5,497.661,17.562,ms/
 BfsEjmlBenchmark.ejmlSparseBfsLevel,4,1,100,300000,0,avgt,5,496.798,37.988,ms/op
 BfsEjmlBenchmark.ejmlSparseBfsParent,4,1,100,300000,0,avgt,5,509.580,61.938,ms/op
 BfsEjmlBenchmark.gdsBfsTraverse,4,1,100,300000,0,avgt,5,2.070,0.501,ms/op
-BfsPregelBenchmark.pregelBfsLevel,4,16,100,300000,0,avgt,5,18047.513,7072.765,ms/op
-BfsPregelBenchmark.pregelBfsLevel,4,128,100,300000,0,avgt,5,6147.162,4282.923,ms/op
-BfsPregelBenchmark.pregelBfsParent,4,1,100,300000,0,avgt,5,29530.140,4164.472,ms/op
-BfsPregelBenchmark.pregelBfsParent,4,4,100,300000,0,avgt,5,8963.770,6149.239,ms/op
-BfsPregelBenchmark.pregelBfsParent,4,8,100,300000,0,avgt,5,6165.755,2570.288,ms/op
-BfsPregelBenchmark.pregelBfsParent,4,16,100,300000,0,avgt,5,2795.676,968.292,ms/op
-BfsPregelBenchmark.pregelBfsParent,4,128,100,300000,0,avgt,5,720.150,158.523,ms/op
+BfsPregelBenchmark.pregelBfsLevel,4,1,100,300000,0,avgt,5,127.080,62.067,ms/op
+BfsPregelBenchmark.pregelBfsLevel,4,8,100,300000,0,avgt,5,93.130,11.481,ms/op
+BfsPregelBenchmark.pregelBfsParent,4,1,100,300000,0,avgt,5,616.241,82.909,ms/op
+BfsPregelBenchmark.pregelBfsParent,4,8,100,300000,0,avgt,5,547.655,55.572,ms/op
 BfsEjmlBenchmark.ejmlDenseBfsBoolean,4,1,100,3000000,0,avgt,5,2014.523,399.629,ms/op
 BfsEjmlBenchmark.ejmlDenseBfsLevel,4,1,100,3000000,0,avgt,5,2157.170,142.307,ms/op
 BfsEjmlBenchmark.ejmlDenseBfsParent,4,1,100,3000000,0,avgt,5,1809.729,454.566,ms/op
@@ -20,4 +17,8 @@ BfsEjmlBenchmark.ejmlSparseBfsBoolean,4,1,100,3000000,0,avgt,5,3821.149,276.959,
 BfsEjmlBenchmark.ejmlSparseBfsLevel,4,1,100,3000000,0,avgt,5,3696.285,275.459,ms/op
 BfsEjmlBenchmark.ejmlSparseBfsParent,4,1,100,3000000,0,avgt,5,3307.009,128.291,ms/op
 BfsEjmlBenchmark.gdsBfsTraverse,4,1,100,3000000,0,avgt,5,40.403,34.166,ms/op
+BfsPregelBenchmark.pregelBfsLevel,4,1,100,3000000,0,avgt,5,1072.732,820.411,ms/op
+BfsPregelBenchmark.pregelBfsLevel,4,8,100,3000000,0,avgt,5,404.297,90.912,ms/op
+BfsPregelBenchmark.pregelBfsParent,4,1,100,3000000,0,avgt,5,5563.408,2890.606,ms/op
+BfsPregelBenchmark.pregelBfsParent,4,8,100,3000000,0,avgt,5,4438.770,1055.983,ms/op
 
