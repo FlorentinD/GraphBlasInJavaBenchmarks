@@ -4,3 +4,4 @@
 /src/main/generated/org/florentind/core/ejml/
 /out/
 /.jqwik-database
+/venv/
