@@ -38,7 +38,7 @@ def grouped_barplot(df, categorie, hueColumn, valueColumn, err):
     x = np.arange(len(u))
     subx = df[hueColumn].unique()
     offsets = (np.arange(len(subx)) - np.arange(len(subx)).mean()) / (len(subx) + 1.)
-    if (len(subx) > 1) :
+    if len(subx) > 1:
         width = np.diff(offsets).mean()
     else:
         width = 0.8
@@ -59,10 +59,9 @@ def grouped_barplot(df, categorie, hueColumn, valueColumn, err):
 for variant in bfsVariants:
     # get meta info like units, mode, avg-degree ...
     # TODO: get actual run iterations somehow as an info (know for bfs ca. 37 for 300k nodes graph
-    title = "{}-Bfs with a random power-law graph \n of {} nodes and an avg-degree of {} using the {} of {}".format(
-        variant.BfsVariant.iloc[0], variant.nodeCount.iloc[0],
-        variant.avgDegree.iloc[0], variant.Mode.iloc[0],
-        variant.Cnt.iloc[0]
+    title = "{}-Bfs with a random power-law graph \n with an average degree of {} using the {} of {}".format(
+        variant.BfsVariant.iloc[0], variant.avgDegree.iloc[0],
+        variant.Mode.iloc[0], variant.Cnt.iloc[0]
     )
 
     barplot = grouped_barplot(variant, "nodeCount", "Name", "Score", "Error")
