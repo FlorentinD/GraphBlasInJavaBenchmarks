@@ -12,7 +12,7 @@ import org.openjdk.jmh.annotations.Param;
 
 // TODO: converter from EJML-Graph to JNI-Graph
 public class PageRankBaseBenchmark extends EjmlGraphBaseBenchmark {
-    @Param({"3000000"})
+    @Param({"300000", "3000000"})
     int nodeCount;
 
     @Param({"4"})
@@ -20,7 +20,7 @@ public class PageRankBaseBenchmark extends EjmlGraphBaseBenchmark {
 
 
     // TODO: scale maxIterations (! need to make sure none terminates earlier .. f.i. via a high tolerance)
-    @Param({"10"})
+    @Param({"20"})
     protected int maxIterations;
 
     @Param({"0.85"})

@@ -55,12 +55,12 @@ public class PageRankGdsBenchmark extends PageRankBaseBenchmark {
     // TODO: add tolerance feature to Pregel (otherwise Pregel has an advantage)
     // TODO: also normalize result as in ejml version done automatically?
     @org.openjdk.jmh.annotations.Benchmark
-    public void pregelPageRank(Blackhole bh) {
+    public void pregel(Blackhole bh) {
         bh.consume(pregel.run());
     }
 
     @org.openjdk.jmh.annotations.Benchmark
-    public void computeUnweighted(Blackhole bh) {
+    public void gdsUnweighted(Blackhole bh) {
         PageRank algorithm = new PageRankFactory<>().build(
                 graph,
                 unweightedConfig,
