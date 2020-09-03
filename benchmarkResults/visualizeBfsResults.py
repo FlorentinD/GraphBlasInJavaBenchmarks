@@ -1,5 +1,6 @@
 # visualizing jmh benchmark results
 
+# TODO generalize for other results (e.g. config dictionary and methods)
 
 # read csv
 import pandas as pd
@@ -27,33 +28,7 @@ bfsVariants = [gb.get_group(x) for x in gb.groups]
 
 # import seaborn as sns
 import matplotlib.pyplot as plt
-import numpy as np
-
-
-# for plotting the error
-# https://stackoverflow.com/questions/42017049/seaborn-how-to-add-error-bars-on-a-grouped-barplot
-# + small bug fix if only one sub-categorie exists
-def grouped_barplot(df, categorie, hueColumn, valueColumn, err):
-    u = df[categorie].unique()
-    x = np.arange(len(u))
-    subx = df[hueColumn].unique()
-    offsets = (np.arange(len(subx)) - np.arange(len(subx)).mean()) / (len(subx) + 1.)
-    if len(subx) > 1:
-        width = np.diff(offsets).mean()
-    else:
-        width = 0.8
-    for i, gr in enumerate(subx):
-        dfg = df[df[hueColumn] == gr]
-        plt.bar(x + offsets[i],
-                dfg[valueColumn].values,
-                width=width,
-                label=gr,
-                yerr=dfg[err].values)
-    plt.xlabel(categorie)
-    plt.ylabel("Time in {}".format(variant.Units.iloc[0]))
-    plt.xticks(x, u)
-    plt.legend(loc="upper left")
-    return plt
+from benchmarkResults.helper import grouped_barplot
 
 
 for variant in bfsVariants:
@@ -64,7 +39,8 @@ for variant in bfsVariants:
         variant.Mode.iloc[0], variant.Cnt.iloc[0]
     )
 
-    barplot = grouped_barplot(variant, "nodeCount", "Name", "Score", "Error")
+    fig, ax = plt.subplots()
+    barplot = grouped_barplot(variant, "nodeCount", "Name", "Score", "Error", ax)
     barplot.title(title)
 
     # sns approach fails to easily plot pre-aggregated error

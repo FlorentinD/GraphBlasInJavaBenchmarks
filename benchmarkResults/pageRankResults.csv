@@ -1,0 +1,11 @@
+Benchmark,avgDegree,concurrency,dampingFactor,maxIterations,nodeCount,tolerance,Mode,Cnt,Score,Error,Units
+pageRank.PageRankEjmlBenchmark.ejml,4,N/A,0.85,20,300000,1e-7,avgt,5,104.653,0.761,ms/op
+pageRank.PageRankEjmlBenchmark.ejml,4,N/A,0.85,20,3000000,1e-7,avgt,5,2282.721,68.831,ms/op
+pageRank.PageRankGdsBenchmark.gds,4,1,0.85,20,300000,1e-7,avgt,5,177.016,19.732,ms/op
+pageRank.PageRankGdsBenchmark.gds,4,1,0.85,20,3000000,1e-7,avgt,5,1525.661,335.097,ms/op
+pageRank.PageRankGdsBenchmark.gds,4,8,0.85,20,300000,1e-7,avgt,5,151.927,24.833,ms/op
+pageRank.PageRankGdsBenchmark.gds,4,8,0.85,20,3000000,1e-7,avgt,5,953.617,355.506,ms/op
+pageRank.PageRankGdsBenchmark.pregel,4,1,0.85,20,300000,1e-7,avgt,5,3009.242,212.604,ms/op
+pageRank.PageRankGdsBenchmark.pregel,4,1,0.85,20,3000000,1e-7,avgt,5,30932.545,1698.259,ms/op
+pageRank.PageRankGdsBenchmark.pregel,4,8,0.85,20,300000,1e-7,avgt,5,1951.915,98.072,ms/op
+pageRank.PageRankGdsBenchmark.pregel,4,8,0.85,20,3000000,1e-7,avgt,5,17567.936,1517.023,ms/op
