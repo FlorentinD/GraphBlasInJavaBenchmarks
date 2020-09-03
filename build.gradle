@@ -86,7 +86,7 @@ jmh {
     zip64 = true
     forceGC = true
     // regExp which benchmarks to run
-    include = ['.*pregelPageRank.*']
+    include = ['.*pageRank.PageRank.*']
     duplicateClassesStrategy = 'warn'
 
     // ! increase -Xmx and set -Xms to equal value on server if needed .. f.i. "-Xmx32g"
