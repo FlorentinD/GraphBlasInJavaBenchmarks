@@ -5,6 +5,7 @@ import org.ejml.sparse.csc.graphAlgos.Bfs_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphalgo.api.Graph;
+import org.neo4j.graphalgo.api.schema.NodeSchema;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.PregelComputation;
 import org.neo4j.graphalgo.beta.pregel.bfs.BFSLevelPregel;
@@ -39,7 +40,7 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
     @Test
     void testPregel() {
         GraphDimensions dim = ImmutableGraphDimensions.builder().nodeCount(NODE_COUNT).maxRelCount(4 * NODE_COUNT).build();
-        System.out.println("memoryEstimation = " + Pregel.memoryEstimation().estimate(dim, 4).render());
+        System.out.println("memoryEstimation = " + Pregel.memoryEstimation(new BFSLevelPregel().nodeSchema()).estimate(dim, 4).render());
 
         var result = getPregelResult(graph, Bfs_DSCC.BfsVariation.LEVEL, 0);
         // ranIteration includes initIteration
