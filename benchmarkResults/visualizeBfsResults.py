@@ -34,7 +34,7 @@ from benchmarkResults.helper import grouped_barplot
 for variant in bfsVariants:
     # get meta info like units, mode, avg-degree ...
     # TODO: get actual run iterations somehow as an info (know for bfs ca. 37 for 300k nodes graph
-    title = "{}-Bfs with a random power-law graph \n with an average degree of {} using the {} of {}".format(
+    title = "{}-Bfs on a random power-law graph \n with an average degree of {} using the {} of {}".format(
         variant.BfsVariant.iloc[0], variant.avgDegree.iloc[0],
         variant.Mode.iloc[0], variant.Cnt.iloc[0]
     )
