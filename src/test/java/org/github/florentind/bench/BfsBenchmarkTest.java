@@ -1,11 +1,10 @@
 package org.github.florentind.bench;
 
 import org.ejml.sparse.csc.CommonOps_DSCC;
-import org.ejml.sparse.csc.graphAlgos.Bfs_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
+import org.github.florentind.graphalgos.bfs.BfsEjml;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphalgo.api.Graph;
-import org.neo4j.graphalgo.api.schema.NodeSchema;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.PregelComputation;
 import org.neo4j.graphalgo.beta.pregel.bfs.BFSLevelPregel;
@@ -14,7 +13,6 @@ import org.neo4j.graphalgo.beta.pregel.bfs.BFSPregelConfig;
 import org.neo4j.graphalgo.beta.pregel.bfs.ImmutableBFSPregelConfig;
 import org.neo4j.graphalgo.core.GraphDimensions;
 import org.neo4j.graphalgo.core.ImmutableGraphDimensions;
-import org.neo4j.graphalgo.core.concurrency.ParallelUtil;
 import org.neo4j.graphalgo.core.concurrency.Pools;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.neo4j.graphalgo.core.utils.paged.HugeLongArray;
@@ -42,7 +40,7 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
         GraphDimensions dim = ImmutableGraphDimensions.builder().nodeCount(NODE_COUNT).maxRelCount(4 * NODE_COUNT).build();
         System.out.println("memoryEstimation = " + Pregel.memoryEstimation(new BFSLevelPregel().nodeSchema()).estimate(dim, 4).render());
 
-        var result = getPregelResult(graph, Bfs_DSCC.BfsVariation.LEVEL, 0);
+        var result = getPregelResult(graph, BfsEjml.BfsVariation.LEVEL, 0);
         // ranIteration includes initIteration
         System.out.println("result.ranIterations() = " + result.ranIterations());
     }
@@ -51,7 +49,7 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
     void pregelEqualsEjmlResult() {
         int startNode = 0;
         // TODO: see why PARENTS variation is not equal
-        Bfs_DSCC.BfsVariation variation = Bfs_DSCC.BfsVariation.LEVEL;
+        BfsEjml.BfsVariation variation = BfsEjml.BfsVariation.LEVEL;
         EjmlGraph ejmlGraph = EjmlGraph.create(graph);
         assertResultEquals(
                 getEjmlResult(ejmlGraph, variation, true, startNode),
@@ -60,9 +58,9 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
         );
     }
 
-    private void assertResultEquals(Bfs_DSCC.BfsResult ejmlResult, Pregel.PregelResult pregelResult, Bfs_DSCC.BfsVariation variation) {
+    private void assertResultEquals(BfsEjml.BfsResult ejmlResult, Pregel.PregelResult pregelResult, BfsEjml.BfsVariation variation) {
         assertEquals(ejmlResult.iterations(), pregelResult.ranIterations() - 1);
-        String propertyKey = (variation == Bfs_DSCC.BfsVariation.LEVEL) ? BFSLevelPregel.LEVEL : BFSParentPregel.PARENT;
+        String propertyKey = (variation == BfsEjml.BfsVariation.LEVEL) ? BFSLevelPregel.LEVEL : BFSParentPregel.PARENT;
         HugeLongArray pregelResultValues = pregelResult.nodeValues().longProperties(propertyKey);
 
         for (int i = 0; i < NODE_COUNT; i++) {
@@ -84,7 +82,7 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
     }
 
 
-    private Pregel.PregelResult getPregelResult(Graph graph, Bfs_DSCC.BfsVariation variation, int startNode) {
+    private Pregel.PregelResult getPregelResult(Graph graph, BfsEjml.BfsVariation variation, int startNode) {
         BFSPregelConfig config = ImmutableBFSPregelConfig.builder()
                 .maxIterations(MAX_ITERATIONS)
                 .startNode(startNode)
@@ -114,12 +112,12 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
         return bfsLevelJob.run();
     }
 
-    private Bfs_DSCC.BfsResult getEjmlResult(EjmlGraph ejmlGraph, Bfs_DSCC.BfsVariation variation, boolean sparse, int startNode) {
+    private BfsEjml.BfsResult getEjmlResult(EjmlGraph ejmlGraph, BfsEjml.BfsVariation variation, boolean sparse, int startNode) {
         var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
         if (sparse) {
-            return new Bfs_DSCC().computeSparse(unTransposedMatrix, variation, new int[]{startNode}, MAX_ITERATIONS);
+            return new BfsEjml().computeSparse(unTransposedMatrix, variation, new int[]{startNode}, MAX_ITERATIONS);
         } else {
-            return new Bfs_DSCC().computeDense(unTransposedMatrix, variation, startNode, MAX_ITERATIONS);
+            return new BfsEjml().computeDense(unTransposedMatrix, variation, startNode, MAX_ITERATIONS);
         }
     }
 }

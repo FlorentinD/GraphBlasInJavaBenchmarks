@@ -1,7 +1,6 @@
 package org.github.florentind.bench.bfs;
 
-
-import org.ejml.sparse.csc.graphAlgos.Bfs_DSCC;
+import org.github.florentind.graphalgos.bfs.BfsEjml;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.infra.Blackhole;
@@ -12,7 +11,7 @@ public class BfsEjmlBenchmark extends BfsBaseBenchmark {
     private int concurrency;
 
 
-// FIXME enable when bfs bug is fixed
+// FIXME enable when bfs bug is fixed ( and result is comparable)
 
 //    @org.openjdk.jmh.annotations.Benchmark
 //    public void gdsBfsTraverse(Blackhole bh) {
@@ -25,34 +24,34 @@ public class BfsEjmlBenchmark extends BfsBaseBenchmark {
     @Benchmark
     public void ejmlSparseBfsBoolean(Blackhole bh) {
         int[] startNodes = {startNode};
-        bh.consume(new Bfs_DSCC().computeSparse(matrix, Bfs_DSCC.BfsVariation.BOOLEAN, startNodes, maxIterations));
+        bh.consume(new BfsEjml().computeSparse(matrix, BfsEjml.BfsVariation.BOOLEAN, startNodes, maxIterations));
     }
 
     @Benchmark
     public void ejmlSparseBfsLevel(Blackhole bh) {
         int[] startNodes = {startNode};
-        bh.consume(new Bfs_DSCC().computeSparse(matrix, Bfs_DSCC.BfsVariation.LEVEL, startNodes, maxIterations));
+        bh.consume(new BfsEjml().computeSparse(matrix, BfsEjml.BfsVariation.LEVEL, startNodes, maxIterations));
     }
 
     @org.openjdk.jmh.annotations.Benchmark
     public void ejmlSparseBfsParent(Blackhole bh) {
         int[] startNodes = {startNode};
-        bh.consume(new Bfs_DSCC().computeSparse(matrix, Bfs_DSCC.BfsVariation.PARENTS, startNodes, maxIterations));
+        bh.consume(new BfsEjml().computeSparse(matrix, BfsEjml.BfsVariation.PARENTS, startNodes, maxIterations));
     }
 
     @org.openjdk.jmh.annotations.Benchmark
     public void ejmlDenseBfsBoolean(Blackhole bh) {
-        bh.consume(new Bfs_DSCC().computeDense(matrix, Bfs_DSCC.BfsVariation.BOOLEAN, startNode, maxIterations));
+        bh.consume(new BfsEjml().computeDense(matrix, BfsEjml.BfsVariation.BOOLEAN, startNode, maxIterations));
     }
 
     @org.openjdk.jmh.annotations.Benchmark
     public void ejmlDenseBfsLevel(Blackhole bh) {
-        bh.consume(new Bfs_DSCC().computeDense(matrix, Bfs_DSCC.BfsVariation.LEVEL, startNode, maxIterations));
+        bh.consume(new BfsEjml().computeDense(matrix, BfsEjml.BfsVariation.LEVEL, startNode, maxIterations));
     }
 
     @org.openjdk.jmh.annotations.Benchmark
     public void ejmlDenseBfsParent(Blackhole bh) {
-        bh.consume(new Bfs_DSCC().computeDense(matrix, Bfs_DSCC.BfsVariation.PARENTS, startNode, maxIterations));
+        bh.consume(new BfsEjml().computeDense(matrix, BfsEjml.BfsVariation.PARENTS, startNode, maxIterations));
     }
 
     // TODO add MSBFS benchmark

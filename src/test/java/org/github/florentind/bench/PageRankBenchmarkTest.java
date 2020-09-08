@@ -3,8 +3,8 @@ package org.github.florentind.bench;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.ejml.sparse.csc.CommonOps_DSCC;
-import org.ejml.sparse.csc.graphAlgos.PageRank_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
+import org.github.florentind.graphalgos.pageRank.PageRankEjml;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PageRankBenchmarkTest extends BaseBenchmarkTest {
     private static final int NODE_COUNT = 300_000;
-    private static final int MAX_ITERATIONS = 10;
+    private static final int MAX_ITERATIONS = 20;
     private static final double DAMPING_FACTOR = 0.85;
     private static final double TOLERANCE = 1e-7;
     private static final int CONCURRENCY = 1;
@@ -46,8 +46,8 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
     void testPregel() {
         var result = getPregelResult();
 
-        System.out.println("result.ranIterations() = " + result.getLeft());
-        System.out.println("statistics = " + Arrays.stream(result.getRight()).summaryStatistics());
+//        System.out.println("result.ranIterations() = " + result.getLeft());
+//        System.out.println("statistics = " + Arrays.stream(result.getRight()).summaryStatistics());
     }
 
     @Disabled
@@ -64,8 +64,8 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
     void testEjml() {
         var result = getEjmlResult();
 
-        System.out.println("result.iterations() = " + result.getMiddle());
-        System.out.println("statistics = " + Arrays.stream(result.getRight()).summaryStatistics());
+//        System.out.println("result.iterations() = " + result.getMiddle());
+//        System.out.println("statistics = " + Arrays.stream(result.getRight()).summaryStatistics());
     }
 
     @Test
@@ -86,7 +86,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
         EjmlGraph ejmlGraph = EjmlGraph.create(graph);
         var adjacencyMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
 
-        var result = new PageRank_DSCC().compute(adjacencyMatrix, DAMPING_FACTOR, TOLERANCE, MAX_ITERATIONS);
+        var result = new PageRankEjml().compute(adjacencyMatrix, DAMPING_FACTOR, TOLERANCE, MAX_ITERATIONS);
 
         return new ImmutableTriple<>("ejml", result.iterations(), result.result());
     }

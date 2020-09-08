@@ -1,7 +1,7 @@
 package org.github.florentind.bench.pageRank;
 
 
-import org.ejml.sparse.csc.graphAlgos.PageRank_DSCC;
+import org.github.florentind.graphalgos.pageRank.PageRankEjml;
 import org.openjdk.jmh.infra.Blackhole;
 
 public class PageRankEjmlBenchmark extends PageRankBaseBenchmark {
@@ -10,6 +10,6 @@ public class PageRankEjmlBenchmark extends PageRankBaseBenchmark {
 
     @org.openjdk.jmh.annotations.Benchmark
     public void ejml(Blackhole bh) {
-        bh.consume(new PageRank_DSCC().compute(matrix, dampingFactor, tolerance, maxIterations));
+        bh.consume(new PageRankEjml().compute(matrix, dampingFactor, tolerance, maxIterations));
     }
 }
