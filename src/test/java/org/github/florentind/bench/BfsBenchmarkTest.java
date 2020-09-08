@@ -3,6 +3,7 @@ package org.github.florentind.bench;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
 import org.github.florentind.graphalgos.bfs.BfsEjml;
+import org.github.florentind.graphalgos.bfs.BfsResult;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphalgo.api.Graph;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
@@ -58,7 +59,7 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
         );
     }
 
-    private void assertResultEquals(BfsEjml.BfsResult ejmlResult, Pregel.PregelResult pregelResult, BfsEjml.BfsVariation variation) {
+    private void assertResultEquals(BfsResult ejmlResult, Pregel.PregelResult pregelResult, BfsEjml.BfsVariation variation) {
         assertEquals(ejmlResult.iterations(), pregelResult.ranIterations() - 1);
         String propertyKey = (variation == BfsEjml.BfsVariation.LEVEL) ? BFSLevelPregel.LEVEL : BFSParentPregel.PARENT;
         HugeLongArray pregelResultValues = pregelResult.nodeValues().longProperties(propertyKey);
@@ -112,7 +113,7 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
         return bfsLevelJob.run();
     }
 
-    private BfsEjml.BfsResult getEjmlResult(EjmlGraph ejmlGraph, BfsEjml.BfsVariation variation, boolean sparse, int startNode) {
+    private BfsResult getEjmlResult(EjmlGraph ejmlGraph, BfsEjml.BfsVariation variation, boolean sparse, int startNode) {
         var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
         if (sparse) {
             return new BfsEjml().computeSparse(unTransposedMatrix, variation, new int[]{startNode}, MAX_ITERATIONS);

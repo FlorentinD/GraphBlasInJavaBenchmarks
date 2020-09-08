@@ -18,25 +18,29 @@
 
 package org.github.florentind.graphalgos.bfs;
 
+import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.ejml.EjmlUnitTests;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.DMatrixSparseCSC;
+import org.github.florentind.core.grapblas_native.EjmlToNativeMatrixConverter;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.nio.Buffer;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static org.github.florentind.graphalgos.bfs.BfsEjml.BfsResult;
 import static org.github.florentind.graphalgos.bfs.BfsEjml.BfsVariation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings({"UnusedMethod"})
 public class BfsTest {
+    private static final int EXPECTED_ITERATIONS = 3;
     DMatrixSparseCSC inputMatrix;
 
     BfsEjml bfs = new BfsEjml();
@@ -78,7 +82,7 @@ public class BfsTest {
 
         DMatrixRMaj expectedMatrix = new DMatrixRMaj(1, inputMatrix.numCols, true, expected);
 
-        assertEquals(result.iterations(), 3);
+        assertEquals(EXPECTED_ITERATIONS, result.iterations());
         EjmlUnitTests.assertEquals(expectedMatrix, result.result());
     }
 
@@ -90,7 +94,7 @@ public class BfsTest {
 
         BfsEjml.BfsDenseResult result = bfs.computeDense(inputMatrix, variation, startNode, maxIterations);
 
-        assertEquals(result.iterations(), 3);
+        assertEquals(EXPECTED_ITERATIONS, result.iterations());
         assertTrue(Arrays.equals(expected, result.result()));
     }
 
@@ -103,5 +107,20 @@ public class BfsTest {
 
         assertEquals(denseIt.iterations(), sparseIt.iterations());
         assertEquals(denseIt.nodesVisited(), sparseIt.nodesVisited());
+    }
+
+    // FIXME
+    @Disabled
+    @Test
+    public void testNativeBfs() {
+        GRBCORE.initNonBlocking();
+
+        Buffer nativeMatrix = EjmlToNativeMatrixConverter.convert(inputMatrix);
+
+        var result = new BfsNative().computeLevel(nativeMatrix, 0, 6);
+
+        GRBCORE.freeMatrix(nativeMatrix);
+
+        assertEquals(EXPECTED_ITERATIONS, result.iterations());
     }
 }

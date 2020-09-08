@@ -171,14 +171,6 @@ public class BfsEjml {
         BOOLEAN, PARENTS, LEVEL
     }
 
-    public interface BfsResult {
-        int iterations();
-
-        int nodesVisited();
-
-        double get(int nodeId);
-    }
-
     // TODO move into extra file
     public class BfsSparseResult implements BfsResult {
         private final DMatrixSparseCSC result;

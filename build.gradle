@@ -35,6 +35,8 @@ dependencies {
 
 
     compileOnly         group: 'org.ejml',                 name: 'ejml-all',        version: ver.ejml
+    // TODO: this is also locally installed !
+    implementation      group: 'com.github.fabianmurariu',  name: 'graphblas-java-native',   version: '0.1.14'
     implementation      group: 'org.neo4j.gds',            name: 'core',            version: ver.gds
     // TODO: find out why this is needed for the benchmarks
     implementation      group: 'org.neo4j.gds',            name: 'test-utils',      version: ver.gds
