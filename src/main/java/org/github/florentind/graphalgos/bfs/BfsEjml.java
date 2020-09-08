@@ -82,8 +82,7 @@ public class BfsEjml {
                 }
             }
 
-            // FIXME: avoid cloning .. change combine method that writes into the initialResult
-            result = MaskUtil_DSCC.combineOutputs(result, iterationResult.clone(), mask, null);
+            result = MaskUtil_DSCC.combineOutputs(result, iterationResult, mask, null);
 
             isFixPoint = (visitedNodes == prevVisitedNodes) || (visitedNodes == adjacencyMatrix.numCols);
         }
