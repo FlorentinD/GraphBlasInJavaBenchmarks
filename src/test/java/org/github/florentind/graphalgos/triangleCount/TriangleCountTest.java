@@ -50,7 +50,7 @@ public class TriangleCountTest {
     @ValueSource(booleans = {true, false})
     public void triangleCountNodeWise(boolean useLowerTriangle) {
         // FIX version with lower triangle
-        double[] result = TriangleCountEjml.computeNodeWise(inputMatrix, useLowerTriangle);
+        double[] result = TriangleCountEjml.computeNodeWise(inputMatrix, useLowerTriangle).result;
 
         double[] expected = {1, 3, 2, 4, 1, 1, 3};
 
