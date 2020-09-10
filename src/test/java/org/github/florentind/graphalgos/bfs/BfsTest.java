@@ -24,7 +24,6 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.DMatrixSparseCSC;
 import org.github.florentind.core.grapblas_native.EjmlToNativeMatrixConverter;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -80,10 +79,8 @@ public class BfsTest {
         int maxIterations = 20;
         BfsEjml.BfsSparseResult result = bfs.computeSparse(inputMatrix, variation, startNodes, maxIterations);
 
-        DMatrixRMaj expectedMatrix = new DMatrixRMaj(1, inputMatrix.numCols, true, expected);
-
+        assertBfsResult(expected, result);
         assertEquals(EXPECTED_ITERATIONS, result.iterations());
-        EjmlUnitTests.assertEquals(expectedMatrix, result.result());
     }
 
     @ParameterizedTest
@@ -92,10 +89,10 @@ public class BfsTest {
         int startNode = 0;
         int maxIterations = 20;
 
-        BfsEjml.BfsDenseResult result = bfs.computeDense(inputMatrix, variation, startNode, maxIterations);
+        var result = bfs.computeDense(inputMatrix, variation, startNode, maxIterations);
 
+        assertBfsResult(expected, result);
         assertEquals(EXPECTED_ITERATIONS, result.iterations());
-        assertTrue(Arrays.equals(expected, result.result()));
     }
 
     @Test
@@ -109,8 +106,6 @@ public class BfsTest {
         assertEquals(denseIt.nodesVisited(), sparseIt.nodesVisited());
     }
 
-    // FIXME
-    @Disabled
     @Test
     public void testNativeBfs() {
         GRBCORE.initNonBlocking();
@@ -121,6 +116,15 @@ public class BfsTest {
 
         GRBCORE.freeMatrix(nativeMatrix);
 
-        assertEquals(EXPECTED_ITERATIONS, result.iterations());
+        // only level variant implemented atm
+        assertBfsResult(new double[]{1, 2, 3, 2, 3, 4, 3}, result);
+        // as the result is set at the beginning of each iteration
+        assertEquals(EXPECTED_ITERATIONS + 1, result.iterations());
+    }
+
+    private void assertBfsResult(double[] expected, BfsResult result) {
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i], result.get(i), "Different result at " + i);
+        }
     }
 }

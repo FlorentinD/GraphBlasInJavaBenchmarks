@@ -18,6 +18,8 @@ import java.util.Arrays;
 
 // variants: boolean/parents/level/multi-bfs  + sparse/dense result vector
 public class BfsEjml {
+    // TODO: version that uses the same operators as used in graphblas (probably using dense vectors .. as easier)
+    //          f.i. fixPoint recognized using reduce with OR-monoid
 
     private static DSemiRing getSemiRing(BfsVariation variation) {
         return variation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : DSemiRings.OR_AND;

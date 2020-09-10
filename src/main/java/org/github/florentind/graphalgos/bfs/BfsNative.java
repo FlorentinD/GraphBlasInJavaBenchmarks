@@ -13,7 +13,7 @@ import static org.github.florentind.core.grapblas_native.NativeVectorToString.in
  * implementation based on graphblas-java-native ops e.g. C magic
  */
 public class BfsNative {
-
+    // TODO  variable concurrency value
     // TODO: add tolerance parameter
     /**
      *  BFS based on based on https://github.com/DrTimothyAldenDavis/SuiteSparse/blob/master/GraphBLAS/Demo/Source/bfs5m.c
@@ -23,19 +23,18 @@ public class BfsNative {
         // assert adj-matrix to be in CSC
         assert GRBCORE.getFormat(adjacencyMatrix) == 1;
 
-        // GxB_DESCRIPTOR_NTHREADS use to set number of threads (is a global option -> can be set via GxB_set)
+        // TODO GxB_DESCRIPTOR_NTHREADS use to set number of threads (is a global option -> can be set via GxB_set .. not mapped yet)
         int concurrency = 1;
-
+        long status;
         long nodeCount = GRBCORE.nrows(adjacencyMatrix);
-
-        System.out.println("Matrix: \n" + doubleMatrixToString(adjacencyMatrix, Math.toIntExact(nodeCount)));
 
         // result vector
         Buffer resultVector = GRBCORE.createVector(GRAPHBLAS.intType(), nodeCount);
-
-        // TODO make result vector dense (optimization?)
-        // GrB_Vector_assign_INT32 (v, NULL, NULL, 0, GrB_ALL, n, NULL)
-        // for non-blocking mode:  GrB_Vector_nvals (&n, v) ;             // finish pending work on v
+        // make result vector dense
+        status = GRAPHBLAS.assignVectorInt(resultVector, null, null, 0, null, nodeCount, null);
+        assert status == GRBCORE.GrB_SUCCESS;
+        // finish pending work on v
+        GRBCORE.nvalsVector(resultVector);
 
         // queue vector
         Buffer queueVector = GRBCORE.createVector(GRAPHBLAS.booleanType(), nodeCount);
@@ -45,13 +44,6 @@ public class BfsNative {
         Buffer semiRing = GRBCORE.createSemiring(GRBMONOID.lorMonoid(), GRAPHBLAS.landBinaryOp());
 
         Buffer desc = GRBCORE.createDescriptor();
-        // TODO find a way to set: GRBCORE.GxB_DESCRIPTOR_NTHREADS concurrency
-        // according to user guide it should be via the descriptor field GxB_DESCRIPTOR_NTHREADS = GxB_NTHREADS
-        // see https://github.com/DrTimothyAldenDavis/SuiteSparse/blob/master/GraphBLAS/Source/GxB_Desc_set.c
-        // GRBCORE.setDescriptorValue(desc, GRBCORE.GxB_DESCRIPTOR_NTHREADS , concurrency);
-
-
-
         // invert the mask
         GRBCORE.setDescriptorValue(desc, GRBCORE.GrB_MASK ,GRBCORE.GrB_COMP);
         // clear q first
@@ -59,19 +51,17 @@ public class BfsNative {
 
 
         boolean successor = true;
-
-        int level = 0;
+        int level = 1;
 
         // BFS-traversal
         for (; successor && level < maxIterations; level++) {
-            // TODO translate vector-assign  .. resultVector<q> = level
             // v<q> = level, using vector assign with q as the mask
-            // GrB_Vector_assign_INT32 (v, q, NULL, level, GrB_ALL, n, NULL) ;
+            // no option to use GrB_ALL -> but ni = nodeCount leads to it being used
+            status = GRAPHBLAS.assignVectorInt(resultVector, queueVector, null, level, null, nodeCount, null);
+            assert status == GRBCORE.GrB_SUCCESS;
 
-            // TODO translate GrB_Vector_clear
-            // clear queue Vector .. eq GrB_Vector_clear(queueVector);
             // q<¬v> = q lor.land matrix
-            int status = GRBOPSMAT.vxm(queueVector, resultVector, null, semiRing, queueVector, adjacencyMatrix, desc);
+            status = GRBOPSMAT.vxm(queueVector, resultVector, null, semiRing, queueVector, adjacencyMatrix, desc);
             assert status == GRBCORE.GrB_SUCCESS;
 
             System.out.println("queueVector " + booleanVectorToString(queueVector, Math.toIntExact(nodeCount)));
@@ -84,17 +74,10 @@ public class BfsNative {
         }
 
         // output vector
-        // TODO just use values if we know its a dense vector?
         int[] values = new int[Math.toIntExact(nodeCount)];
         long[] indices = new long[Math.toIntExact(nodeCount)];
 
         GRAPHBLAS.extractVectorTuplesInt(resultVector, values, indices);
-
-        System.out.println("Id, Level");
-        for (int i = 0; i < nodeCount; i++) {
-            System.out.printf("%d , %d%n", indices[i],values[i]);
-        }
-
 
 
         // free c-allocated stuff
@@ -103,18 +86,17 @@ public class BfsNative {
         GRBCORE.freeDescriptor(desc);
         GRBCORE.freeSemiring(semiRing);
 
-        return new NativeSparseBfsResult(values, indices, level);
+        // just using values as we know its a dense vector
+        return new NativeBfsResult(values, level - 1);
     }
 
-    public class NativeSparseBfsResult implements BfsResult {
+    public class NativeBfsResult implements BfsResult {
         private final int[] values;
-        private final long[] indices;
         private final int iterations;
         private final int notFoundValue;
 
-        public NativeSparseBfsResult(int[] values, long[] indices, int iterations) {
+        public NativeBfsResult(int[] values, int iterations) {
             this.values = values;
-            this.indices = indices;
             this.iterations = iterations;
             // for now only LEVEL variant exists
             this.notFoundValue = 0;
@@ -133,12 +115,7 @@ public class BfsNative {
 
         @Override
         public double get(int nodeId) {
-            int index = Arrays.binarySearch(indices, nodeId);
-            if (index > 0) {
-                return values[index];
-            } else{
-                return notFoundValue;
-            }
+            return values[nodeId];
         }
     }
 }
