@@ -45,7 +45,7 @@ public class ConnectedComponentsBenchmarkTest extends BaseBenchmarkTest {
                 config,
                 new ConnectedComponentsPregel(),
                 Pools.DEFAULT,
-                AllocationTracker.EMPTY
+                AllocationTracker.empty()
         );
 
         var result = connectedComponentsJob.run();
@@ -62,7 +62,7 @@ public class ConnectedComponentsBenchmarkTest extends BaseBenchmarkTest {
                 ParallelUtil.DEFAULT_BATCH_SIZE,
                 config,
                 ProgressLogger.NULL_LOGGER,
-                AllocationTracker.EMPTY
+                AllocationTracker.empty()
         ).compute();
 
         System.out.println(result.setIdOf(NODE_COUNT - 1));

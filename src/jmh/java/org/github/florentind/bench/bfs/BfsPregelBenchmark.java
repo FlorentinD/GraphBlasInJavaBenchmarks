@@ -40,7 +40,7 @@ public class BfsPregelBenchmark extends BfsBaseBenchmark {
                 config,
                 new BFSLevelPregel(),
                 Pools.DEFAULT,
-                AllocationTracker.EMPTY
+                AllocationTracker.empty()
         );
 
         bfsParentJob = Pregel.create(
@@ -48,7 +48,7 @@ public class BfsPregelBenchmark extends BfsBaseBenchmark {
                 config,
                 new BFSParentPregel(),
                 Pools.DEFAULT,
-                AllocationTracker.EMPTY
+                AllocationTracker.empty()
         );
     }
 

@@ -38,7 +38,7 @@ public class PageRankBaseBenchmark extends EjmlGraphBaseBenchmark {
                 .averageDegree(avgDegree)
                 .seed(42L)
                 .aggregation(Aggregation.MAX)
-                .allocationTracker(AllocationTracker.EMPTY)
+                .allocationTracker(AllocationTracker.empty())
                 .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.YES)
                 .relationshipDistribution(RelationshipDistribution.POWER_LAW)
                 .build().generate();

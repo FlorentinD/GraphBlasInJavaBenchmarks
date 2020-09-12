@@ -53,7 +53,7 @@ public class WccGraphImplBenchmark extends GraphImplBaseBenchmark {
             Aggregation.MAX,
             Orientation.NATURAL,
             RandomGraphGeneratorConfig.AllowSelfLoops.YES,
-            AllocationTracker.EMPTY
+            AllocationTracker.empty()
         );
         return generator.generate();
     }
@@ -79,7 +79,7 @@ public class WccGraphImplBenchmark extends GraphImplBaseBenchmark {
         Wcc algorithm = new WccFactory<>().build(
             graph,
             unweightedConfig,
-            AllocationTracker.EMPTY,
+            AllocationTracker.empty(),
             NullLog.getInstance()
         );
 
@@ -91,7 +91,7 @@ public class WccGraphImplBenchmark extends GraphImplBaseBenchmark {
         Wcc algorithm = new WccFactory<>().build(
             graph,
             weightedConfig,
-            AllocationTracker.EMPTY,
+            AllocationTracker.empty(),
             NullLog.getInstance()
         );
 

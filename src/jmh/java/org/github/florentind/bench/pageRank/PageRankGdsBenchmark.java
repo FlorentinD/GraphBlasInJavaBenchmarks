@@ -48,7 +48,7 @@ public class PageRankGdsBenchmark extends PageRankBaseBenchmark {
                 config,
                 new PageRankPregel(),
                 Pools.DEFAULT,
-                AllocationTracker.EMPTY
+                AllocationTracker.empty()
         );
     }
 
@@ -64,7 +64,7 @@ public class PageRankGdsBenchmark extends PageRankBaseBenchmark {
         PageRank algorithm = new PageRankFactory<>().build(
                 graph,
                 unweightedConfig,
-                AllocationTracker.EMPTY,
+                AllocationTracker.empty(),
                 NullLog.getInstance()
         );
 

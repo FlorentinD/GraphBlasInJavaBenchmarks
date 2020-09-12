@@ -37,7 +37,7 @@ public class ConnectedComponentesPregelBenchmark extends BfsBaseBenchmark {
                 config,
                 new ConnectedComponentsPregel(),
                 Pools.DEFAULT,
-                AllocationTracker.EMPTY
+                AllocationTracker.empty()
         );
     }
 

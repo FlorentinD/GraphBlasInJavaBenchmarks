@@ -45,7 +45,7 @@ public class TriangleCountGraphImplBenchmark extends GraphImplBaseBenchmark {
             Aggregation.MAX,
             Orientation.NATURAL,
             RandomGraphGeneratorConfig.AllowSelfLoops.YES,
-            AllocationTracker.EMPTY
+            AllocationTracker.empty()
         );
         return generator.generate();
     }
@@ -65,7 +65,7 @@ public class TriangleCountGraphImplBenchmark extends GraphImplBaseBenchmark {
         IntersectingTriangleCount algorithm = new IntersectingTriangleCountFactory<>().build(
             graph,
             config,
-            AllocationTracker.EMPTY,
+            AllocationTracker.empty(),
             NullLog.getInstance()
         );
 

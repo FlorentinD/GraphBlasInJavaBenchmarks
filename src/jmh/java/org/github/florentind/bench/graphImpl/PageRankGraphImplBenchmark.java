@@ -50,7 +50,7 @@ public class PageRankGraphImplBenchmark extends GraphImplBaseBenchmark {
             Aggregation.MAX,
             Orientation.NATURAL,
             RandomGraphGeneratorConfig.AllowSelfLoops.YES,
-            AllocationTracker.EMPTY
+            AllocationTracker.empty()
         );
         return generator.generate();
     }
@@ -76,7 +76,7 @@ public class PageRankGraphImplBenchmark extends GraphImplBaseBenchmark {
         PageRank algorithm = new PageRankFactory<>().build(
             graph,
             unweightedConfig,
-            AllocationTracker.EMPTY,
+            AllocationTracker.empty(),
             NullLog.getInstance()
         );
 
@@ -88,7 +88,7 @@ public class PageRankGraphImplBenchmark extends GraphImplBaseBenchmark {
         PageRank algorithm = new PageRankFactory<>().build(
             graph,
             weightedConfig,
-            AllocationTracker.EMPTY,
+            AllocationTracker.empty(),
             NullLog.getInstance()
         );
 

@@ -119,7 +119,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
                 config,
                 computation,
                 Pools.DEFAULT,
-                AllocationTracker.EMPTY
+                AllocationTracker.empty()
         );
 
         var result = pageRankJob.run();

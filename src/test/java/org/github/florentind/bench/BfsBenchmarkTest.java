@@ -1,8 +1,11 @@
 package org.github.florentind.bench;
 
+import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
+import org.github.florentind.core.grapblas_native.EjmlToNativeMatrixConverter;
 import org.github.florentind.graphalgos.bfs.BfsEjml;
+import org.github.florentind.graphalgos.bfs.BfsNative;
 import org.github.florentind.graphalgos.bfs.BfsResult;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphalgo.api.Graph;
@@ -17,6 +20,8 @@ import org.neo4j.graphalgo.core.ImmutableGraphDimensions;
 import org.neo4j.graphalgo.core.concurrency.Pools;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.neo4j.graphalgo.core.utils.paged.HugeLongArray;
+
+import java.nio.Buffer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -37,17 +42,7 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
     }
 
     @Test
-    void testPregel() {
-        GraphDimensions dim = ImmutableGraphDimensions.builder().nodeCount(NODE_COUNT).maxRelCount(4 * NODE_COUNT).build();
-        System.out.println("memoryEstimation = " + Pregel.memoryEstimation(new BFSLevelPregel().nodeSchema()).estimate(dim, 4).render());
-
-        var result = getPregelResult(graph, BfsEjml.BfsVariation.LEVEL, 0);
-        // ranIteration includes initIteration
-        System.out.println("result.ranIterations() = " + result.ranIterations());
-    }
-
-    @Test
-    void pregelEqualsEjmlResult() {
+    void pregelEqualsEjmlEqualsJniResult() {
         int startNode = 0;
         // TODO: see why PARENTS variation is not equal
         BfsEjml.BfsVariation variation = BfsEjml.BfsVariation.LEVEL;
@@ -57,27 +52,33 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
                 getPregelResult(ejmlGraph, variation, startNode),
                 variation
         );
+
+        assertResultEquals(
+                getJniResult(ejmlGraph, variation, startNode),
+                getPregelResult(ejmlGraph, variation, startNode),
+                variation
+        );
     }
 
-    private void assertResultEquals(BfsResult ejmlResult, Pregel.PregelResult pregelResult, BfsEjml.BfsVariation variation) {
-        assertEquals(ejmlResult.iterations(), pregelResult.ranIterations() - 1);
+    private void assertResultEquals(BfsResult graphblasResult, Pregel.PregelResult pregelResult, BfsEjml.BfsVariation variation) {
+        assertEquals(graphblasResult.iterations(), pregelResult.ranIterations() - 1);
         String propertyKey = (variation == BfsEjml.BfsVariation.LEVEL) ? BFSLevelPregel.LEVEL : BFSParentPregel.PARENT;
         HugeLongArray pregelResultValues = pregelResult.nodeValues().longProperties(propertyKey);
 
         for (int i = 0; i < NODE_COUNT; i++) {
-            double ejmlValue = ejmlResult.get(i);
+            double graphblasValue = graphblasResult.get(i);
             switch (variation) {
                 case PARENTS:
                     // -1  for parent: ids have an offset of 1 for ejml as 0 would be false in the bool semi-ring
                 case LEVEL:
                     // -1 as for level: starts at 1 instead of 0 (and not found in pregel == -1)
-                    ejmlValue -= 1;
+                    graphblasValue -= 1;
                     break;
                 default:
                     throw new IllegalStateException("Not implemented: " + variation.name());
             }
 
-            assertEquals(ejmlValue, Double.valueOf(pregelResultValues.get(i)));
+            assertEquals(graphblasValue, Double.valueOf(pregelResultValues.get(i)));
         }
 
     }
@@ -107,7 +108,7 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
                 config,
                 computation,
                 Pools.DEFAULT,
-                AllocationTracker.EMPTY
+                AllocationTracker.empty()
         );
 
         return bfsLevelJob.run();
@@ -121,4 +122,19 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
             return new BfsEjml().computeDense(unTransposedMatrix, variation, startNode, MAX_ITERATIONS);
         }
     }
+
+    private BfsResult getJniResult(EjmlGraph ejmlGraph, BfsEjml.BfsVariation variation, int startNode) {
+        GRBCORE.initNonBlocking();
+
+        assert variation == BfsEjml.BfsVariation.LEVEL : "Not implemented ..";
+
+        var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
+
+        Buffer jniMatrix = EjmlToNativeMatrixConverter.convert(unTransposedMatrix);
+
+        var result = new BfsNative().computeLevel(jniMatrix, startNode, MAX_ITERATIONS);
+        GRBCORE.freeMatrix(jniMatrix);
+
+        return result;
+    };
 }
