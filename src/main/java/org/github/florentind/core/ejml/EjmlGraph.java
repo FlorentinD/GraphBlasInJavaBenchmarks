@@ -115,6 +115,12 @@ public final class EjmlGraph extends FilterGraph {
         return new EjmlGraphIntersect(transposedMatrix, maxDegree);
     }
 
+    // TODO: transfer this into the gds repo?
+    @Override
+    public RelationshipIntersect intersection() {
+        return this.intersection(9223372036854775807L);
+    }
+
     public DMatrixSparseCSC matrix() {
         return transposedMatrix;
     }
