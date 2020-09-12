@@ -64,13 +64,13 @@ public class BfsNative {
             status = GRBOPSMAT.vxm(queueVector, resultVector, null, semiRing, queueVector, adjacencyMatrix, desc);
             assert status == GRBCORE.GrB_SUCCESS;
 
-            System.out.println("queueVector " + booleanVectorToString(queueVector, Math.toIntExact(nodeCount)));
-            System.out.println("resultVector " + integerVectorToString(resultVector, Math.toIntExact(nodeCount)));
+//            System.out.println("queueVector " + booleanVectorToString(queueVector, Math.toIntExact(nodeCount)));
+//            System.out.println("resultVector " + integerVectorToString(resultVector, Math.toIntExact(nodeCount)));
 
             // successor = ||(q)
             successor = GRBALG.vectorReduceAllBoolean(false, null, GRBMONOID.lorMonoid(), queueVector, null);
 
-            System.out.println("successor = " + successor);
+//            System.out.println("successor = " + successor);
         }
 
         // output vector
