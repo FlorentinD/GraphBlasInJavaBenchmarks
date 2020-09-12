@@ -12,14 +12,25 @@ import com.github.fabianmurariu.unsafe.GRBCORE;
  */
 public class EjmlToNativeMatrixConverter {
 
+    public static Buffer convert(DMatrixSparseCSC matrix) {
+        // as ejml uses CSC
+        return convert(matrix, true);
+    }
     /**
      *
      * @param matrix Input matrix
+     * @param by_col true -> CSC matrix, else CSR matrix
      * @return Pointer to the GraphBLAS matrix object
      */
-    public static Buffer convert(DMatrixSparseCSC matrix) {
+    public static Buffer convert(DMatrixSparseCSC matrix, boolean by_col) {
         int nodeCount = matrix.numCols;
         assert matrix.numRows == nodeCount : "adjacency matrix has to be a square matrix";
+
+        if (by_col) {
+            GRBCORE.setGlobalInt(GRBCORE.GxB_FORMAT, GRBCORE.GxB_BY_COL);
+        } else {
+            GRBCORE.setGlobalInt(GRBCORE.GxB_FORMAT, GRBCORE.GxB_BY_ROW);
+        }
 
         int relCount = matrix.nz_length;
 
@@ -44,9 +55,6 @@ public class EjmlToNativeMatrixConverter {
 
         long statusCode = GRAPHBLAS.buildMatrixFromTuplesDouble(resultMatrix, rowIds, colIds, values, relCount, GRAPHBLAS.firstBinaryOpDouble());
         assert statusCode == GRBCORE.GrB_SUCCESS : "Status code was: " + statusCode;
-
-        // as ejml also uses CSC
-        GRBCORE.makeCSC(resultMatrix);
 
         return resultMatrix;
     }

@@ -13,7 +13,7 @@ import java.nio.Buffer;
 
 public class BfsNativeBenchmark extends BfsBaseBenchmark {
 
-    @Param({"-1"})
+    @Param({"1", "8"})
     private int concurrency;
 
     protected Buffer jniMatrix;
@@ -30,6 +30,8 @@ public class BfsNativeBenchmark extends BfsBaseBenchmark {
 
     @Benchmark
     public void jniBfsLevel(Blackhole bh) {
+        GRBCORE.setGlobalInt(GRBCORE.GxB_NTHREADS, concurrency);
+
         bh.consume(new BfsNative().computeLevel(jniMatrix, startNode, maxIterations));
     }
 
