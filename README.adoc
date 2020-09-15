@@ -1,5 +1,57 @@
-== GraphBLAS in Java Benchmarks
+= GraphBLAS in Java Benchmarks
 
 Master Thesis project comparing different graph-algorithms written in gds-pregel, gds and ejml.
 
 *Relies on local build ejml and gds*
+
+
+== Setting up the project
+
+=== Prerequisites
+
+* java (tested with openjdk 11.0.8 via sdkman)
+* mvn
+* git
+
+----
+# starting from this directory
+cd ..
+
+# ejml (my fork as not everythink is in the main-repo)
+git clone git@github.com:FlorentinD/ejml.git
+cd ejml/
+git checkout mask_rebased
+./gradlew autogenerate
+./gradlew install
+
+# SuiteSparse:Graphblas (make sure to install under `usr/local` f.i. via make gbinstall)
+git clone git@github.com:DrTimothyAldenDavis/SuiteSparse.git
+cd Suitesparse/
+sudo make gbinstall -j32 INSTALL=/usr/local/
+cd ..
+
+# graphblas-java-native (my fork, as I added some mappings which are not merged yet)
+git@github.com:FlorentinD/graphblas-java-native.git
+cd graphblas-java-native/
+# branch with newest commit
+git checkout mapGlobalOptions
+cd graphblas-java/
+# should not be needed to skip the tests .. (find problem)
+mvn clean install
+cd ..
+mvn clean install -Dgpg.skip
+cd ..
+
+# graph-data-science (at some point not depending on a local version anymore  ..)
+git clone git@github.com:neo4j/graph-data-science.git
+cd graph-data-science/
+./gradlew publishToMavenLocal
+
+
+# run benchmarks (exclude, include benchmarks via build.gradle)
+cd GraphBlasInJavaBenchmarks/
+./gradlew :jmh --no-daemon
+----
+
+
+
