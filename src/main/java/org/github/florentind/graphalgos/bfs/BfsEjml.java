@@ -21,6 +21,9 @@ public class BfsEjml {
     // TODO: version that uses the same operators as used in graphblas (probably using dense vectors .. as easier)
     //          f.i. fixPoint recognized using reduce with OR-monoid
 
+    // TODO use DSemiRing FIRST_AND instead of OR_AND (first has 1 as a default?) .. OR_FIRST as its just a boolean value thats interesting here
+    // .. hope for short circuit OR (or else write in eval part)
+
     private static DSemiRing getSemiRing(BfsVariation variation) {
         return variation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : DSemiRings.OR_AND;
     }

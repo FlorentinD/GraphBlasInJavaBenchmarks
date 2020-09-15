@@ -132,7 +132,7 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
 
         Buffer jniMatrix = EjmlToNativeMatrixConverter.convert(unTransposedMatrix);
 
-        var result = new BfsNative().computeLevel(jniMatrix, startNode, MAX_ITERATIONS);
+        var result = new BfsNative().computeLevel(jniMatrix, startNode, MAX_ITERATIONS, 1);
         GRBCORE.freeMatrix(jniMatrix);
 
         return result;

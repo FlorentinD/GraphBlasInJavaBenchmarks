@@ -112,9 +112,10 @@ public class BfsTest {
 
         Buffer nativeMatrix = EjmlToNativeMatrixConverter.convert(inputMatrix);
 
-        var result = new BfsNative().computeLevel(nativeMatrix, 0, 6);
+        var result = new BfsNative().computeLevel(nativeMatrix, 0, 6, 1);
 
         GRBCORE.freeMatrix(nativeMatrix);
+        GRBCORE.grbFinalize();
 
         // only level variant implemented atm
         assertBfsResult(new double[]{1, 2, 3, 2, 3, 4, 3}, result);

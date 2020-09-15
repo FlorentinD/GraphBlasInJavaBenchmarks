@@ -19,12 +19,12 @@ public class BfsNative {
      *  BFS based on based on https://github.com/DrTimothyAldenDavis/SuiteSparse/blob/master/GraphBLAS/Demo/Source/bfs5m.c
      *  @param adjacencyMatrix adjacency matrix in CSC format
      */
-    public BfsResult computeLevel(Buffer adjacencyMatrix, int startNode, int maxIterations) {
+    public BfsResult computeLevel(Buffer adjacencyMatrix, int startNode, int maxIterations, int concurrency) {
         // assert adj-matrix to be in CSC
-        assert GRBCORE.getFormat(adjacencyMatrix) == 1;
+        assert GRBCORE.getFormat(adjacencyMatrix) == GRBCORE.GxB_BY_COL;
 
-        // TODO GxB_DESCRIPTOR_NTHREADS use to set number of threads (is a global option -> can be set via GxB_set .. not mapped yet)
-        int concurrency = 1;
+        GRBCORE.setGlobalInt(GRBCORE.GxB_NTHREADS, concurrency);
+
         long status;
         long nodeCount = GRBCORE.nrows(adjacencyMatrix);
 
@@ -77,6 +77,8 @@ public class BfsNative {
         int[] values = new int[Math.toIntExact(nodeCount)];
         long[] indices = new long[Math.toIntExact(nodeCount)];
 
+        // make sure everything got written
+        GRBCORE.vectorWait(resultVector);
         GRAPHBLAS.extractVectorTuplesInt(resultVector, values, indices);
 
 

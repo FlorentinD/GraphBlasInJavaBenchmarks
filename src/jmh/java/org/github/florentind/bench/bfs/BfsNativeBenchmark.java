@@ -16,13 +16,23 @@ public class BfsNativeBenchmark extends BfsBaseBenchmark {
     @Param({"1", "8"})
     private int concurrency;
 
+    @Param({"true", "false"})
+    private boolean blockingMode;
+
     protected Buffer jniMatrix;
 
     @Setup
     public void setup() {
         super.setup();
 
-        GRBCORE.initNonBlocking();
+        if (blockingMode) {
+            // according to GraphBLAS only for debugging, but more resembles the ejml version
+            GRBCORE.initBlocking();
+        }else {
+            GRBCORE.initNonBlocking();
+        }
+
+        assert blockingMode == (GRBCORE.getGlobalInt(GRBCORE.GxB_MODE) == GRBCORE.GrB_BLOCKING);
 
         jniMatrix = EjmlToNativeMatrixConverter.convert(matrix);
     }
@@ -30,9 +40,7 @@ public class BfsNativeBenchmark extends BfsBaseBenchmark {
 
     @Benchmark
     public void jniBfsLevel(Blackhole bh) {
-        GRBCORE.setGlobalInt(GRBCORE.GxB_NTHREADS, concurrency);
-
-        bh.consume(new BfsNative().computeLevel(jniMatrix, startNode, maxIterations));
+        bh.consume(new BfsNative().computeLevel(jniMatrix, startNode, maxIterations, concurrency));
     }
 
     @TearDown
@@ -40,5 +48,6 @@ public class BfsNativeBenchmark extends BfsBaseBenchmark {
         super.tearDown();
 
         GRBCORE.freeMatrix(jniMatrix);
+        GRBCORE.grbFinalize();
     }
 }
