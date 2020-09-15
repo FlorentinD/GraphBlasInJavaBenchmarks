@@ -4,6 +4,8 @@ import org.github.florentind.core.ejml.EjmlGraph;
 import org.github.florentind.graphalgos.triangleCount.TriangleCountEjml;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.neo4j.graphalgo.Orientation;
 import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
 import org.neo4j.graphalgo.beta.generator.RelationshipDistribution;
@@ -15,12 +17,18 @@ import org.neo4j.graphalgo.triangle.ImmutableTriangleCountBaseConfig;
 import org.neo4j.graphalgo.triangle.IntersectingTriangleCountFactory;
 import org.neo4j.logging.NullLog;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * based on these test with a nodeCount of , I chose the following version:
+ * - nodeWise -> useMask = true (up to 5x faster for 300k graph)
+ * - global -> Sandia (instead of Cohen) .. Cohen seems to be faster for smaller graphs though ..
+ */
 public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
-// TODO: wait for fixed gds TriangleCount
 
     @Override
     long nodeCount() {
-        return 3000;
+        return 10_000;
     }
 
     @Override
@@ -29,6 +37,8 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
     }
 
     EjmlGraph ejmlGraph;
+
+    private static long expectedGlobalTriangles = 16182;
 
     // !! graph must be symmetric to properly work (and not have self-loops)
     @Override
@@ -47,10 +57,7 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
                 .build().generate();
 
 
-        //ejmlGraph = EjmlGraph.create(graph);
-
-        //ejmlGraph.matrix().createCoordinateIterator().forEachRemaining(v -> System.out.println(v.col + "," +  v.row));
-
+        ejmlGraph = EjmlGraph.create(graph);
     }
 
     @Test
@@ -61,42 +68,38 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
                 .build();
 
         var result = new IntersectingTriangleCountFactory<>()
-                .build(graph, config, AllocationTracker.empty(), NullLog.getInstance())
+                .build(ejmlGraph, config, AllocationTracker.empty(), NullLog.getInstance())
                 .compute();
 
 
-        System.out.println("result.globalTriangles() = " + result.globalTriangles());
-//
-//        System.out.println("single stuff:");
-//        for (int i = 0; i < nodeCount(); i++) {
-//            System.out.print(result.localTriangles().get(i) + ",");
-//        }
+        long globalTriangles = result.globalTriangles();
+        System.out.println("result.globalTriangles() = " + globalTriangles);
 
+        assertEquals(expectedGlobalTriangles, globalTriangles);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    public void testNodeWiseEjml(boolean useLowerTriangle) {
+        // ! no need to transpose as symmetric anyway
+        var result = TriangleCountEjml.computeNodeWise(ejmlGraph.matrix(), useLowerTriangle);
+
+        long globalTriangleCount = result.totalCount();
+        assertEquals(expectedGlobalTriangles, globalTriangleCount);
     }
 
     @Test
-    public void testEjml() {
-        ejmlGraph = EjmlGraph.create(graph);
+    public void testEjmlGlobalSandia() {
         // ! no need to transpose as symmetric anyway
-        //var matrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
+        long globalTriangleCount = (long) TriangleCountEjml.computeTotalSandia(ejmlGraph.matrix());
+        assertEquals(expectedGlobalTriangles, globalTriangleCount);
+    }
 
-        var result = TriangleCountEjml.computeNodeWise(ejmlGraph.matrix(), true);
-        //var globalCount = TriangleCountEjml.computeTotalSandia(ejmlGraph.matrix());
-
-        System.out.println("globalTriangles:" + result.totalCount());
-
-        System.out.println("single stuff");
-        for (int i = 0; i < nodeCount(); i++) {
-            System.out.print(result.get(i) + ",");
-        }
-
-        // TODO Triangle 0, 3, 6
-
-        System.out.println();
-        System.out.println("0->3:" + ejmlGraph.matrix().isAssigned(0, 3));
-        System.out.println("3->6:" + ejmlGraph.matrix().isAssigned(3, 6));
-        System.out.println("6->0:" + ejmlGraph.matrix().isAssigned(6, 0));
-
-        //System.out.println("globalCount = " + globalCount);
+    @Test
+    public void testEjmlGlobalCohen() {
+        // ! no need to transpose as symmetric anyway
+        // without a mask, this quickly OOMs
+        long globalTriangleCount = (long) TriangleCountEjml.computeTotalCohen(ejmlGraph.matrix(), true);
+        assertEquals(expectedGlobalTriangles, globalTriangleCount);
     }
 }
