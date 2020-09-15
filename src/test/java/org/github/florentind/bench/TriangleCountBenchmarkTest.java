@@ -1,7 +1,10 @@
 package org.github.florentind.bench;
 
 import org.github.florentind.core.ejml.EjmlGraph;
+import org.github.florentind.core.jgrapht.JGraphTConverter;
 import org.github.florentind.graphalgos.triangleCount.TriangleCountEjml;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphMetrics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -101,5 +104,13 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
         // without a mask, this quickly OOMs
         long globalTriangleCount = (long) TriangleCountEjml.computeTotalCohen(ejmlGraph.matrix(), true);
         assertEquals(expectedGlobalTriangles, globalTriangleCount);
+    }
+
+    @Test
+    public void testJGraphTGlobal() {
+        // TODO this finds way too many triangles ..
+        Graph jGraph = JGraphTConverter.convert(ejmlGraph);
+
+        assertEquals(expectedGlobalTriangles, GraphMetrics.getNumberOfTriangles(jGraph));
     }
 }

@@ -18,6 +18,7 @@ ext {
             'jctools-core':                 '3.0.0',
             'jetbrains-annotations':        '18.0.0',
             'jol':                          '0.10',
+            'jgrapht':                      '1.5.0',
             'junit5':                       '5.6.2',
             'junit-quickcheck-core':        '0.8.1',
             'junit-quickcheck-generators':  '0.8.1',

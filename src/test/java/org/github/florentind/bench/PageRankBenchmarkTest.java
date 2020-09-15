@@ -4,8 +4,10 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
+import org.github.florentind.core.jgrapht.JGraphTConverter;
 import org.github.florentind.graphalgos.pageRank.PageRankEjml;
-import org.junit.jupiter.api.Disabled;
+import org.jgrapht.Graph;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.pr.ImmutablePageRankPregelConfig;
@@ -41,45 +43,37 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
         return 4;
     }
 
-    @Disabled
-    @Test
-    void testPregel() {
-        var result = getPregelResult();
+    Triple<String, Integer, double[]> goldStandard;
 
-//        System.out.println("result.ranIterations() = " + result.getLeft());
-//        System.out.println("statistics = " + Arrays.stream(result.getRight()).summaryStatistics());
+    @BeforeEach
+    public void setup() {
+        super.setup();
+        goldStandard = getGdsResult();
     }
 
-    @Disabled
     @Test
-    void testGdsUnweightedPageRank() {
-        var result = getGdsResult();
+    void testJGraphT() {
+        Graph jGraph = JGraphTConverter.convert(graph);
+        org.jgrapht.alg.scoring.PageRank pageRank = new org.jgrapht.alg.scoring.PageRank<>(jGraph);
+        double[] jGraphTResult = pageRank.getScores().values().stream().mapToDouble(v -> (Double) v).toArray();
 
-        System.out.println("iterations = " + result.getMiddle());
-        System.out.println("statistics = " + Arrays.stream(result.getRight()).summaryStatistics());
+        assertArrayEquals(goldStandard.getRight(), jGraphTResult, 1e-2);
     }
 
-    @Disabled
     @Test
     void testEjml() {
-        var result = getEjmlResult();
+        var ejmlResult = getEjmlResult();
 
-//        System.out.println("result.iterations() = " + result.getMiddle());
-//        System.out.println("statistics = " + Arrays.stream(result.getRight()).summaryStatistics());
+        assertEquals(goldStandard.getMiddle(), ejmlResult.getMiddle());
+        assertArrayEquals(goldStandard.getRight(), ejmlResult.getRight(), 1e-2);
     }
 
     @Test
-    void resultEquivalence() {
-        var gdsResult = getGdsResult();
-        var pregelResult = getPregelResult();
-        var ejmlResult = getEjmlResult();
+    void testPregel() {
+        var ejmlResult = getPregelResult();
 
-        // iterations ran
-        assertEquals(pregelResult.getMiddle(), ejmlResult.getMiddle());
-        assertEquals(pregelResult.getMiddle(), gdsResult.getMiddle());
-
-        assertArrayEquals(pregelResult.getRight(), ejmlResult.getRight(), 1e-2);
-        assertArrayEquals(gdsResult.getRight(), ejmlResult.getRight(), 1e-2);
+        assertEquals(goldStandard.getMiddle(), ejmlResult.getMiddle());
+        assertArrayEquals(goldStandard.getRight(), ejmlResult.getRight(), 1e-2);
     }
 
     Triple<String, Integer, double[]> getEjmlResult() {
@@ -128,7 +122,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
         return new ImmutableTriple<>("pregel", result.ranIterations(), normalizedResult);
     }
 
-    double[] normalizeResult(double[] result) {
+    static double[] normalizeResult(double[] result) {
         var sum = Arrays.stream(result).sum();
         return Arrays.stream(result).map(x -> x / sum).toArray();
     }

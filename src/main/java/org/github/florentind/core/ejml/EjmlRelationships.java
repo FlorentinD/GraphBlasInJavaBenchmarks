@@ -32,7 +32,7 @@ import java.util.Set;
 import static org.neo4j.graphalgo.utils.StringFormatting.formatWithLocale;
 
 @ValueClass
-interface EjmlRelationships {
+public interface EjmlRelationships {
 
     // Needs to be 1 to indicate a relationship between two nodes in the matrix.
     double DEFAULT_RELATIONSHIP_PROPERTY = 1D;

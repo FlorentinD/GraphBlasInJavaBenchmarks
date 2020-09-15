@@ -15,8 +15,6 @@ import org.neo4j.graphalgo.beta.pregel.bfs.BFSLevelPregel;
 import org.neo4j.graphalgo.beta.pregel.bfs.BFSParentPregel;
 import org.neo4j.graphalgo.beta.pregel.bfs.BFSPregelConfig;
 import org.neo4j.graphalgo.beta.pregel.bfs.ImmutableBFSPregelConfig;
-import org.neo4j.graphalgo.core.GraphDimensions;
-import org.neo4j.graphalgo.core.ImmutableGraphDimensions;
 import org.neo4j.graphalgo.core.concurrency.Pools;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.neo4j.graphalgo.core.utils.paged.HugeLongArray;
@@ -136,5 +134,5 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
         GRBCORE.freeMatrix(jniMatrix);
 
         return result;
-    };
+    }
 }

@@ -28,8 +28,6 @@ public class PageRankBaseBenchmark extends EjmlGraphBaseBenchmark {
     @Param({"1e-7"})
     protected float tolerance;
 
-
-
     @Override
     protected CSRGraph getCSRGraph() {
         return RandomGraphGenerator.builder()
