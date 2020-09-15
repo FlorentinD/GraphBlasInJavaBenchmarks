@@ -28,7 +28,7 @@ public class PageRankTest {
 
     @Test
     public void pageRankEjml() {
-        PageRankEjml.PageRankResult result = pageRank.compute(
+        PageRankResult result = pageRank.compute(
                 inputMatrix,
                 PageRankEjml.DEFAULT_DAMPING_FACTOR,
                 PageRankEjml.DEFAULT_TOLERANCE,

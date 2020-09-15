@@ -10,7 +10,6 @@ import org.neo4j.graphalgo.core.Aggregation;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.openjdk.jmh.annotations.Param;
 
-// TODO: converter from EJML-Graph to JNI-Graph
 public class PageRankBaseBenchmark extends EjmlGraphBaseBenchmark {
     @Param({"300000", "3000000"})
     int nodeCount;
