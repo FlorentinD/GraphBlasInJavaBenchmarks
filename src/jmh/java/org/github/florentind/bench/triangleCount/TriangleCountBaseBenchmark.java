@@ -15,7 +15,7 @@ public class TriangleCountBaseBenchmark extends EjmlGraphBaseBenchmark {
     //      Pregel?
 
     // "1000", "10000", "100000", "1000000"
-    @Param({"1000", "10000"})
+    @Param({"10000", "100000", "1000000"})
     int nodeCount;
 
     @Param({"4"})
