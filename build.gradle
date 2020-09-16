@@ -90,7 +90,7 @@ jmh {
     zip64 = true
     forceGC = true
     // regExp which benchmarks to run
-    include = ['.*TriangleCount.*']
+    include = ['.*TriangleCountNativeBenchmark.*']
     exclude = ['.*GraphImpl.*']
     duplicateClassesStrategy = 'warn'
 

@@ -1,10 +1,14 @@
 package org.github.florentind.graphalgos.triangleCount;
 
+import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.ejml.data.DMatrixSparseCSC;
+import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.nio.Buffer;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -56,5 +60,17 @@ public class TriangleCountTest {
 
         assertArrayEquals(expected, result);
         assertEquals(EXPECTED_TRIANGLE_COUNT, Arrays.stream(result).sum() / 3);
+    }
+
+    @Test
+    public void nativeSandia() {
+        GRBCORE.initNonBlocking();
+
+        Buffer jniMatrix = ToNativeMatrixConverter.convert(inputMatrix);
+
+        assertEquals(EXPECTED_TRIANGLE_COUNT, TriangleCountNative.computeTotalSandia(jniMatrix));
+
+        GRBCORE.freeMatrix(jniMatrix);
+        GRBCORE.grbFinalize();
     }
 }

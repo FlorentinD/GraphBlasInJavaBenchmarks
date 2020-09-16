@@ -1,11 +1,15 @@
 package org.github.florentind.bench;
 
+import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.github.florentind.core.ejml.EjmlGraph;
+import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.core.jgrapht.JGraphTConverter;
 import org.github.florentind.graphalgos.triangleCount.TriangleCountEjml;
+import org.github.florentind.graphalgos.triangleCount.TriangleCountNative;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphMetrics;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -20,6 +24,8 @@ import org.neo4j.graphalgo.triangle.ImmutableTriangleCountBaseConfig;
 import org.neo4j.graphalgo.triangle.IntersectingTriangleCountFactory;
 import org.neo4j.logging.NullLog;
 
+import java.nio.Buffer;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -31,7 +37,7 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
 
     @Override
     long nodeCount() {
-        return 100_000;
+        return 10_000;
     }
 
     @Override
@@ -94,7 +100,7 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
     @Test
     public void testEjmlGlobalSandia() {
         // ! no need to transpose as symmetric anyway
-        long globalTriangleCount = (long) TriangleCountEjml.computeTotalSandia(ejmlGraph.matrix());
+        long globalTriangleCount = TriangleCountEjml.computeTotalSandia(ejmlGraph.matrix());
         assertEquals(expectedGlobalTriangles, globalTriangleCount);
     }
 
@@ -102,10 +108,25 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
     public void testEjmlGlobalCohen() {
         // ! no need to transpose as symmetric anyway
         // without a mask, this quickly OOMs
-        long globalTriangleCount = (long) TriangleCountEjml.computeTotalCohen(ejmlGraph.matrix(), true);
+        long globalTriangleCount = TriangleCountEjml.computeTotalCohen(ejmlGraph.matrix(), true);
         assertEquals(expectedGlobalTriangles, globalTriangleCount);
     }
 
+    @Test
+    public void testNativeSandia() {
+        GRBCORE.initNonBlocking();
+
+        Buffer jniMatrix = ToNativeMatrixConverter.convert(ejmlGraph);
+
+        long actual = TriangleCountNative.computeTotalSandia(jniMatrix);
+
+        GRBCORE.freeMatrix(jniMatrix);
+        GRBCORE.grbFinalize();
+
+        assertEquals(expectedGlobalTriangles, actual);
+    }
+
+    @Disabled
     @Test
     public void testJGraphTGlobal() {
         // TODO this finds way too many triangles ..

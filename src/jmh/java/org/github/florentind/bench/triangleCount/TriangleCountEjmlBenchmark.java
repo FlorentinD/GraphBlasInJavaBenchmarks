@@ -6,13 +6,13 @@ import org.openjdk.jmh.infra.Blackhole;
 public class TriangleCountEjmlBenchmark extends TriangleCountBaseBenchmark {
 
     @org.openjdk.jmh.annotations.Benchmark
-    public void nodeWiseEjml(Blackhole bh) {
+    public void ejmlNodeWise(Blackhole bh) {
         boolean useLowerTriangle = true;
         bh.consume(TriangleCountEjml.computeNodeWise(graph.matrix(), useLowerTriangle));
     }
 
     @org.openjdk.jmh.annotations.Benchmark
-    public void globalSandiaEjml(Blackhole bh) {
+    public void ejmlGlobalSandia(Blackhole bh) {
         bh.consume(TriangleCountEjml.computeTotalSandia(graph.matrix()));
     }
 }

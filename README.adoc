@@ -34,7 +34,7 @@ cd ..
 git@github.com:FlorentinD/graphblas-java-native.git
 cd graphblas-java-native/
 # branch with newest commit
-git checkout mapGlobalOptions
+git checkout otherMappings
 cd graphblas-java/
 # should not be needed to skip the tests .. (find problem)
 mvn clean install
