@@ -1,11 +1,14 @@
 package org.github.florentind.bench;
 
+import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
+import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.core.jgrapht.JGraphTConverter;
 import org.github.florentind.graphalgos.pageRank.PageRankEjml;
+import org.github.florentind.graphalgos.pageRank.PageRankNative;
 import org.jgrapht.Graph;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +23,7 @@ import org.neo4j.graphalgo.pagerank.PageRank;
 import org.neo4j.graphalgo.pagerank.PageRankAlgorithmType;
 import org.neo4j.graphalgo.pagerank.PageRankStreamConfig;
 
+import java.nio.Buffer;
 import java.util.Arrays;
 import java.util.stream.LongStream;
 
@@ -74,6 +78,19 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
 
         assertEquals(goldStandard.getMiddle(), ejmlResult.getMiddle());
         assertArrayEquals(goldStandard.getRight(), ejmlResult.getRight(), 1e-2);
+    }
+
+    @Test
+    void testNative() {
+        GRBCORE.initNonBlocking();
+
+        Buffer nativeMatrix = ToNativeMatrixConverter.convert(graph, true);
+        var nativeResult = PageRankNative.compute(nativeMatrix, DAMPING_FACTOR, TOLERANCE, MAX_ITERATIONS, CONCURRENCY);
+
+        GRBCORE.grbFinalize();
+
+        assertEquals(goldStandard.getMiddle(), nativeResult.iterations());
+        assertArrayEquals(goldStandard.getRight(), nativeResult.result(), 1e-2);
     }
 
     Triple<String, Integer, double[]> getEjmlResult() {

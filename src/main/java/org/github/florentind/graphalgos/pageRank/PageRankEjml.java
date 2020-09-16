@@ -67,7 +67,8 @@ public class PageRankEjml {
             // Divide previous PageRank with number of outbound edges
             // Difference to reference: need to use nonDanglingNodesMask here to avoid division by 0
             // Reason: outDegrees vector would be sparse in other GraphBLAS implementations (here always dense)
-            // TODO: this should only be done if outDegree != 0? (otherwise division through 0, but result is ignored in next mult-op either way) (see Performance impact first)
+            // TODO: this should only be done if outDegree != 0?
+            //  (otherwise division through 0, but result is ignored in next mult-op either way) (see Performance impact first)
             importanceVec = CommonOps_DArray.elementWiseMult(pr, outDegrees, importanceVec, (a, b) -> a / b);
 
             // Multiply importance by damping factor
@@ -108,6 +109,7 @@ public class PageRankEjml {
 
 
             // !! Difference to reference: no tolerance contained
+            // TODO: this is basically elementWiseAdd/Mult using minus-monoid
             // calculate diff (for tolerance check)
             for (int i = 0; i < prevResult.length; i++) {
                 prevResult[i] = prevResult[i] - pr[i];

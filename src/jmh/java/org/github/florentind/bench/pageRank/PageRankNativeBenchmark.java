@@ -1,9 +1,9 @@
-package org.github.florentind.bench.bfs;
+package org.github.florentind.bench.pageRank;
+
 
 import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
-import org.github.florentind.graphalgos.bfs.BfsNative;
-import org.openjdk.jmh.annotations.Benchmark;
+import org.github.florentind.graphalgos.pageRank.PageRankNative;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
@@ -11,15 +11,16 @@ import org.openjdk.jmh.infra.Blackhole;
 
 import java.nio.Buffer;
 
-public class BfsNativeBenchmark extends BfsBaseBenchmark {
+public class PageRankNativeBenchmark extends PageRankBaseBenchmark {
+    Buffer jniMatrix;
+
+    // TODO add weighted version of PageRank (e.g. use a relationship property)
 
     @Param({"1", "8"})
     private int concurrency;
 
     @Param({"true", "false"})
     private boolean blockingMode;
-
-    protected Buffer jniMatrix;
 
     @Setup
     public void setup() {
@@ -28,19 +29,18 @@ public class BfsNativeBenchmark extends BfsBaseBenchmark {
         if (blockingMode) {
             // according to GraphBLAS only for debugging, but more resembles the ejml version
             GRBCORE.initBlocking();
-        }else {
+        } else {
             GRBCORE.initNonBlocking();
         }
 
         assert blockingMode == (GRBCORE.getGlobalInt(GRBCORE.GxB_MODE) == GRBCORE.GrB_BLOCKING);
 
-        jniMatrix = ToNativeMatrixConverter.convert(matrix);
+        jniMatrix = ToNativeMatrixConverter.convert(graph);
     }
 
-
-    @Benchmark
-    public void jniBfsLevel(Blackhole bh) {
-        bh.consume(new BfsNative().computeLevel(jniMatrix, startNode, maxIterations, concurrency));
+    @org.openjdk.jmh.annotations.Benchmark
+    public void jni(Blackhole bh) {
+        bh.consume(PageRankNative.compute(jniMatrix, dampingFactor, tolerance, maxIterations, concurrency));
     }
 
     @TearDown

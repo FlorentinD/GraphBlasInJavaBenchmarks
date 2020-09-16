@@ -3,7 +3,7 @@ package org.github.florentind.bench;
 import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
-import org.github.florentind.core.grapblas_native.EjmlToNativeMatrixConverter;
+import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.graphalgos.bfs.BfsEjml;
 import org.github.florentind.graphalgos.bfs.BfsNative;
 import org.github.florentind.graphalgos.bfs.BfsResult;
@@ -128,7 +128,7 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
 
         var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
 
-        Buffer jniMatrix = EjmlToNativeMatrixConverter.convert(unTransposedMatrix);
+        Buffer jniMatrix = ToNativeMatrixConverter.convert(unTransposedMatrix);
 
         var result = new BfsNative().computeLevel(jniMatrix, startNode, MAX_ITERATIONS, 1);
         GRBCORE.freeMatrix(jniMatrix);

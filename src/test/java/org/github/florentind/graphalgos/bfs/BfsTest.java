@@ -19,10 +19,8 @@
 package org.github.florentind.graphalgos.bfs;
 
 import com.github.fabianmurariu.unsafe.GRBCORE;
-import org.ejml.EjmlUnitTests;
-import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.DMatrixSparseCSC;
-import org.github.florentind.core.grapblas_native.EjmlToNativeMatrixConverter;
+import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,12 +28,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.nio.Buffer;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static org.github.florentind.graphalgos.bfs.BfsEjml.BfsVariation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings({"UnusedMethod"})
 public class BfsTest {
@@ -110,7 +106,7 @@ public class BfsTest {
     public void testNativeBfs() {
         GRBCORE.initNonBlocking();
 
-        Buffer nativeMatrix = EjmlToNativeMatrixConverter.convert(inputMatrix);
+        Buffer nativeMatrix = ToNativeMatrixConverter.convert(inputMatrix);
 
         var result = new BfsNative().computeLevel(nativeMatrix, 0, 6, 1);
 

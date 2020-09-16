@@ -20,7 +20,7 @@ public class TriangleCountEjml {
      * @param matrix Representing an undirected graph
      * @return triangles inside the graph
      */
-    public static double computeTotalCohen(DMatrixSparseCSC matrix, boolean useMask) {
+    public static long computeTotalCohen(DMatrixSparseCSC matrix, boolean useMask) {
         DMatrixSparseCSC L = getLowerTriangle(matrix);
         DMatrixSparseCSC U = CommonOps_DSCC.select(matrix, IBinaryPredicates.higherTriangle, null, null);
 
@@ -45,10 +45,10 @@ public class TriangleCountEjml {
         double globalCount = CommonOps_DSCC.reduceScalar(C, Double::sum) / 2;
         // assert count is a whole number
         assert (globalCount % 1) == 0;
-        return globalCount;
+        return (long) globalCount;
     }
 
-    public static double computeTotalSandia(DMatrixSparseCSC matrix) {
+    public static long computeTotalSandia(DMatrixSparseCSC matrix) {
         DMatrixSparseCSC L = getLowerTriangle(matrix);
 
         Mask mask = DMasks.builder(L, true).build();
@@ -57,7 +57,7 @@ public class TriangleCountEjml {
         double globalCount = CommonOps_DSCC.reduceScalar(C, Double::sum);
         // assert count is a whole number
         assert (globalCount % 1) == 0;
-        return globalCount;
+        return (long) globalCount;
     }
 
     // Sandia variant (slides 95 - 96)
