@@ -90,6 +90,4 @@ public class PageRankTest {
 
         GRBCORE.grbFinalize();
     }
-
-    // TODO test other pageRank impl. with a graph with only dangling nodes (compute2)
 }

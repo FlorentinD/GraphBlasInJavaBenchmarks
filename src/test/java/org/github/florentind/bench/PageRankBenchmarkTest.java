@@ -9,7 +9,6 @@ import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.core.jgrapht.JGraphTConverter;
 import org.github.florentind.graphalgos.pageRank.PageRankEjml;
 import org.github.florentind.graphalgos.pageRank.PageRankNative;
-import org.jgrapht.Graph;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
@@ -57,9 +56,9 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
 
     @Test
     void testJGraphT() {
-        Graph jGraph = JGraphTConverter.convert(graph);
-        org.jgrapht.alg.scoring.PageRank pageRank = new org.jgrapht.alg.scoring.PageRank<>(jGraph);
-        double[] jGraphTResult = pageRank.getScores().values().stream().mapToDouble(v -> (Double) v).toArray();
+        var jGraph = JGraphTConverter.convert(graph);
+        var pageRanks = new org.jgrapht.alg.scoring.PageRank(jGraph).getScores();
+        double[] jGraphTResult = pageRanks.values().stream().mapToDouble(v -> (Double) v).toArray();
 
         assertArrayEquals(goldStandard.getRight(), jGraphTResult, 1e-2);
     }

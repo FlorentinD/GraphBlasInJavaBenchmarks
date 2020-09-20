@@ -37,6 +37,7 @@ public class PageRankNative {
         //
         Buffer dOut = GRBCORE.createVector(GRAPHBLAS.longType(), nodeCount);
 
+        // Difference:
         // Workaround as we expect a double matrix and not a boolean like in LAGraph, where reduce with PLUS can be used
         // to get the out degree based on double values (implicit conversion isnt going to work thats why via mxv)
         Buffer tmp_one_array = GRBCORE.createVector(GRAPHBLAS.longType(), nodeCount);

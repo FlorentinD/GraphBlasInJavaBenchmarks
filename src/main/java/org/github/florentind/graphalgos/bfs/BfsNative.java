@@ -3,11 +3,6 @@ package org.github.florentind.graphalgos.bfs;
 import com.github.fabianmurariu.unsafe.*;
 
 import java.nio.Buffer;
-import java.util.Arrays;
-
-import static org.github.florentind.core.grapblas_native.NativeMatrixToString.doubleMatrixToString;
-import static org.github.florentind.core.grapblas_native.NativeVectorToString.booleanVectorToString;
-import static org.github.florentind.core.grapblas_native.NativeVectorToString.integerVectorToString;
 
 /**
  * implementation based on graphblas-java-native ops e.g. C magic
