@@ -6,3 +6,7 @@
 /.jqwik-database
 /venv/
 /benchmarkResults/*.jpg
+
+server-connect.adoc
+
+benchmarkResults/__pycache__/

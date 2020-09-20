@@ -2,15 +2,16 @@ package org.github.florentind.graphalgos.triangleCount;
 
 import com.github.fabianmurariu.unsafe.*;
 
-import java.awt.*;
 import java.nio.Buffer;
 
 public class TriangleCountNative {
     // TODO translate ejml version to native version
     // e.g. sandia and nodeWise with mask would be most important
 
-    public static long computeTotalSandia(Buffer matrix) {
-        long status = 0;
+    public static long computeTotalSandia(Buffer matrix, int concurrency) {
+        GRBCORE.setGlobalInt(GRBCORE.GxB_NTHREADS, concurrency);
+
+        long status;
         Buffer L = getLowerTriangle(matrix);
         long nodeCount = GRBCORE.nrows(matrix);
         Buffer C = GRBCORE.createMatrix(GRAPHBLAS.doubleType(), nodeCount, nodeCount);
@@ -45,7 +46,7 @@ public class TriangleCountNative {
 
         Buffer selectOp = lower ? GRAPHBLAS.selectOpTRIL() : GRAPHBLAS.selectOpTRIU();
 
-        long status = GRBOPSMAT.select(L, null, null, GRAPHBLAS.selectOpTRIL(), matrix, null, null);
+        long status = GRBOPSMAT.select(L, null, null, selectOp, matrix, null, null);
         assert status == GRBCORE.GrB_SUCCESS;
 
         return L;

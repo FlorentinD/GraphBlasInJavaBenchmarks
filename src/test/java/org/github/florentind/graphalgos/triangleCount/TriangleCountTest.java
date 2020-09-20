@@ -68,7 +68,7 @@ public class TriangleCountTest {
 
         Buffer jniMatrix = ToNativeMatrixConverter.convert(inputMatrix);
 
-        assertEquals(EXPECTED_TRIANGLE_COUNT, TriangleCountNative.computeTotalSandia(jniMatrix));
+        assertEquals(EXPECTED_TRIANGLE_COUNT, TriangleCountNative.computeTotalSandia(jniMatrix, 1));
 
         GRBCORE.freeMatrix(jniMatrix);
         GRBCORE.grbFinalize();

@@ -6,7 +6,6 @@ import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.core.jgrapht.JGraphTConverter;
 import org.github.florentind.graphalgos.triangleCount.TriangleCountEjml;
 import org.github.florentind.graphalgos.triangleCount.TriangleCountNative;
-import org.jgrapht.Graph;
 import org.jgrapht.GraphMetrics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -47,7 +46,7 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
 
     EjmlGraph ejmlGraph;
 
-    private static long expectedGlobalTriangles = 16182;
+    private static final long expectedGlobalTriangles = 16182;
 
     // !! graph must be symmetric to properly work (and not have self-loops)
     @Override
@@ -118,7 +117,7 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
 
         Buffer jniMatrix = ToNativeMatrixConverter.convert(ejmlGraph);
 
-        long actual = TriangleCountNative.computeTotalSandia(jniMatrix);
+        long actual = TriangleCountNative.computeTotalSandia(jniMatrix, 1);
 
         GRBCORE.freeMatrix(jniMatrix);
         GRBCORE.grbFinalize();
@@ -130,7 +129,7 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
     @Test
     public void testJGraphTGlobal() {
         // TODO this finds way too many triangles ..
-        Graph jGraph = JGraphTConverter.convert(ejmlGraph);
+        var jGraph = JGraphTConverter.convert(ejmlGraph);
 
         assertEquals(expectedGlobalTriangles, GraphMetrics.getNumberOfTriangles(jGraph));
     }

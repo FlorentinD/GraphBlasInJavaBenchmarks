@@ -41,7 +41,7 @@ public class TriangleCountNativeBenchmark extends TriangleCountBaseBenchmark {
 
     @org.openjdk.jmh.annotations.Benchmark
     public void jniSandia(Blackhole bh) {
-        bh.consume(TriangleCountNative.computeTotalSandia(jniMatrix));
+        bh.consume(TriangleCountNative.computeTotalSandia(jniMatrix, concurrency));
     }
 
     @TearDown
