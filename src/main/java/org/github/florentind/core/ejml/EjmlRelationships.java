@@ -79,6 +79,9 @@ public interface EjmlRelationships {
         });
 
         DMatrixSparseCSC transposedMatrix = ConvertDMatrixStruct.convert(tripleStore, (DMatrixSparseCSC) null);
+        // based on the sorted insertion into the tripleStore, we know it is sorted
+        transposedMatrix.indicesSorted = true;
+
         return ImmutableEjmlRelationships.of(transposedMatrix);
     }
 }

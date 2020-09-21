@@ -5,7 +5,7 @@
 # read csv
 import pandas as pd
 
-benchmarkResult = pd.read_csv("pageRankResults.csv")
+benchmarkResult = pd.read_csv("triangleCountResult.csv")
 print(benchmarkResult.dtypes)
 
 benchmarkResult["Name"] = benchmarkResult.Benchmark.str.split(".").str[-1]
@@ -26,10 +26,7 @@ import matplotlib.pyplot as plt
 from benchmarkResults.helper import grouped_barplot
 
 # get meta info like units, mode, avg-degree ...
-# TODO: get actual run iterations somehow as an info (know for bfs ca. 37 for 300k nodes graph
-title = "PageRank (damping: {}, maxIterations: {}) \n on a random power-law graph with an average degree of {} \n using the {} of {}".format(
-        benchmarkResult.dampingFactor.iloc[0],
-        benchmarkResult.maxIterations.iloc[0],
+title = "TriangleCount \n on a undirected random power-law graph with an average degree of {} \n using the {} of {}".format(
         benchmarkResult.avgDegree.iloc[0],
         benchmarkResult.Mode.iloc[0], benchmarkResult.Cnt.iloc[0]
     )
@@ -38,6 +35,7 @@ fig, ax = plt.subplots()
 
 barplot = grouped_barplot(benchmarkResult, "nodeCount", "Name", "Score", "Error", ax)
 barplot.title(title)
+ax.set_yscale('log')
 
-plt.savefig("pageRank.jpg", bbox_inches='tight')
+plt.savefig("triangleCount.jpg", bbox_inches='tight')
 plt.show()

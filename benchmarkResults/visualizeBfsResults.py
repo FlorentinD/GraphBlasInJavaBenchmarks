@@ -8,7 +8,7 @@ import pandas as pd
 benchmarkResult = pd.read_csv("bfsResults.csv")
 print(benchmarkResult.dtypes)
 
-benchmarkResult["Name"] = benchmarkResult.Benchmark.str.split(".").str[1]
+benchmarkResult["Name"] = benchmarkResult.Benchmark.str.split(".").str[-1]
 benchmarkResult["BfsVariant"] = benchmarkResult.Name.str.split("Bfs").str[1]
 benchmarkResult["Name"] = "(" + benchmarkResult.Name.str.split("Bfs").str[0] + "," + benchmarkResult.concurrency.apply(
     str) + ")"
