@@ -19,14 +19,14 @@ public abstract class MatrixOpsBaseBenchmark {
 
     protected DMatrixSparseCSC matrix;
 
-    @Param({"100000"})
+    @Param({"500000"})
     private int dimension;
 
-    @Param({"10000000"})
-    private int elementCount;
+    @Param({"4"})
+    private int avgDegree;
 
     @Setup
     public void setup() {
-        matrix = RandomMatrices_DSCC.rectangle(dimension, dimension, elementCount, new Random(42));
+        matrix = RandomMatrices_DSCC.rectangle(dimension, dimension, dimension * avgDegree, new Random(42));
     }
 }
