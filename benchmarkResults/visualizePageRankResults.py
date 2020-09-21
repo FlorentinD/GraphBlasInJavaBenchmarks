@@ -5,7 +5,7 @@
 # read csv
 import pandas as pd
 
-benchmarkResult = pd.read_csv("pageRankResults.csv")
+benchmarkResult = pd.read_csv("results/pageRankResults.csv")
 print(benchmarkResult.dtypes)
 
 benchmarkResult["Name"] = benchmarkResult.Benchmark.str.split(".").str[-1]
@@ -39,5 +39,5 @@ fig, ax = plt.subplots()
 barplot = grouped_barplot(benchmarkResult, "nodeCount", "Name", "Score", "Error", ax)
 barplot.title(title)
 
-plt.savefig("pageRank.jpg", bbox_inches='tight')
+plt.savefig("out/pageRank.jpg", bbox_inches='tight')
 plt.show()

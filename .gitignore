@@ -10,3 +10,4 @@
 server-connect.adoc
 
 benchmarkResults/__pycache__/
+/benchmarkResults/out/

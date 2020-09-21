@@ -5,7 +5,7 @@
 # read csv
 import pandas as pd
 
-benchmarkResult = pd.read_csv("triangleCountResult.csv")
+benchmarkResult = pd.read_csv("results/triangleCountResult.csv")
 print(benchmarkResult.dtypes)
 
 benchmarkResult["Name"] = benchmarkResult.Benchmark.str.split(".").str[-1]
@@ -37,5 +37,5 @@ barplot = grouped_barplot(benchmarkResult, "nodeCount", "Name", "Score", "Error"
 barplot.title(title)
 ax.set_yscale('log')
 
-plt.savefig("triangleCount.jpg", bbox_inches='tight')
+plt.savefig("out/triangleCount.jpg", bbox_inches='tight')
 plt.show()

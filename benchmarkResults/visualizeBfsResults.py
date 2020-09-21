@@ -5,7 +5,7 @@
 # read csv
 import pandas as pd
 
-benchmarkResult = pd.read_csv("bfsResults.csv")
+benchmarkResult = pd.read_csv("results/bfsResults.csv")
 print(benchmarkResult.dtypes)
 
 benchmarkResult["Name"] = benchmarkResult.Benchmark.str.split(".").str[-1]
@@ -47,5 +47,5 @@ for variant in bfsVariants:
     # barplot = sns.barplot(x="nodeCount", y="Score", hue="Name", data=variant)
     # barplot.set_ylabel(yLabel)
 
-    plt.savefig("bfs_{}.jpg".format(variant['BfsVariant'].iloc[0]))
+    plt.savefig("out/bfs_{}.jpg".format(variant['BfsVariant'].iloc[0]))
     plt.show()
