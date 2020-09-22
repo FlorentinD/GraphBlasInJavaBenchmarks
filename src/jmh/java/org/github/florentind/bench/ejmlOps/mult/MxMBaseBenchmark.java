@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 @Fork(value = 1, warmups = 2)
 public class MxMBaseBenchmark {
-    protected DMatrixSparseCSC otherMatrix;
     protected DMatrixSparseCSC result;
 
     protected DMatrixSparseCSC matrix;
@@ -31,7 +30,6 @@ public class MxMBaseBenchmark {
     @Setup
     public void setup() {
         matrix = RandomMatrices_DSCC.rectangle(dimension, dimension, elementCount, new Random(42));
-        otherMatrix = RandomMatrices_DSCC.rectangle(dimension, dimension, elementCount, new Random(9000));
         result = new DMatrixSparseCSC(matrix.numRows, matrix.numCols);
     }
 

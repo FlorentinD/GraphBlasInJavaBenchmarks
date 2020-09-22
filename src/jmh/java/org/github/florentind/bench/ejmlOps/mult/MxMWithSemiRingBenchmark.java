@@ -29,7 +29,7 @@ public class MxMWithSemiRingBenchmark extends MxMBaseBenchmark {
 
     @Benchmark
     public void mxm(Blackhole bh) {
-        CommonOpsWithSemiRing_DSCC.mult(matrix, otherMatrix, result, semiRings.get(semiRing), null, null);
+        CommonOpsWithSemiRing_DSCC.mult(matrix, matrix, result, semiRings.get(semiRing), null, null);
         bh.consume(result);
     }
 }
