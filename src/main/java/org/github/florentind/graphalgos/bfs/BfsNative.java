@@ -4,12 +4,14 @@ import com.github.fabianmurariu.unsafe.*;
 
 import java.nio.Buffer;
 
+import static org.github.florentind.core.grapblas_native.NativeVectorToString.booleanVectorToString;
+import static org.github.florentind.core.grapblas_native.NativeVectorToString.integerVectorToString;
+
 /**
  * implementation based on graphblas-java-native ops e.g. C magic
  */
 public class BfsNative {
-    // TODO  variable concurrency value
-    // TODO: add tolerance parameter
+// TODO: add parent version
     /**
      *  BFS based on based on https://github.com/DrTimothyAldenDavis/SuiteSparse/blob/master/GraphBLAS/Demo/Source/bfs5m.c
      *  @param adjacencyMatrix adjacency matrix in CSC format
@@ -36,7 +38,10 @@ public class BfsNative {
         // init node vector
         GRAPHBLAS.setVectorElementBoolean(queueVector, startNode, true);
 
-        Buffer semiRing = GRBCORE.createSemiring(GRBMONOID.lorMonoid(), GRAPHBLAS.landBinaryOp());
+        // ! difference to ejml version: here exists an any monoid as well as a pair op
+        //              any is non-deterministic -> not possible in ejml semi-rings
+        //              any + pair -> determenistic as it will always return 1 if one pair is found
+        Buffer semiRing = GRBCORE.createSemiring(GRBMONOID.anyMonoidDouble(), GRAPHBLAS.pairBinaryOpDouble());
 
         Buffer desc = GRBCORE.createDescriptor();
         // invert the mask
@@ -45,27 +50,30 @@ public class BfsNative {
         GRBCORE.setDescriptorValue(desc, GRBCORE.GrB_OUTP ,GRBCORE.GrB_REPLACE);
 
 
-        boolean successor = true;
         int level = 1;
+        // nodeCount
+        int nodesVisited = 0;
+        long nodesInQueue = 1;
 
         // BFS-traversal
-        for (; successor && level < maxIterations; level++) {
+        for (; level < maxIterations; level++) {
             // v<q> = level, using vector assign with q as the mask
             // no option to use GrB_ALL -> but ni = nodeCount leads to it being used
             status = GRAPHBLAS.assignVectorInt(resultVector, queueVector, null, level, null, nodeCount, null);
             assert status == GRBCORE.GrB_SUCCESS;
 
+//            System.out.println("queueVector " + booleanVectorToString(queueVector, Math.toIntExact(nodeCount)));
+//            System.out.println("resultVector " + integerVectorToString(resultVector, Math.toIntExact(nodeCount)));
+
+            nodesVisited += nodesInQueue ;
+            // check for fixPoint
+            if (nodesInQueue == 0 || nodesVisited == nodeCount || level >= maxIterations) break ;
+
             // q<¬v> = q lor.land matrix
             status = GRBOPSMAT.vxm(queueVector, resultVector, null, semiRing, queueVector, adjacencyMatrix, desc);
             assert status == GRBCORE.GrB_SUCCESS;
 
-//            System.out.println("queueVector " + booleanVectorToString(queueVector, Math.toIntExact(nodeCount)));
-//            System.out.println("resultVector " + integerVectorToString(resultVector, Math.toIntExact(nodeCount)));
-
-            // successor = ||(q)
-            successor = GRBALG.vectorReduceAllBoolean(false, null, GRBMONOID.lorMonoid(), queueVector, null);
-
-//            System.out.println("successor = " + successor);
+            nodesInQueue = GRBCORE.nvalsVector(queueVector);
         }
 
         // output vector

@@ -100,7 +100,7 @@ public class BfsTest {
         // only level variant implemented atm
         assertBfsResult(new double[]{1, 2, 3, 2, 3, 4, 3}, result);
         // as the result is set at the beginning of each iteration
-        assertEquals(EXPECTED_ITERATIONS + 1, result.iterations());
+        assertEquals(EXPECTED_ITERATIONS, result.iterations());
     }
 
     private void assertBfsResult(double[] expected, BfsResult result) {
