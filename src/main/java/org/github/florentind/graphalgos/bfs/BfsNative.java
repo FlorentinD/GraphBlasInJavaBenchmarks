@@ -28,7 +28,7 @@ public class BfsNative {
         // result vector
         Buffer resultVector = GRBCORE.createVector(GRAPHBLAS.intType(), nodeCount);
         // make result vector dense
-        status = GRAPHBLAS.assignVectorInt(resultVector, null, null, 0, null, nodeCount, null);
+        status = GRAPHBLAS.assignVectorInt(resultVector, null, null, 0, GRBCORE.GrB_ALL, nodeCount, null);
         assert status == GRBCORE.GrB_SUCCESS;
         // finish pending work on v
         GRBCORE.nvalsVector(resultVector);
@@ -59,7 +59,7 @@ public class BfsNative {
         for (; level < maxIterations; level++) {
             // v<q> = level, using vector assign with q as the mask
             // no option to use GrB_ALL -> but ni = nodeCount leads to it being used
-            status = GRAPHBLAS.assignVectorInt(resultVector, queueVector, null, level, null, nodeCount, null);
+            status = GRAPHBLAS.assignVectorInt(resultVector, queueVector, null, level, GRBCORE.GrB_ALL, nodeCount, null);
             assert status == GRBCORE.GrB_SUCCESS;
 
 //            System.out.println("queueVector " + booleanVectorToString(queueVector, Math.toIntExact(nodeCount)));

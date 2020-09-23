@@ -4,6 +4,8 @@ import com.github.fabianmurariu.unsafe.*;
 
 import java.nio.Buffer;
 
+import static com.github.fabianmurariu.unsafe.GRBCORE.GrB_ALL;
+
 public class PageRankNative {
     public static final int DEFAULT_MAX_ITERATIONS = 20;
     public static final double DEFAULT_DAMPING_FACTOR = 0.85;
@@ -41,7 +43,7 @@ public class PageRankNative {
         // Workaround as we expect a double matrix and not a boolean like in LAGraph, where reduce with PLUS can be used
         // to get the out degree based on double values (implicit conversion isnt going to work thats why via mxv)
         Buffer tmp_one_array = GRBCORE.createVector(GRAPHBLAS.longType(), nodeCount);
-        GRAPHBLAS.assignVectorLong(tmp_one_array, null, null, 1, null, nodeCount, null);
+        GRAPHBLAS.assignVectorLong(tmp_one_array, null, null, 1, GrB_ALL, nodeCount, null);
         Buffer plusSecondSemiring = GRBCORE.createSemiring(GRBMONOID.plusMonoidLong(), GRAPHBLAS.secondBinaryOpLong());
         status = GRBOPSMAT.mxv(dOut, null, null, plusSecondSemiring, adjacencyMatrix, tmp_one_array, null);
         assert status == GRBCORE.GrB_SUCCESS;
@@ -51,7 +53,7 @@ public class PageRankNative {
 
         Buffer pr = GRBCORE.createVector(GRAPHBLAS.doubleType(), nodeCount);
         Buffer prevResult = GRBCORE.createVector(GRAPHBLAS.doubleType(), nodeCount);
-        status = GRAPHBLAS.assignVectorDouble(pr, null, null, 1.0 / nodeCount, null, nodeCount, null);
+        status = GRAPHBLAS.assignVectorDouble(pr, null, null, 1.0 / nodeCount, GrB_ALL, nodeCount, null);
         assert status == GRBCORE.GrB_SUCCESS;
 
         Buffer invertedMask = GRBCORE.createDescriptor();
@@ -66,7 +68,7 @@ public class PageRankNative {
 
         for (; iteration < maxIterations && resultDiff > tolerance; iteration++) {
             // !Difference: in C would just swap prevResult and result
-            GRBOPSVEC.assign(prevResult, null, GRAPHBLAS.secondBinaryOpDouble(), pr, null, nodeCount, null);
+            GRBOPSVEC.assign(prevResult, null, GRAPHBLAS.secondBinaryOpDouble(), pr, GrB_ALL, nodeCount, null);
 
             //
             // Importance calculation
@@ -77,7 +79,7 @@ public class PageRankNative {
             assert status == GRBCORE.GrB_SUCCESS;
 
             // Multiply importance by damping factor
-            status = GRAPHBLAS.assignVectorDouble(importanceVec, null, GRAPHBLAS.timesBinaryOpDouble(), dampingFactor, null, nodeCount, null);
+            status = GRAPHBLAS.assignVectorDouble(importanceVec, null, GRAPHBLAS.timesBinaryOpDouble(), dampingFactor, GrB_ALL, nodeCount, null);
             assert status == GRBCORE.GrB_SUCCESS;
 
 
@@ -90,7 +92,7 @@ public class PageRankNative {
             //
 
             // Extract all the dangling PR entries from the previous result
-            status = GRBOPSVEC.extract(danglingVec, dOut, null, pr, null, nodeCount, invertedMask);
+            status = GRBOPSVEC.extract(danglingVec, dOut, null, pr, GrB_ALL, nodeCount, invertedMask);
             assert status == GRBCORE.GrB_SUCCESS;
 
             // Sum the previous PR values of dangling vertices together
@@ -104,7 +106,7 @@ public class PageRankNative {
             // PageRank summarization
             // Add teleport, importanceVec, and danglingVec components together
             //
-            status = GRAPHBLAS.assignVectorDouble(pr, null, null, (teleport + danglingSum), null, nodeCount, null);
+            status = GRAPHBLAS.assignVectorDouble(pr, null, null, (teleport + danglingSum), GrB_ALL, nodeCount, null);
             assert status == GRBCORE.GrB_SUCCESS;
 
             GRBOPSVEC.elemWiseAddUnionMonoid(pr, null, null, GRBMONOID.plusMonoidDouble(), pr, importanceVec, null);

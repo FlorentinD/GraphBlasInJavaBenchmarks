@@ -32,6 +32,8 @@ public class TriangleCountNative {
         return (long) globalCount;
     }
 
+    // TODO nodeWiseVersion
+
     private static Buffer getLowerTriangle(Buffer matrix) {
         return getTriangle(matrix, true);
     }
