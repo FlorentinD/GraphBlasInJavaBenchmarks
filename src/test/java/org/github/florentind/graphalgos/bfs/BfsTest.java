@@ -57,7 +57,7 @@ public class BfsTest {
     public void testSparseEjmlVariations(BfsVariation variation, double[] expected) {
         int[] startNodes = {0};
         int maxIterations = 20;
-        BfsEjml.BfsSparseResult result = bfs.computeSparse(inputMatrix, variation, startNodes, maxIterations);
+        BfsSparseResult result = bfs.computeSparse(inputMatrix, variation, startNodes, maxIterations);
 
         assertBfsResult(expected, result);
         assertEquals(EXPECTED_ITERATIONS, result.iterations());

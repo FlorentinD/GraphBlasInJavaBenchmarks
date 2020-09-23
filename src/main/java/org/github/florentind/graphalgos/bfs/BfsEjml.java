@@ -6,9 +6,7 @@ import org.ejml.data.IGrowArray;
 import org.ejml.masks.DMasks;
 import org.ejml.masks.Mask;
 import org.ejml.masks.PrimitiveDMask;
-import org.ejml.ops.CommonOps_DArray;
-import org.ejml.ops.DSemiRing;
-import org.ejml.ops.DSemiRings;
+import org.ejml.ops.*;
 import org.ejml.sparse.csc.CommonOpsWithSemiRing_DSCC;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.ejml.sparse.csc.MaskUtil_DSCC;
@@ -18,22 +16,23 @@ import java.util.Arrays;
 
 // variants: boolean/parents/level/multi-bfs  + sparse/dense result vector
 public class BfsEjml {
+    private static final DMonoid SECOND_MONOID = new DMonoid(0, (a, b) -> b);
     // TODO: version that uses the same operators as used in graphblas (probably using dense vectors .. as easier)
     //          f.i. fixPoint recognized using reduce with OR-monoid
 
-    // TODO use DSemiRing FIRST_AND instead of OR_AND (first has 1 as a default?) .. OR_FIRST as its just a boolean value thats interesting here
+    // TODO use DSemiRing FIRST_AND instead of OR_AND (first has 1 as a default?) .. OR_FIRST / OR_SECOND
+    //      for dense version: FIRST still needs to check for (a != 0)?!
+    //  as its just a boolean value thats interesting here
     // .. hope for short circuit OR (or else write in eval part)
-
-    private static DSemiRing getSemiRing(BfsVariation variation) {
-        return variation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : DSemiRings.OR_AND;
-    }
 
     // TODO: is the tmp iterationResult really necessary? (just the inputVector could be enough)
 
 
-    // TODO: use dense matrix instead of pure primitive array to support MSBFS
-    public BfsDenseResult computeDense(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int startNode, int maxIterations) {
-        DSemiRing semiRing = getSemiRing(bfsVariation);
+    public BfsDenseDoubleResult computeDense(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int startNode, int maxIterations) {
+        DMonoid firstNotZeroMonoid = new DMonoid(0, (a, b) -> (a != 0) ? 1 : 0);
+        // as dense here:
+        DSemiRing levelSemiRing = new DSemiRing(DMonoids.OR, firstNotZeroMonoid);
+        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : levelSemiRing;
         double[] result = new double[adjacencyMatrix.numCols];
         Arrays.fill(result, semiRing.add.id);
 
@@ -87,17 +86,19 @@ public class BfsEjml {
                 }
             }
 
-            result = MaskUtil_DSCC.combineOutputs(result, iterationResult, mask, null);
+            result = MaskUtil_DSCC.combineOutputs(result, iterationResult, mask, null, true);
 
+            //System.out.println(Arrays.toString(result));
             isFixPoint = (visitedNodes == prevVisitedNodes) || (visitedNodes == adjacencyMatrix.numCols);
         }
 
-        return new BfsDenseResult(result, iteration - 1, semiRing.add.id);
+        return new BfsDenseDoubleResult(result, iteration - 1, semiRing.add.id);
     }
 
     public BfsSparseResult computeSparse(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int[] startNodes, int maxIterations) {
         // TODO: use transposed result matrix as startNodes.length << adjacencyMatrix.length
         //         need to transpose result of VxM before combining
+        //          -> use a DSparseVector (then just one start node allowed)
         DMatrixSparseCSC result = new DMatrixSparseCSC(startNodes.length, adjacencyMatrix.numCols);
         // DMatrixSparseCSC iterationResult = result.createLike();
 
@@ -117,29 +118,27 @@ public class BfsEjml {
         IGrowArray gw = new IGrowArray();
         DGrowArray gx = new DGrowArray();
 
-        int visitedNodes = startNodes.length;
-        int prevVisitedNodes;
+        int nodesVisited = startNodes.length;
 
-        DSemiRing semiRing = getSemiRing(bfsVariation);
+        // as the id of the monoid is never used for sparse mult .. this works nicely to use FIRST even for plus here
+        DMonoid first_monoid = new DMonoid(1, (a, b) -> a);
+        // TODO see why first cannot be used for plus ! .. need sparse vector x csc matrix op for this to work ..
+        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : new DSemiRing(SECOND_MONOID, first_monoid);
 
-        boolean isFixPoint = false;
         int iteration = 1;
 
-        for (; (iteration <= maxIterations) && !isFixPoint; iteration++) {
+        for (; (iteration <= maxIterations); iteration++) {
             // negated -> dont compute values for visited nodes
             // replace -> iterationResult is basically the new inputVector
             Mask mask = DMasks.builder(result, true).withNegated(true).withReplace(true).build();
             iterationResult = CommonOpsWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, gw, gx);
-            prevVisitedNodes = visitedNodes;
 
             if (mask.replace) {
-                visitedNodes += iterationResult.nz_length;
-            } else {
-                visitedNodes = iterationResult.nz_length;
+                nodesVisited += iterationResult.nz_length;
             }
 
             // set inputVector based on newly discovered nodes
-            // TODO: do this via an `assign` that supports a mask
+            // TODO: do this via an `assign` that supports a mask (double[] out, DMatrixSparse_CSC/Vector input)
             inputVector = iterationResult.copy();
 
             if (bfsVariation == BfsVariation.LEVEL) {
@@ -160,88 +159,22 @@ public class BfsEjml {
                 }
             }
 
-            // combine iterationResult and result (basically poor mans `mask.replace=false`)
+            // combine iterationResult and result
+            // TODO: use a dense result vector for here!
             result = MaskUtil_DSCC.combineOutputs(result, iterationResult, null, null);
 
-            // TODO dont combine result if its known to be a fixPoint?
-            isFixPoint = (visitedNodes == prevVisitedNodes) || (visitedNodes == adjacencyMatrix.numCols);
+            // check for fixPoint
+            if ((iterationResult.nz_length == 0) || (nodesVisited == adjacencyMatrix.numCols)) {
+                break;
+            }
         }
 
         // expect the result to be a row vector / row vectors
-        return new BfsSparseResult(result, iteration - 1, semiRing.add.id);
+        return new BfsSparseResult(result, iteration, semiRing.add.id);
     }
 
 
     public enum BfsVariation {
         BOOLEAN, PARENTS, LEVEL
-    }
-
-    // TODO move into extra file
-    public class BfsSparseResult implements BfsResult {
-        private final DMatrixSparseCSC result;
-        private final double notFoundValue;
-        private final int iterations;
-
-        public BfsSparseResult(DMatrixSparseCSC result, int iterations, double fallBackValue) {
-            this.result = result;
-            this.iterations = iterations;
-            notFoundValue = fallBackValue;
-        }
-
-        @Override
-        public int iterations() {
-            return this.iterations;
-        }
-
-        @Override
-        public int nodesVisited() {
-            return this.result.getNonZeroLength();
-        }
-
-        @Override
-        public double get(int nodeId) {
-            return result.get(0, nodeId, notFoundValue);
-        }
-
-        public DMatrixSparseCSC result() {
-            return this.result;
-        }
-    }
-
-    public class BfsDenseResult implements BfsResult {
-        private final double[] result;
-        private final double notFoundValue;
-        private final int iterations;
-
-        public BfsDenseResult(double[] result, int iterations, double notFoundValue) {
-            this.result = result;
-            this.iterations = iterations;
-            this.notFoundValue = notFoundValue;
-        }
-
-        @Override
-        public int iterations() {
-            return this.iterations;
-        }
-
-        @Override
-        public int nodesVisited() {
-            int visited = 0;
-
-            for (double v : result) {
-                if (v != notFoundValue) visited++;
-            }
-
-            return visited;
-        }
-
-        @Override
-        public double get(int nodeId) {
-            return result[nodeId];
-        }
-
-        public double[] result() {
-            return this.result;
-        }
     }
 }
