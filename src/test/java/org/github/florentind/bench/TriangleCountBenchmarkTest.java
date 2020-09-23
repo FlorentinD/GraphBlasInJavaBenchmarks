@@ -92,8 +92,7 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
         // ! no need to transpose as symmetric anyway
         var result = TriangleCountEjml.computeNodeWise(ejmlGraph.matrix(), useLowerTriangle);
 
-        long globalTriangleCount = result.totalCount();
-        assertEquals(expectedGlobalTriangles, globalTriangleCount);
+        assertEquals(expectedGlobalTriangles, result.totalCount());
     }
 
     @Test
@@ -123,6 +122,20 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
         GRBCORE.grbFinalize();
 
         assertEquals(expectedGlobalTriangles, actual);
+    }
+
+    @Test
+    public void testNativeNodeWise() {
+        GRBCORE.initNonBlocking();
+
+        Buffer jniMatrix = ToNativeMatrixConverter.convert(ejmlGraph);
+
+        var result = TriangleCountNative.computeNodeWise(jniMatrix, 1);
+
+        GRBCORE.freeMatrix(jniMatrix);
+        GRBCORE.grbFinalize();
+
+        assertEquals(expectedGlobalTriangles, result.totalCount());
     }
 
     @Disabled

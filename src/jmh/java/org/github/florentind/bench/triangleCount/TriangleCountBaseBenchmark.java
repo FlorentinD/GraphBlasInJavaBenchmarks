@@ -11,8 +11,7 @@ import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.openjdk.jmh.annotations.Param;
 
 public class TriangleCountBaseBenchmark extends EjmlGraphBaseBenchmark {
-    // TODO smaller nodeCounts
-    //      Pregel?
+    // TODO Pregel?
 
     // "1000", "10000", "100000", "1000000"
     @Param({"10000", "100000", "1000000"})

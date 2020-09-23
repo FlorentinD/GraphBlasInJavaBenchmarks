@@ -11,11 +11,8 @@ import org.openjdk.jmh.infra.Blackhole;
 import java.nio.Buffer;
 
 public class TriangleCountNativeBenchmark extends TriangleCountBaseBenchmark {
-    // TODO implement stuff
 
     Buffer jniMatrix;
-
-    // TODO add weighted version of PageRank (e.g. use a relationship property)
 
     @Param({"1", "8"})
     private int concurrency;
@@ -42,6 +39,11 @@ public class TriangleCountNativeBenchmark extends TriangleCountBaseBenchmark {
     @org.openjdk.jmh.annotations.Benchmark
     public void jniSandia(Blackhole bh) {
         bh.consume(TriangleCountNative.computeTotalSandia(jniMatrix, concurrency));
+    }
+
+    @org.openjdk.jmh.annotations.Benchmark
+    public void jniNodeWise(Blackhole bh) {
+        bh.consume(TriangleCountNative.computeNodeWise(jniMatrix, concurrency));
     }
 
     @TearDown

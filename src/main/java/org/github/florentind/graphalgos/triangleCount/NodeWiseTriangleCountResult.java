@@ -3,7 +3,7 @@ package org.github.florentind.graphalgos.triangleCount;
 import java.util.Arrays;
 
 public class NodeWiseTriangleCountResult {
-    double[] result;
+    protected double[] result;
 
     public NodeWiseTriangleCountResult(double[] result) {
         this.result = result;

@@ -51,4 +51,19 @@ public class NativeVectorToString {
 
         return String.join(",", values);
     }
+
+    public static String longVectorToString(Buffer result, int nodeCount) {
+        List<String> values = new ArrayList<>();
+
+        for (int i = 0; i < nodeCount; i++) {
+            long[] value = GRAPHBLAS.getVectorElementLong(result, i);
+            if (value.length != 0) {
+                values.add(Long.toString(value[0]));
+            } else {
+                values.add("?");
+            }
+        }
+
+        return String.join(",", values);
+    }
 }

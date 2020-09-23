@@ -4,9 +4,9 @@ import com.github.fabianmurariu.unsafe.*;
 
 import java.nio.Buffer;
 
+import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
+
 public class TriangleCountNative {
-    // TODO translate ejml version to native version
-    // e.g. sandia and nodeWise with mask would be most important
 
     public static long computeTotalSandia(Buffer matrix, int concurrency) {
         GRBCORE.setGlobalInt(GRBCORE.GxB_NTHREADS, concurrency);
@@ -32,7 +32,38 @@ public class TriangleCountNative {
         return (long) globalCount;
     }
 
-    // TODO nodeWiseVersion
+    public static NodeWiseTriangleCountResult computeNodeWise(Buffer matrix, int concurrency) {
+        GRBCORE.setGlobalInt(GRBCORE.GxB_NTHREADS, concurrency);
+
+        Buffer desc = GRBCORE.createDescriptor();
+        checkStatusCode(GRBCORE.setDescriptorValue(desc, GRBCORE.GrB_OUTP, GRBCORE.GrB_REPLACE));
+
+        Buffer L = getLowerTriangle(matrix);
+        Buffer plusAndSemiring = GRBCORE.createSemiring(GRBMONOID.plusMonoidDouble(), GRAPHBLAS.landBinaryOpDouble());
+        checkStatusCode(GRBOPSMAT.mxm(L, matrix, null, plusAndSemiring, matrix, L, desc));
+
+        long nodeCount = GRBCORE.nrows(matrix);
+        Buffer nativeResult = GRBCORE.createVector(GRAPHBLAS.longType(), nodeCount);
+
+        checkStatusCode(GRBOPSMAT.matrixReduceMonoid(nativeResult, null, null, GRBMONOID.plusMonoidLong(), L, null));
+
+        int resultSize = Math.toIntExact(GRBCORE.nvalsVector(nativeResult));
+        double[] resultValues = new double[resultSize];
+        long[] indices = new long[resultSize];
+
+        GRAPHBLAS.extractVectorTuplesDouble(nativeResult, resultValues, indices);
+
+        GRBCORE.freeSemiring(plusAndSemiring);
+        GRBCORE.freeDescriptor(desc);
+        GRBCORE.freeVector(nativeResult);
+        GRBCORE.freeMatrix(L);
+
+        if (resultSize == nodeCount) {
+            return new NodeWiseTriangleCountResult(resultValues);
+        } else {
+            return new SparseNodeWiseTriangleCountResult(indices, resultValues);
+        }
+    }
 
     private static Buffer getLowerTriangle(Buffer matrix) {
         return getTriangle(matrix, true);

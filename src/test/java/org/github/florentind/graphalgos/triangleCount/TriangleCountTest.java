@@ -16,12 +16,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TriangleCountTest {
     private static final int EXPECTED_TRIANGLE_COUNT = 5;
+    private static final double[] EXPECTED_NODEWISE_TC = {1, 3, 2, 4, 1, 1, 3, 0};
     DMatrixSparseCSC inputMatrix;
 
     @BeforeEach
     public void setUp() {
         // based on example in http://mit.bme.hu/~szarnyas/grb/graphblas-introduction.pdf (undirected)
-        inputMatrix = new DMatrixSparseCSC(7, 7, 24);
+        inputMatrix = new DMatrixSparseCSC(8, 8, 24);
         inputMatrix.set(0, 1, 1);
         inputMatrix.set(0, 3, 1);
         inputMatrix.set(1, 3, 1);
@@ -54,12 +55,12 @@ public class TriangleCountTest {
     @ValueSource(booleans = {true, false})
     public void triangleCountNodeWise(boolean useLowerTriangle) {
         // FIX version with lower triangle
-        double[] result = TriangleCountEjml.computeNodeWise(inputMatrix, useLowerTriangle).result;
+        var result = TriangleCountEjml.computeNodeWise(inputMatrix, useLowerTriangle);
 
-        double[] expected = {1, 3, 2, 4, 1, 1, 3};
-
-        assertArrayEquals(expected, result);
-        assertEquals(EXPECTED_TRIANGLE_COUNT, Arrays.stream(result).sum() / 3);
+        for (int i = 0; i < EXPECTED_NODEWISE_TC.length; i++) {
+            assertEquals(EXPECTED_NODEWISE_TC[i], result.get(i));
+        }
+        assertEquals(EXPECTED_TRIANGLE_COUNT, result.totalCount());
     }
 
     @Test
@@ -69,6 +70,23 @@ public class TriangleCountTest {
         Buffer jniMatrix = ToNativeMatrixConverter.convert(inputMatrix);
 
         assertEquals(EXPECTED_TRIANGLE_COUNT, TriangleCountNative.computeTotalSandia(jniMatrix, 1));
+
+        GRBCORE.freeMatrix(jniMatrix);
+        GRBCORE.grbFinalize();
+    }
+
+    @Test
+    public void nativeNodeWise() {
+        GRBCORE.initNonBlocking();
+
+        Buffer jniMatrix = ToNativeMatrixConverter.convert(inputMatrix);
+
+        NodeWiseTriangleCountResult result = TriangleCountNative.computeNodeWise(jniMatrix, 1);
+
+        for (int i = 0; i < EXPECTED_NODEWISE_TC.length; i++) {
+            assertEquals(EXPECTED_NODEWISE_TC[i], result.get(i));
+        }
+        assertEquals(EXPECTED_TRIANGLE_COUNT, result.totalCount());
 
         GRBCORE.freeMatrix(jniMatrix);
         GRBCORE.grbFinalize();
