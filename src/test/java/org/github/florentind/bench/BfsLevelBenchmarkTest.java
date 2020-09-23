@@ -3,10 +3,10 @@ package org.github.florentind.bench;
 import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
+import org.github.florentind.core.grapblas_native.NativeHelper;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
-import org.github.florentind.graphalgos.bfs.BfsEjml;
-import org.github.florentind.graphalgos.bfs.BfsNative;
-import org.github.florentind.graphalgos.bfs.BfsResult;
+import org.github.florentind.graphalgos.bfs.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphalgo.api.Graph;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
@@ -23,10 +23,13 @@ import java.nio.Buffer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BfsBenchmarkTest extends BaseBenchmarkTest {
-    private static final int NODE_COUNT = 30000;
+public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
+    private static final int NODE_COUNT = 30_000;
     private static final int MAX_ITERATIONS = 100;
     private static final int CONCURRENCY = 16;
+    // TODO: see why PARENTS variation is not equal
+    private static final BfsEjml.BfsVariation VARIATION = BfsEjml.BfsVariation.LEVEL;
+    private static final int START_NODE = 0;
 
 
     @Override
@@ -39,50 +42,42 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
         return 4;
     }
 
+    BfsResult goldStandard;
+    EjmlGraph ejmlGraph;
+
+    @Override
+    @BeforeEach
+    void setup() {
+        super.setup();
+        ejmlGraph = EjmlGraph.create(graph);
+        goldStandard = getJniResult(ejmlGraph, VARIATION, START_NODE);
+    }
+
     @Test
-    void pregelEqualsEjmlEqualsJniResult() {
-        int startNode = 0;
-        // TODO: see why PARENTS variation is not equal
-        BfsEjml.BfsVariation variation = BfsEjml.BfsVariation.LEVEL;
-        EjmlGraph ejmlGraph = EjmlGraph.create(graph);
-        assertResultEquals(
-                getEjmlResult(ejmlGraph, variation, true, startNode),
-                getPregelResult(ejmlGraph, variation, startNode),
-                variation
-        );
-
-        assertResultEquals(
-                getJniResult(ejmlGraph, variation, startNode),
-                getPregelResult(ejmlGraph, variation, startNode),
-                variation
-        );
+    void pregelEqualsJni() {
+        assertResultEquals(getPregelResult(ejmlGraph, VARIATION, START_NODE));
     }
 
-    private void assertResultEquals(BfsResult graphblasResult, Pregel.PregelResult pregelResult, BfsEjml.BfsVariation variation) {
-        assertEquals(graphblasResult.iterations(), pregelResult.ranIterations() - 1);
-        String propertyKey = (variation == BfsEjml.BfsVariation.LEVEL) ? BFSLevelPregel.LEVEL : BFSParentPregel.PARENT;
-        HugeLongArray pregelResultValues = pregelResult.nodeValues().longProperties(propertyKey);
+    @Test
+    void ejmlSparseEqualsJni() {
+        assertResultEquals(getEjmlResult(ejmlGraph, VARIATION, true, START_NODE));
+    }
 
+    @Test
+    void ejmlDenseEqualsJni() {
+        assertResultEquals(getEjmlResult(ejmlGraph, VARIATION, false, START_NODE));
+    }
+
+
+    private void assertResultEquals(BfsResult actual) {
+        assertEquals(goldStandard.iterations(), actual.iterations());
         for (int i = 0; i < NODE_COUNT; i++) {
-            double graphblasValue = graphblasResult.get(i);
-            switch (variation) {
-                case PARENTS:
-                    // -1  for parent: ids have an offset of 1 for ejml as 0 would be false in the bool semi-ring
-                case LEVEL:
-                    // -1 as for level: starts at 1 instead of 0 (and not found in pregel == -1)
-                    graphblasValue -= 1;
-                    break;
-                default:
-                    throw new IllegalStateException("Not implemented: " + variation.name());
-            }
-
-            assertEquals(graphblasValue, Double.valueOf(pregelResultValues.get(i)));
+            assertEquals(goldStandard.get(i), actual.get(i), "Different for node " + i);
         }
-
     }
 
 
-    private Pregel.PregelResult getPregelResult(Graph graph, BfsEjml.BfsVariation variation, int startNode) {
+    private BfsResult getPregelResult(Graph graph, BfsEjml.BfsVariation variation, int startNode) {
         BFSPregelConfig config = ImmutableBFSPregelConfig.builder()
                 .maxIterations(MAX_ITERATIONS)
                 .startNode(startNode)
@@ -90,12 +85,15 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
                 .build();
 
         PregelComputation<BFSPregelConfig> computation;
+        long zeroElement;
         switch (variation) {
             case LEVEL:
                 computation = new BFSLevelPregel();
+                zeroElement = 0;
                 break;
             case PARENTS:
                 computation = new BFSParentPregel();
+                zeroElement = Long.MAX_VALUE;
                 break;
             default:
                 throw new IllegalStateException("variant not implemented for Pregel" + variation.name());
@@ -109,7 +107,30 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
                 AllocationTracker.empty()
         );
 
-        return bfsLevelJob.run();
+        Pregel.PregelResult result = bfsLevelJob.run();
+
+
+        // making the result equal to the graphblas version
+        String propertyKey = (variation == BfsEjml.BfsVariation.LEVEL) ? BFSLevelPregel.LEVEL : BFSParentPregel.PARENT;
+        HugeLongArray resultValues = result.nodeValues().longProperties(propertyKey);
+        double[] resultArray = new double[Math.toIntExact(nodeCount())];
+        for (int i = 0; i < NODE_COUNT; i++) {
+            double resultValue = resultValues.get(i);
+            switch (variation) {
+                case PARENTS:
+                    // +1  for parent: ids have an offset of 1 for graphblas as 0 would be false in the bool semi-ring
+                case LEVEL:
+                    // +1 as for level: graphblas versions starts at 1 instead of 0 (and not found in pregel == -1)
+                    resultValue += 1;
+                    break;
+                default:
+                    throw new IllegalStateException("Not implemented: " + variation.name());
+            }
+            resultArray[i] = resultValue;
+        }
+
+        // -1 as initStep is an extra iteration in pregel
+        return new BfsDenseDoubleResult(resultArray, result.ranIterations() - 1, zeroElement);
     }
 
     private BfsResult getEjmlResult(EjmlGraph ejmlGraph, BfsEjml.BfsVariation variation, boolean sparse, int startNode) {
@@ -131,7 +152,7 @@ public class BfsBenchmarkTest extends BaseBenchmarkTest {
         Buffer jniMatrix = ToNativeMatrixConverter.convert(unTransposedMatrix);
 
         var result = new BfsNative().computeLevel(jniMatrix, startNode, MAX_ITERATIONS, 1);
-        GRBCORE.freeMatrix(jniMatrix);
+        NativeHelper.checkStatusCode(GRBCORE.freeMatrix(jniMatrix));
 
         return result;
     }
