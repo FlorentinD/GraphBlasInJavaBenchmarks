@@ -16,21 +16,16 @@ import java.util.Arrays;
 
 // variants: boolean/parents/level/multi-bfs  + sparse/dense result vector
 public class BfsEjml {
-    private static final DMonoid SECOND_MONOID = new DMonoid(0, (a, b) -> b);
     // TODO: version that uses the same operators as used in graphblas (probably using dense vectors .. as easier)
-    //          f.i. fixPoint recognized using reduce with OR-monoid
 
-    // TODO use DSemiRing FIRST_AND instead of OR_AND (first has 1 as a default?) .. OR_FIRST / OR_SECOND
-    //      for dense version: FIRST still needs to check for (a != 0)?!
-    //  as its just a boolean value thats interesting here
-    // .. hope for short circuit OR (or else write in eval part)
 
     // TODO: is the tmp iterationResult really necessary? (just the inputVector could be enough)
 
 
     public BfsDenseDoubleResult computeDense(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int startNode, int maxIterations) {
+        // if the inputVector entry is not zero -> return true (sparse adjacency matrix -> entry exists == true)
         DMonoid firstNotZeroMonoid = new DMonoid(0, (a, b) -> (a != 0) ? 1 : 0);
-        // as dense here:
+        // as dense here: cannot use FIRST instead of OR
         DSemiRing levelSemiRing = new DSemiRing(DMonoids.OR, firstNotZeroMonoid);
         DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : levelSemiRing;
         double[] result = new double[adjacencyMatrix.numCols];
@@ -98,9 +93,8 @@ public class BfsEjml {
     public BfsSparseResult computeSparse(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int[] startNodes, int maxIterations) {
         // TODO: use transposed result matrix as startNodes.length << adjacencyMatrix.length
         //         need to transpose result of VxM before combining
-        //          -> use a DSparseVector (then just one start node allowed)
+        //          -> use a DSparseVector and write MatrixSparseVector mult op (then just one start node allowed)
         DMatrixSparseCSC result = new DMatrixSparseCSC(startNodes.length, adjacencyMatrix.numCols);
-        // DMatrixSparseCSC iterationResult = result.createLike();
 
         // init result vector
         for (int i = 0; i < startNodes.length; i++) {
@@ -121,9 +115,10 @@ public class BfsEjml {
         int nodesVisited = startNodes.length;
 
         // as the id of the monoid is never used for sparse mult .. this works nicely to use FIRST even for plus here
-        DMonoid first_monoid = new DMonoid(1, (a, b) -> a);
-        // TODO see why first cannot be used for plus ! .. need sparse vector x csc matrix op for this to work ..
-        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : new DSemiRing(SECOND_MONOID, first_monoid);
+        // find out why id actually matters for sparse mult
+        DMonoid first_monoid = new DMonoid(0, (a, b) -> a);
+
+        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : new DSemiRing(first_monoid, first_monoid);
 
         int iteration = 1;
 
@@ -133,9 +128,8 @@ public class BfsEjml {
             Mask mask = DMasks.builder(result, true).withNegated(true).withReplace(true).build();
             iterationResult = CommonOpsWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, gw, gx);
 
-            if (mask.replace) {
-                nodesVisited += iterationResult.nz_length;
-            }
+            nodesVisited += iterationResult.nz_length;
+
 
             // set inputVector based on newly discovered nodes
             // TODO: do this via an `assign` that supports a mask (double[] out, DMatrixSparse_CSC/Vector input)
