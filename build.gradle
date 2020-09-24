@@ -90,7 +90,8 @@ jmh {
     zip64 = true
     forceGC = true
     // regExp which benchmarks to run
-    include = ['.*TriangleCountNativeBenchmark.*']
+    // ejmlSparseBfsLevel
+    include = ['.*ejml.*BfsLevel.*']
     exclude = ['.*GraphImpl.*']
     duplicateClassesStrategy = 'warn'
 

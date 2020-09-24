@@ -45,7 +45,7 @@ public class ConverterTest {
 
         assertTrue(jGraph.getType().isWeighted());
         assertTrue(jGraph.getType().isUndirected());
-        assertEquals(graph.relationshipCount(), jGraph.edgeSet().size());
+        assertEquals(graph.relationshipCount(), jGraph.edgeSet().size() * 2);
 
         assertEquals(42, jGraph.getEdgeWeight(jGraph.getEdge(0, 1)));
         assertEquals(1337, jGraph.getEdgeWeight(jGraph.getEdge(1, 2)));

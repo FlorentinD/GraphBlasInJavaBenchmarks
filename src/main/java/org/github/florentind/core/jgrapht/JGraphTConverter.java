@@ -24,7 +24,9 @@ public class JGraphTConverter {
 
             gdsGraph.forEachNode(id -> {
                 gdsGraph.forEachRelationship(id, DEFAULT_RELATIONSHIP_PROPERTY, (src, trg, weight) -> {
-                    edges.add(new Triple<>(Math.toIntExact(src), Math.toIntExact(trg), weight));
+                    if(!(gdsGraph.isUndirected() && src >= trg)) {
+                        edges.add(new Triple<>(Math.toIntExact(src), Math.toIntExact(trg), weight));
+                    }
                     return true;
                 });
                 return true;
@@ -41,7 +43,9 @@ public class JGraphTConverter {
             List<Pair<Integer, Integer>> edges = new ArrayList<>();
             gdsGraph.forEachNode(id -> {
                 gdsGraph.forEachRelationship(id, (src, trg) -> {
-                    edges.add(new Pair<>(Math.toIntExact(src), Math.toIntExact(trg)));
+                    if(!(gdsGraph.isUndirected() && src >= trg)) {
+                        edges.add(new Pair<>(Math.toIntExact(src), Math.toIntExact(trg)));
+                    }
                     return true;
                 });
                 return true;
