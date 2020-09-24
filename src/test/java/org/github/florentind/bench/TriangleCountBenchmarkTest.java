@@ -8,7 +8,6 @@ import org.github.florentind.graphalgos.triangleCount.TriangleCountEjml;
 import org.github.florentind.graphalgos.triangleCount.TriangleCountNative;
 import org.jgrapht.GraphMetrics;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -138,10 +137,8 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
         assertEquals(expectedGlobalTriangles, result.totalCount());
     }
 
-    @Disabled
     @Test
     public void testJGraphTGlobal() {
-        // TODO this finds way too many triangles ..
         var jGraph = JGraphTConverter.convert(ejmlGraph);
 
         assertEquals(expectedGlobalTriangles, GraphMetrics.getNumberOfTriangles(jGraph));
