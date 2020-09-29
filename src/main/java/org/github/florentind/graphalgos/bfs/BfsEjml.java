@@ -122,7 +122,7 @@ public class BfsEjml {
 
         int iteration = 1;
 
-        for (; (iteration <= maxIterations); iteration++) {
+        for (;; iteration++) {
             // negated -> dont compute values for visited nodes
             // replace -> iterationResult is basically the new inputVector
             Mask mask = DMasks.builder(result, true).withNegated(true).withReplace(true).build();
@@ -158,7 +158,7 @@ public class BfsEjml {
             result = MaskUtil_DSCC.combineOutputs(result, iterationResult, null, null);
 
             // check for fixPoint
-            if ((iterationResult.nz_length == 0) || (nodesVisited == adjacencyMatrix.numCols)) {
+            if ((iterationResult.nz_length == 0) || (nodesVisited == adjacencyMatrix.numCols) || (iteration >= maxIterations)) {
                 break;
             }
         }

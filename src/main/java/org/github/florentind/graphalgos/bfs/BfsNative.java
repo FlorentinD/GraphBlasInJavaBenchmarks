@@ -1,6 +1,9 @@
 package org.github.florentind.graphalgos.bfs;
 
-import com.github.fabianmurariu.unsafe.*;
+import com.github.fabianmurariu.unsafe.GRAPHBLAS;
+import com.github.fabianmurariu.unsafe.GRBCORE;
+import com.github.fabianmurariu.unsafe.GRBMONOID;
+import com.github.fabianmurariu.unsafe.GRBOPSMAT;
 
 import java.nio.Buffer;
 
@@ -53,7 +56,7 @@ public class BfsNative {
         long nodesInQueue = 1;
 
         // BFS-traversal
-        for (; level < maxIterations; level++) {
+        for (; ; level++) {
             // v<q> = level, using vector assign with q as the mask
             // no option to use GrB_ALL -> but ni = nodeCount leads to it being used
             checkStatusCode(GRAPHBLAS.assignVectorInt(resultVector, queueVector, null, level, GRBCORE.GrB_ALL, nodeCount, null));
@@ -63,7 +66,7 @@ public class BfsNative {
 
             nodesVisited += nodesInQueue ;
             // check for fixPoint
-            if (nodesInQueue == 0 || nodesVisited == nodeCount || level >= maxIterations) break ;
+            if (nodesInQueue == 0 || nodesVisited == nodeCount || level > maxIterations) break ;
 
             // q<¬v> = q lor.land matrix
             checkStatusCode(GRBOPSMAT.vxm(queueVector, resultVector, null, semiRing, queueVector, adjacencyMatrix, desc));

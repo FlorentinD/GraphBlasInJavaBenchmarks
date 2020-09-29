@@ -19,8 +19,13 @@ public class BfsDenseIntegerResult implements BfsResult {
 
     @Override
     public int nodesVisited() {
-        // works as the result vector is sparse
-        return this.values.length;
+        int visited = 0;
+
+        for (double v : values) {
+            if (v != notFoundValue) visited++;
+        }
+
+        return visited;
     }
 
     @Override
