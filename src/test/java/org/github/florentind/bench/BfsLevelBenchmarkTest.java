@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
     private static final int NODE_COUNT = 30_000;
     private static final int MAX_ITERATIONS = 100;
-    // TODO pregel seems flaky when concurrency > 1 and larger graphs
     private static final int CONCURRENCY = 16;
     // TODO: see why PARENTS variation is not equal
     private static final BfsEjml.BfsVariation VARIATION = BfsEjml.BfsVariation.LEVEL;
@@ -83,7 +82,7 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
     private BfsResult getPregelResult(Graph graph, BfsEjml.BfsVariation variation, int startNode) {
         // MAX_ITERATIONS + 1 as the init iterations also counts
         BFSPregelConfig config = ImmutableBFSPregelConfig.builder()
-                .maxIterations(MAX_ITERATIONS + 1)
+                .maxIterations(MAX_ITERATIONS)
                 .startNode(startNode)
                 .concurrency(CONCURRENCY)
                 .build();
@@ -133,8 +132,7 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
             resultArray[i] = resultValue;
         }
 
-        // -1 as initStep is an extra iteration in pregel
-        return new BfsDenseDoubleResult(resultArray, result.ranIterations() - 1, zeroElement);
+        return new BfsDenseDoubleResult(resultArray, result.ranIterations(), zeroElement);
     }
 
     private BfsResult getEjmlResult(EjmlGraph ejmlGraph, BfsEjml.BfsVariation variation, boolean sparse, int startNode) {
