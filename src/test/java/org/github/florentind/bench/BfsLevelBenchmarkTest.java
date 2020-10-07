@@ -5,7 +5,10 @@ import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
 import org.github.florentind.core.grapblas_native.NativeHelper;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
-import org.github.florentind.graphalgos.bfs.*;
+import org.github.florentind.graphalgos.bfs.BfsDenseDoubleResult;
+import org.github.florentind.graphalgos.bfs.BfsEjml;
+import org.github.florentind.graphalgos.bfs.BfsNative;
+import org.github.florentind.graphalgos.bfs.BfsResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphalgo.api.Graph;
@@ -60,12 +63,17 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
 
     @Test
     void ejmlSparseEqualsJni() {
-        assertResultEquals(getEjmlResult(ejmlGraph, VARIATION, true, START_NODE));
+        assertResultEquals(getEjmlSparseResult(ejmlGraph, VARIATION, START_NODE));
     }
 
     @Test
     void ejmlDenseEqualsJni() {
-        assertResultEquals(getEjmlResult(ejmlGraph, VARIATION, false, START_NODE));
+        assertResultEquals(getEjmlDenseResult(ejmlGraph, VARIATION, START_NODE));
+    }
+
+    @Test
+    void ejmlDenseSparseEqualsJni() {
+        assertResultEquals(getEjmlDenseSparseResult(ejmlGraph, VARIATION, START_NODE));
     }
 
 
@@ -135,13 +143,19 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
         return new BfsDenseDoubleResult(resultArray, result.ranIterations(), zeroElement);
     }
 
-    private BfsResult getEjmlResult(EjmlGraph ejmlGraph, BfsEjml.BfsVariation variation, boolean sparse, int startNode) {
+    private BfsResult getEjmlSparseResult(EjmlGraph ejmlGraph, BfsEjml.BfsVariation variation, int startNode) {
         var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
-        if (sparse) {
-            return new BfsEjml().computeSparse(unTransposedMatrix, variation, new int[]{startNode}, MAX_ITERATIONS);
-        } else {
-            return new BfsEjml().computeDense(unTransposedMatrix, variation, startNode, MAX_ITERATIONS);
-        }
+        return new BfsEjml().computeSparse(unTransposedMatrix, variation, new int[]{startNode}, MAX_ITERATIONS);
+    }
+
+    private BfsResult getEjmlDenseResult(EjmlGraph ejmlGraph, BfsEjml.BfsVariation variation, int startNode) {
+        var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
+        return new BfsEjml().computeDense(unTransposedMatrix, variation, startNode, MAX_ITERATIONS);
+    }
+
+    private BfsResult getEjmlDenseSparseResult(EjmlGraph ejmlGraph, BfsEjml.BfsVariation variation, int startNode) {
+        var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
+        return new BfsEjml().computeDenseSparse(unTransposedMatrix, variation, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getJniResult(EjmlGraph ejmlGraph, BfsEjml.BfsVariation variation, int startNode) {

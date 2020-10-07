@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.nio.Buffer;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static org.github.florentind.graphalgos.bfs.BfsEjml.BfsVariation;
@@ -71,6 +72,19 @@ public class BfsTest {
 
         var result = bfs.computeDense(inputMatrix, variation, startNode, maxIterations);
 
+        assertBfsResult(expected, result);
+        assertEquals(EXPECTED_ITERATIONS, result.iterations());
+    }
+
+    @ParameterizedTest
+    @MethodSource("bfsVariantSource")
+    public void testSparseDenseEjmlVariations(BfsVariation variation, double[] expected) {
+        int startNode = 0;
+        int maxIterations = 20;
+
+        var result = bfs.computeDenseSparse(inputMatrix, variation, startNode, maxIterations);
+
+        System.out.println("result.result() = " + Arrays.toString(result.result()));
         assertBfsResult(expected, result);
         assertEquals(EXPECTED_ITERATIONS, result.iterations());
     }

@@ -48,10 +48,11 @@ public class BfsEjml {
         boolean isFixPoint = false;
         int iteration = 1;
 
+        // negated -> dont compute values for visited nodes
+        // replace -> iterationResult is basically the new inputVector
+        PrimitiveDMask mask = DMasks.builder(result).withZeroElement(semiRing.add.id).withNegated(true).withReplace(true).build();
+
         for (; (iteration <= maxIterations) && !isFixPoint; iteration++) {
-            // negated -> dont compute values for visited nodes
-            // replace -> iterationResult is basically the new inputVector
-            PrimitiveDMask mask = DMasks.builder(result).withZeroElement(semiRing.add.id).withNegated(true).withReplace(true).build();
             // clear iterationsResult to only contain newly discovered nodes
             Arrays.fill(iterationResult, semiRing.add.id);
             iterationResult = MatrixVectorMultWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null);
@@ -99,7 +100,7 @@ public class BfsEjml {
         // init result vector
         for (int i = 0; i < startNodes.length; i++) {
             if (bfsVariation == BfsVariation.PARENTS) {
-                result.set(0, startNodes[i], i + 1);
+                result.set(0, startNodes[i], startNodes[i] + 1);
             } else {
                 result.set(0, startNodes[i], 1);
             }
@@ -167,6 +168,76 @@ public class BfsEjml {
         return new BfsSparseResult(result, iteration, semiRing.add.id);
     }
 
+
+    public BfsDenseDoubleResult computeDenseSparse(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int startNode, int maxIterations) {
+        int nodeCount = adjacencyMatrix.numCols;
+        double[] result = new double[nodeCount];
+        DMatrixSparseCSC inputVector = new DMatrixSparseCSC(1, nodeCount);
+
+        // init result vector
+
+            if (bfsVariation == BfsVariation.PARENTS) {
+                inputVector.set(0, startNode, startNode + 1);
+            } else {
+                inputVector.set(0, startNode, 1);
+            }
+
+        // for reusing memory
+        IGrowArray gw = new IGrowArray();
+        DGrowArray gx = new DGrowArray();
+        DMatrixSparseCSC iterationResult = null;
+
+        int nodesVisited = 0;
+
+        // as the id of the monoid is never used for sparse mult .. this works nicely to use FIRST even for plus here
+        // find out why id actually matters for sparse mult
+        DMonoid first_monoid = new DMonoid(0, (a, b) -> a);
+        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : new DSemiRing(first_monoid, first_monoid);
+
+        int iteration = 1;
+
+        // negated -> dont compute values for visited nodes
+        // replace -> iterationResult is basically the new inputVector
+        Mask mask = DMasks.builder(result).withNumCols(nodeCount).withNegated(true).withReplace(true).build();
+
+        for (;; iteration++) {
+            nodesVisited += inputVector.nz_length;
+
+            if (bfsVariation == BfsVariation.LEVEL) {
+                int currentIteration = iteration;
+                CommonOps_DSCC.apply(inputVector, x -> currentIteration);
+            }
+
+            // TODO assign scalar for level or boolean (inputVector as a mask)
+            result = CommonOps_DArray.assign(result, inputVector);
+
+            if (bfsVariation == BfsVariation.PARENTS) {
+                // set value to its own id
+                for (int col = 0; col < inputVector.numCols; col++) {
+                    // as inputVector only has 1 row ..
+                    int nz_idx = inputVector.col_idx[col];
+                    if (nz_idx != inputVector.col_idx[col + 1]) {
+                        inputVector.nz_values[nz_idx] = col + 1;
+                    }
+                }
+            }
+
+            // check for fixPoint
+            if ((inputVector.nz_length == 0) || (nodesVisited == nodeCount) || (iteration >= maxIterations)) {
+                break;
+            }
+
+            iterationResult = CommonOpsWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, gw, gx);
+
+            // switch references .. less costly then clone
+            DMatrixSparseCSC tmp = inputVector;
+            inputVector = iterationResult;
+            iterationResult = tmp;
+        }
+
+        // expect the result to be a row vector / row vectors
+        return new BfsDenseDoubleResult(result, iteration - 1, semiRing.add.id);
+    }
 
     public enum BfsVariation {
         BOOLEAN, PARENTS, LEVEL
