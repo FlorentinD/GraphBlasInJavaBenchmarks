@@ -30,9 +30,4 @@ public class MxMBenchmark extends MxMBaseBenchmark {
         CommonOps_DSCC.mult(matrix, matrix, result);
         bh.consume(result);
     }
-
-    @Benchmark
-    public void mTxm(Blackhole bh) {
-        bh.consume(CommonOps_DSCC.multTransA(transposedMatrix, matrix, null, null, null));
-    }
 }

@@ -40,13 +40,19 @@ public final class EjmlGraph extends FilterGraph {
 
     private boolean canRelease = true;
 
+    public static EjmlGraph create(CSRGraph graph) {
+        return create(graph, false);
+    }
+
     /**
      * Converts a Graph into an EJML graph.
      * ! Releases its topology
      */
-    public static EjmlGraph create(CSRGraph graph) {
+    public static EjmlGraph create(CSRGraph graph, boolean releaseTopology) {
         EjmlRelationships ejmlRelationships = EjmlRelationships.of(graph);
-        graph.releaseTopology();
+        if (releaseTopology) {
+            graph.releaseTopology();
+        }
         return new EjmlGraph(graph, ejmlRelationships);
     }
 

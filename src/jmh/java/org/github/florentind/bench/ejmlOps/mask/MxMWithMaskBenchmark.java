@@ -17,13 +17,10 @@ public class MxMWithMaskBenchmark extends MatrixOpsBaseBenchmark {
     // TODO potential action: just remove unnecessary elements at the end instead of applying the mask during computation
 
     Mask mask;
-    DMatrixSparseCSC transposedMatrix;
-
     @Setup
     public void setup() {
         super.setup();
         mask = DMasks.builder(matrix, true).build();
-        transposedMatrix = CommonOps_DSCC.transpose(matrix, null, null);
     }
 
     @Benchmark
@@ -34,26 +31,5 @@ public class MxMWithMaskBenchmark extends MatrixOpsBaseBenchmark {
     @Benchmark
     public void mxm(Blackhole bh) {
         bh.consume(CommonOpsWithSemiRing_DSCC.mult(matrix, matrix, null, DSemiRings.AND_OR, null, null));
-    }
-
-    // these are really really slow (as expected)
-//    @Benchmark
-//    public void mxmTWithMask(Blackhole bh) {
-//        bh.consume(CommonOpsWithSemiRing_DSCC.multTransB(matrix, transposedMatrix, null, DSemiRings.AND_OR, mask, null, null, null));
-//    }
-//
-//    @Benchmark
-//    public void mxmT(Blackhole bh) {
-//        bh.consume(CommonOpsWithSemiRing_DSCC.multTransB(matrix, transposedMatrix, null, DSemiRings.AND_OR, null, null, null, null));
-//    }
-
-    @Benchmark
-    public void mTxmWithMask(Blackhole bh) {
-        bh.consume(CommonOpsWithSemiRing_DSCC.multTransA(transposedMatrix, matrix, null, DSemiRings.AND_OR, mask, null, null, null));
-    }
-
-    @Benchmark
-    public void mTxm(Blackhole bh) {
-        bh.consume(CommonOpsWithSemiRing_DSCC.multTransA(transposedMatrix, matrix, null, DSemiRings.AND_OR, null, null, null, null));
     }
 }

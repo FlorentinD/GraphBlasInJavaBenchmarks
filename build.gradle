@@ -91,7 +91,7 @@ jmh {
     forceGC = true
     // regExp which benchmarks to run
     // ejmlSparseBfsLevel
-    include = ['.*ejml.*BfsLevel.*']
+    include = ['.*MxVMultBenchmark.*']
     exclude = ['.*GraphImpl.*']
     duplicateClassesStrategy = 'warn'
 

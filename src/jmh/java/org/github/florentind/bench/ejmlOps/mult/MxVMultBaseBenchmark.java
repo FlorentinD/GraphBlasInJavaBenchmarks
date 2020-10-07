@@ -2,22 +2,36 @@
 package org.github.florentind.bench.ejmlOps.mult;
 
 import org.github.florentind.bench.ejmlOps.MatrixOpsBaseBenchmark;
+import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 
 import java.util.Arrays;
+import java.util.Random;
 
 
 public class MxVMultBaseBenchmark extends MatrixOpsBaseBenchmark {
-    protected double[] inputVector;
+    protected double[] denseInputVector;
+
     protected double[] output;
+
+    @Param({"0.01", "0.2", "0.8"})
+    private float inputVectorDensity;
 
     @Override
     @Setup
     public void setup() {
         super.setup();
-        inputVector = new double[matrix.numRows];
+        denseInputVector = new double[matrix.numRows];
         output = new double[matrix.numRows];
         // fast init and actual values are not relevant for the benchmark
-        Arrays.fill(output, 22);
+
+        int nonZeroElements = Math.round(inputVectorDensity * matrix.numCols);
+
+        var rand = new Random(99);
+
+        for (int i = 0; i < nonZeroElements; i++) {
+           int index = rand.nextInt(denseInputVector.length);
+           denseInputVector[index] = rand.nextDouble();
+        }
     }
 }

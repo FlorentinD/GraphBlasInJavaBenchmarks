@@ -5,7 +5,7 @@
 # read csv
 import pandas as pd
 
-benchmarkResult = pd.read_csv("results/bfsResults.csv")
+benchmarkResult = pd.read_csv("results/bfs/bfsLevelImprovement.csv")
 print(benchmarkResult.dtypes)
 
 benchmarkResult["Name"] = benchmarkResult.Benchmark.str.split(".").str[-1]

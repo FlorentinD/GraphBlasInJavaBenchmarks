@@ -16,7 +16,7 @@ public class BfsNativeBenchmark extends BfsBaseBenchmark {
     @Param({"1", "8"})
     private int concurrency;
 
-    @Param({"true", "false"})
+    @Param({"false"})
     private boolean blockingMode;
 
     protected Buffer jniMatrix;

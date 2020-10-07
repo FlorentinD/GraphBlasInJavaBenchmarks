@@ -29,7 +29,7 @@ public class ReduceColumnWiseBenchmark extends MatrixOpsBaseBenchmark {
 
     @Benchmark
     public void columnMaxAbs(Blackhole bh) {
-        CommonOps_DSCC.columnMaxAbs(matrix, output.data);
+        CommonOps_DSCC.maxAbsCols(matrix, output);
     }
 
     // f.i. divideColumns is not directly translate-able as it allows different values per column
