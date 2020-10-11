@@ -5,12 +5,15 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
+import org.github.florentind.core.ejml.EjmlUtil;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.core.jgrapht.JGraphTConverter;
 import org.github.florentind.graphalgos.pageRank.PageRankEjml;
 import org.github.florentind.graphalgos.pageRank.PageRankNative;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.neo4j.graphalgo.beta.generator.PropertyProducer;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.pr.ImmutablePageRankPregelConfig;
 import org.neo4j.graphalgo.beta.pregel.pr.PageRankPregel;
@@ -29,11 +32,11 @@ import java.util.stream.LongStream;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PageRankBenchmarkTest extends BaseBenchmarkTest {
-    private static final int NODE_COUNT = 300_000;
+public class WeightedPageRankBenchmarkTest extends BaseBenchmarkTest {
+    private static final int NODE_COUNT = 3;
     private static final int MAX_ITERATIONS = 20;
     private static final double DAMPING_FACTOR = 0.85;
-    private static final double TOLERANCE = 1e-7;
+    private static final double TOLERANCE = 1e-32;
     private static final int CONCURRENCY = 1;
 
     @Override
@@ -46,18 +49,24 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
         return 4;
     }
 
+    @Override
+    PropertyProducer relationshipPropertyProducer() {
+        return PropertyProducer.random("weight", 0, 1);
+    }
+
     Triple<String, Integer, double[]> goldStandard;
 
     @BeforeEach
     public void setup() {
         super.setup();
+
         goldStandard = getGdsResult();
     }
 
     @Test
     void testJGraphT() {
         var jGraph = JGraphTConverter.convert(graph);
-        var pageRanks = new org.jgrapht.alg.scoring.PageRank(jGraph).getScores();
+        var pageRanks = new org.jgrapht.alg.scoring.PageRank(jGraph, DAMPING_FACTOR, MAX_ITERATIONS, TOLERANCE).getScores();
         double[] jGraphTResult = pageRanks.values().stream().mapToDouble(v -> (Double) v).toArray();
 
         assertArrayEquals(goldStandard.getRight(), jGraphTResult, 1e-2);
@@ -76,9 +85,11 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
         var pregelResult = getPregelResult();
 
         assertEquals(goldStandard.getMiddle(), pregelResult.getMiddle());
+        // values seem to be different .. but order is still correct?
         assertArrayEquals(goldStandard.getRight(), pregelResult.getRight(), 1e-2);
     }
 
+    @Disabled
     @Test
     void testNative() {
         GRBCORE.initNonBlocking();
@@ -96,7 +107,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
         EjmlGraph ejmlGraph = EjmlGraph.create(graph);
         var adjacencyMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
 
-        var result = new PageRankEjml().compute(adjacencyMatrix, DAMPING_FACTOR, TOLERANCE, MAX_ITERATIONS);
+        var result = new PageRankEjml().computeWeighted(adjacencyMatrix, DAMPING_FACTOR, TOLERANCE, MAX_ITERATIONS);
 
         return new ImmutableTriple<>("ejml", result.iterations(), result.result());
     }
@@ -108,7 +119,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
                 .tolerance(TOLERANCE)
                 .build();
 
-        PageRank pageRank = PageRankAlgorithmType.NON_WEIGHTED
+        PageRank pageRank = PageRankAlgorithmType.WEIGHTED
                 .create(graph, config, LongStream.empty(), ProgressLogger.NULL_LOGGER)
                 .compute();
 
@@ -117,6 +128,10 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
     }
 
     Triple<String, Integer, double[]> getPregelResult() {
+        // normalize relationshipWeights (needed for pregel version)
+        var normalizedGraph = EjmlUtil.normalizeOutgoingWeights(EjmlGraph.create(graph));
+
+
         var config = ImmutablePageRankPregelConfig.builder()
                 .maxIterations(MAX_ITERATIONS)
                 .dampingFactor(DAMPING_FACTOR)
@@ -125,7 +140,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
 
         PageRankPregel computation = new PageRankPregel();
         var pageRankJob = Pregel.create(
-                graph,
+                normalizedGraph,
                 config,
                 computation,
                 Pools.DEFAULT,

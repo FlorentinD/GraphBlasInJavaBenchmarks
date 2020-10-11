@@ -69,7 +69,7 @@ public class PageRankEjml {
             // Reason: outDegrees vector would be sparse in other GraphBLAS implementations (here always dense)
             // TODO: this should only be done if outDegree != 0?
             //  (otherwise division through 0, but result is ignored in next mult-op either way) (see Performance impact first)
-            importanceVec = CommonOps_DArray.elementWiseMult(pr, outDegrees, importanceVec, (a, b) -> a / b);
+            CommonOps_DArray.elementWiseMult(pr, outDegrees, importanceVec, (a, b) -> a / b);
 
             // Multiply importance by damping factor
             CommonOps_DArray.apply(importanceVec, i -> i * dampingFactor);
@@ -109,7 +109,127 @@ public class PageRankEjml {
 
 
             // !! Difference to reference: no tolerance contained
-            // TODO: this is basically elementWiseAdd/Mult using minus-monoid
+            // TODO: this is basically elementWiseMult using minus-monoid
+            // calculate diff (for tolerance check)
+            for (int i = 0; i < prevResult.length; i++) {
+                prevResult[i] = prevResult[i] - pr[i];
+            }
+            CommonOps_DArray.apply(prevResult, Math::abs);
+            resultDiff = CommonOps_DArray.reduceScalar(prevResult, DMonoids.PLUS);
+        }
+
+        return new PageRankResult(pr, iterations);
+    }
+
+    /**
+     * based on https://github.com/GraphBLAS/LAGraph/blob/master/Source/Algorithm/LAGraph_pagerank2.c
+     * but adjacencyMatrix contains weights.
+     *
+     * Propageted score to neighbors is divided by the sum of the weights instead of the degree
+     *
+     * @param adjacencyMatrix (Input) Graph
+     * @param dampingFactor   How often are teleports
+     * @param tolerance       Minimum change in scores between iterations
+     * @param maxIterations   Maximum number of iterations
+     * @return pr-scores (sum of all scores = 1)
+     */
+    public PageRankResult computeWeighted(DMatrixSparseCSC adjacencyMatrix, double dampingFactor, double tolerance, int maxIterations) {
+        // TODO: this might be mostly duplicate code from normal version
+        // Differences: normalize weights on copy adjacency matrix stuff -> no division by outDegree needed at beginning of iteration
+
+        int nodeCount = adjacencyMatrix.getNumCols();
+        final double teleport = (1.0 - dampingFactor) / nodeCount;
+        // so first iteration is always run
+        double resultDiff = 1;
+        int iterations = 0;
+
+        // Calculating outbound degrees of all nodes
+        // TODO is this needed? e.g. replaced by sum?
+        //  boolean flag to normalize stored weights .. adjust adjacency matrix stored weights
+        double[] weightSums = CommonOps_DSCC.reduceRowWise(adjacencyMatrix, 0.0, Double::sum, null).data;
+
+        boolean weightsNormalized = Arrays.stream(weightSums).allMatch(sum -> sum == 1 || sum == 0);
+
+        if (!weightsNormalized) {
+            // create copy to not change input matrix
+            adjacencyMatrix = adjacencyMatrix.copy();
+
+            // normalize weights .. op based on row + values
+            // TODO: normalize on matrix copy and write as a general operator
+            for (int i = 0; i < adjacencyMatrix.nz_length; i++) {
+                adjacencyMatrix.nz_values[i] = adjacencyMatrix.nz_values[i] / weightSums[adjacencyMatrix.nz_rows[i]];
+            }
+        }
+
+        // Mask set for every node with a nodeDegree > 0 (e.g. weightSum == 1)
+        // In subsequent operations, this mask can be used to select dangling nodes.
+        // Difference to reference: not creating a boolean vector for non-dangling nodes and inverting at this point already
+        // as here we have explicit mask objects
+        PrimitiveDMask danglingNodesMask = DMasks.builder(weightSums)
+                .withZeroElement(0)
+                .withReplace(true)
+                .withNegated(true)
+                .build();
+
+
+        // init result vector
+        double[] pr = new double[nodeCount];
+        double[] prevResult = new double[nodeCount];
+        Arrays.fill(pr, 1.0 / nodeCount);
+
+        double[] importanceVec = new double[nodeCount];
+        double[] importanceResultVec = new double[nodeCount];
+
+        //iterations
+        for (; iterations < maxIterations && resultDiff > tolerance; iterations++) {
+            // cache result from previous iteration
+            System.arraycopy(pr, 0, prevResult, 0, pr.length);
+
+            //
+            // Importance calculation
+            //
+
+            // TODO: apply faster if first arraycopy pr -> importanceVec and then apply on same vector?
+
+            // Multiply prev pr by damping factor and save into importanceVec
+            CommonOps_DArray.apply(pr, importanceVec, i -> i * dampingFactor);
+
+            // Calculate total PR of all inbound nodes
+            // !! Difference to reference: input vector must be different to initial output vector (otherwise dirty reads) for `multTransA`
+            //  --> importanceResultVec (instead of allocating a new result array per iteration)
+            importanceResultVec = MatrixVectorMultWithSemiRing_DSCC.multTransA(
+                    adjacencyMatrix,
+                    importanceVec,
+                    importanceResultVec,
+                    DSemiRings.PLUS_TIMES,
+                    null,
+                    null
+            );
+
+
+            //
+            // Dangling calculation
+            //
+
+            // Sum the previous PR values of dangling nodes together
+            // !! Difference to reference:  mask in reduceScalar is for the input-vector
+            // --> not extracting dangling pr entries before
+            double danglingSum = CommonOps_DArray.reduceScalar(pr, DMonoids.PLUS, danglingNodesMask);
+
+
+            // Multiply by damping factor and 1 / |V|
+            danglingSum *= (dampingFactor / nodeCount);
+
+            //
+            // PageRank summarization
+            // Add teleport, importanceVec, and dangling_vec components together
+            //
+            Arrays.fill(pr, teleport + danglingSum);
+            CommonOps_DArray.elementWiseAdd(pr, importanceResultVec, pr, DMonoids.PLUS);
+
+
+            // !! Difference to reference: no tolerance contained
+            // TODO: this is basically elementWiseMult using minus-monoid
             // calculate diff (for tolerance check)
             for (int i = 0; i < prevResult.length; i++) {
                 prevResult[i] = prevResult[i] - pr[i];
