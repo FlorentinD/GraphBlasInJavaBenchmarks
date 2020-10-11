@@ -1,4 +1,4 @@
-package org.github.florentind.bench.pageRank;
+package org.github.florentind.bench.weightedPageRank;
 
 
 import org.neo4j.graphalgo.core.utils.ProgressLogger;
@@ -11,18 +11,17 @@ import org.openjdk.jmh.infra.Blackhole;
 
 import java.util.stream.LongStream;
 
-public class PageRankGdsBenchmark extends PageRankBaseBenchmark {
+public class WeightedPageRankGdsBenchmark extends WeightedPageRankBaseBenchmark {
 
     @Param({"1", "8"})
     private int concurrency;
 
-    private PageRankBaseConfig unweightedConfig;
+    private PageRankBaseConfig weightedConfig;
 
     @Override
     public void setup() {
         super.setup();
-
-        unweightedConfig = ImmutablePageRankStatsConfig
+        weightedConfig = ImmutablePageRankStatsConfig
                 .builder()
                 .maxIterations(maxIterations)
                 .dampingFactor(dampingFactor)
@@ -31,10 +30,11 @@ public class PageRankGdsBenchmark extends PageRankBaseBenchmark {
                 .build();
     }
 
+
     @org.openjdk.jmh.annotations.Benchmark
     public void gds(Blackhole bh) {
-        PageRank algorithm = PageRankAlgorithmType.NON_WEIGHTED
-                .create(graph, unweightedConfig, LongStream.empty(), ProgressLogger.NULL_LOGGER);
+        PageRank algorithm = PageRankAlgorithmType.WEIGHTED
+                .create(graph, weightedConfig, LongStream.empty(), ProgressLogger.NULL_LOGGER);
 
         bh.consume(algorithm.compute());
     }

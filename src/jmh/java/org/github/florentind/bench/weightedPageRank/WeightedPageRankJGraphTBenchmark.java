@@ -1,4 +1,4 @@
-package org.github.florentind.bench.pageRank;
+package org.github.florentind.bench.weightedPageRank;
 
 
 import org.github.florentind.core.jgrapht.JGraphTConverter;
@@ -7,15 +7,15 @@ import org.jgrapht.alg.scoring.PageRank;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.infra.Blackhole;
 
-public class PageRankJGraphTBenchmark extends PageRankBaseBenchmark {
+public class WeightedPageRankJGraphTBenchmark extends WeightedPageRankBaseBenchmark {
     Graph jGraph;
 
 //    @Param({"300000"})
 //    int nodeCount;
+
     @Setup
     public void setup() {
         super.setup();
-
         jGraph = JGraphTConverter.convert(graph);
     }
 
