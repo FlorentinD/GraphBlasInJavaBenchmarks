@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
+import math
 
 # for plotting the error
 # https://stackoverflow.com/questions/42017049/seaborn-how-to-add-error-bars-on-a-grouped-barplot
@@ -40,7 +40,10 @@ def grouped_barplot(df, categorie, hueColumn, valueColumn, err, ax):
 def autolabel(bars, ax):
     """Attach a text label above each bar in *rects*, displaying its height."""
     for bar in bars:
-        height = round(bar.get_height())
+        height = 0
+        if not math.isnan(bar.get_height()):
+            height = round(bar.get_height())
+
         ax.annotate('{}'.format(height),
                     xy=(bar.get_x() + bar.get_width() / 2, height),
                     xytext=(0, 3),  # 3 points vertical offset

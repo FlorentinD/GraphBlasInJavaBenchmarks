@@ -1,6 +1,4 @@
 Benchmark,avgDegree,concurrency,dampingFactor,maxIterations,nodeCount,tolerance,Mode,Cnt,Score,Error,Units
-pageRank.PageRankEjmlBenchmark.ejmlPLUS_TIMES,4,1,0.85,20,300000,1e-7,avgt,5,136.649,4.046,ms/op
-pageRank.PageRankEjmlBenchmark.ejmlPLUS_TIMES,4,1,0.85,20,3000000,1e-7,avgt,5,2620.749,69.316,ms/op
 pageRank.PageRankEjmlBenchmark.ejml,4,1,0.85,20,300000,1e-7,avgt,5,118.005,5.767,ms/op
 pageRank.PageRankEjmlBenchmark.ejml,4,1,0.85,20,3000000,1e-7,avgt,5,2536.416,598.765,ms/op
 pageRank.PageRankGdsBenchmark.gds,4,1,0.85,20,300000,1e-7,avgt,5,285.797,3.704,ms/op
@@ -9,13 +7,11 @@ pageRank.PageRankGdsBenchmark.gds,4,8,0.85,20,300000,1e-7,avgt,5,482.463,15.029,
 pageRank.PageRankGdsBenchmark.gds,4,8,0.85,20,3000000,1e-7,avgt,5,2335.873,262.917,ms/op
 pageRank.PageRankJGraphTBenchmark.jGraphT,4,1,0.85,20,300000,1e-7,avgt,5,451.858,137.530,ms/op
 pageRank.PageRankJGraphTBenchmark.jGraphT,4,1,0.85,20,3000000,1e-7,avgt,5,7741.964,2018.787,ms/op
-pageRank.PageRankNativeBenchmark.jniPLUS_TIMES,4,1,0.85,20,300000,1e-7,avgt,5,617.790,2.908,ms/op
-pageRank.PageRankNativeBenchmark.jniPLUS_TIMES,4,1,0.85,20,3000000,1e-7,avgt,5,8176.539,199.763,ms/op
-pageRank.PageRankNativeBenchmark.jniPLUS_TIMES,4,8,0.85,20,300000,1e-7,avgt,5,248.335,31.935,ms/op
-pageRank.PageRankNativeBenchmark.jniPLUS_TIMES,4,8,0.85,20,3000000,1e-7,avgt,5,1676.863,83.405,ms/op
 pageRank.PageRankNativeBenchmark.jni,4,1,0.85,20,300000,1e-7,avgt,5,627.104,13.730,ms/op
 pageRank.PageRankNativeBenchmark.jni,4,1,0.85,20,3000000,1e-7,avgt,5,8253.667,146.295,ms/op
 pageRank.PageRankNativeBenchmark.jni,4,8,0.85,20,300000,1e-7,avgt,5,255.006,19.627,ms/op
 pageRank.PageRankNativeBenchmark.jni,4,8,0.85,20,3000000,1e-7,avgt,5,1598.884,48.252,ms/op
 pageRank.PageRankPregelBenchmark.pregel,4,1,0.85,20,300000,1e-7,avgt,5,5090.187,1281.862,ms/op
-pageRank.PageRankPregelBenchmark.pregel?,4,8,0.85,20,300000,1e-7,avgt,5,4476.375,739.597,ms/op
+pageRank.PageRankPregelBenchmark.pregel,4,8,0.85,20,300000,1e-7,avgt,5,4476.375,739.597,ms/op
+pageRank.PageRankPregelBenchmark.pregel,4,1,0.85,20,3000000,1e-7,avgt,5,N/A,N/A,ms/op
+pageRank.PageRankPregelBenchmark.pregel,4,8,0.85,20,3000000,1e-7,avgt,5,N/A,N/A,ms/op

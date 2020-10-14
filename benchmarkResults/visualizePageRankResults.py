@@ -5,7 +5,13 @@
 # read csv
 import pandas as pd
 
-benchmarkResult = pd.read_csv("results/pageRank/pageRankResults.csv")
+# weighted source: results/weightedPageRank/weightedPageRankResult.csv
+weighted = True
+
+benchmarkResult = pd.read_csv(
+    "results/{}.csv".format("weightedPageRank/weightedPageRankResult" if weighted else "pageRank/pageRankResults"))
+
+
 print(benchmarkResult.dtypes)
 
 benchmarkResult["Name"] = benchmarkResult.Benchmark.str.split(".").str[-1]
@@ -26,8 +32,8 @@ import matplotlib.pyplot as plt
 from benchmarkResults.helper import grouped_barplot
 
 # get meta info like units, mode, avg-degree ...
-# TODO: get actual run iterations somehow as an info (know for bfs ca. 37 for 300k nodes graph
-title = "PageRank (damping: {}, maxIterations: {}) \n on a random power-law graph with an average degree of {} \n using the {} of {}".format(
+title = "{} (damping: {}, maxIterations: {}) \n on a random power-law graph with an average degree of {} \n using the {} of {}".format(
+        "Weighted PageRank" if weighted else "PageRank",
         benchmarkResult.dampingFactor.iloc[0],
         benchmarkResult.maxIterations.iloc[0],
         benchmarkResult.avgDegree.iloc[0],
@@ -39,5 +45,6 @@ fig, ax = plt.subplots()
 barplot = grouped_barplot(benchmarkResult, "nodeCount", "Name", "Score", "Error", ax)
 barplot.title(title)
 
-plt.savefig("out/pageRank.jpg", bbox_inches='tight')
+outFile = "out/{}.jpg".format("weightedPageRank" if weighted else "pageRank")
+plt.savefig(outFile, bbox_inches='tight')
 plt.show()
