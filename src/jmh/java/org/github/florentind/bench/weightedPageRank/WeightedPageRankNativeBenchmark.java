@@ -12,7 +12,7 @@ import org.openjdk.jmh.infra.Blackhole;
 
 import java.nio.Buffer;
 
-public class WeightedPageRankNativeBenchmark extends PageRankBaseBenchmark {
+public class WeightedPageRankNativeBenchmark extends WeightedPageRankBaseBenchmark {
     Buffer jniMatrix;
 
     @Param({"1", "8"})
