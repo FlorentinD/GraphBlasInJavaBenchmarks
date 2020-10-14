@@ -22,7 +22,7 @@ public class BfsNative {
         // assert adj-matrix to be in CSC
         assert GRBCORE.getFormat(adjacencyMatrix) == GRBCORE.GxB_BY_COL;
 
-        GRBCORE.setGlobalInt(GRBCORE.GxB_NTHREADS, concurrency);
+        checkStatusCode(GRBCORE.setGlobalInt(GRBCORE.GxB_NTHREADS, concurrency));
 
         long nodeCount = GRBCORE.nrows(adjacencyMatrix);
 
@@ -45,9 +45,9 @@ public class BfsNative {
 
         Buffer desc = GRBCORE.createDescriptor();
         // invert the mask
-        GRBCORE.setDescriptorValue(desc, GRBCORE.GrB_MASK ,GRBCORE.GrB_COMP);
+        checkStatusCode(GRBCORE.setDescriptorValue(desc, GRBCORE.GrB_MASK ,GRBCORE.GrB_COMP));
         // clear q first
-        GRBCORE.setDescriptorValue(desc, GRBCORE.GrB_OUTP ,GRBCORE.GrB_REPLACE);
+        checkStatusCode(GRBCORE.setDescriptorValue(desc, GRBCORE.GrB_OUTP ,GRBCORE.GrB_REPLACE));
 
 
         int level = 1;
@@ -59,10 +59,9 @@ public class BfsNative {
         for (; ; level++) {
             // v<q> = level, using vector assign with q as the mask
             // no option to use GrB_ALL -> but ni = nodeCount leads to it being used
-            checkStatusCode(GRAPHBLAS.assignVectorInt(resultVector, queueVector, null, level, GRBCORE.GrB_ALL, nodeCount, null));
-
-//            System.out.println("queueVector " + booleanVectorToString(queueVector, Math.toIntExact(nodeCount)));
-//            System.out.println("resultVector " + integerVectorToString(resultVector, Math.toIntExact(nodeCount)));
+            checkStatusCode(
+                    GRAPHBLAS.assignVectorInt(resultVector, queueVector, null, level, GRBCORE.GrB_ALL, nodeCount, null)
+            );
 
             nodesVisited += nodesInQueue ;
             // check for fixPoint
@@ -80,14 +79,14 @@ public class BfsNative {
 
         // make sure everything got written
         GRBCORE.vectorWait(resultVector);
-        GRAPHBLAS.extractVectorTuplesInt(resultVector, values, indices);
+        checkStatusCode(GRAPHBLAS.extractVectorTuplesInt(resultVector, values, indices));
 
 
         // free c-allocated stuff
         GRBCORE.freeVector(queueVector);
         GRBCORE.freeVector(resultVector);
         GRBCORE.freeDescriptor(desc);
-        checkStatusCode(GRBCORE.freeSemiring(semiRing));
+        GRBCORE.freeSemiring(semiRing);
 
         // just using values as we know its a dense vector
         return new BfsDenseIntegerResult(values, level - 1, 0);

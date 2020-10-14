@@ -27,8 +27,6 @@ public class PageRankNative {
         assert GRBCORE.getFormat(adjacencyMatrix) == GRBCORE.GxB_BY_COL;
         GRBCORE.setGlobalInt(GRBCORE.GxB_NTHREADS, concurrency);
 
-        long status;
-
         long nodeCount = GRBCORE.ncols(adjacencyMatrix);
         // so first iteration is always run
         double resultDiff = 1;
@@ -46,20 +44,17 @@ public class PageRankNative {
         Buffer tmp_one_array = GRBCORE.createVector(GRAPHBLAS.longType(), nodeCount);
         GRAPHBLAS.assignVectorLong(tmp_one_array, null, null, 1, GrB_ALL, nodeCount, null);
         Buffer plusSecondSemiring = GRBCORE.createSemiring(GRBMONOID.plusMonoidLong(), GRAPHBLAS.secondBinaryOpLong());
-        status = GRBOPSMAT.mxv(dOut, null, null, plusSecondSemiring, adjacencyMatrix, tmp_one_array, null);
-        assert status == GRBCORE.GrB_SUCCESS;
+       checkStatusCode(GRBOPSMAT.mxv(dOut, null, null, plusSecondSemiring, adjacencyMatrix, tmp_one_array, null));
 
         Buffer importanceVec = GRBCORE.createVector(GRAPHBLAS.doubleType(), nodeCount);
         Buffer danglingVec = GRBCORE.createVector(GRAPHBLAS.doubleType(), nodeCount);
 
         Buffer pr = GRBCORE.createVector(GRAPHBLAS.doubleType(), nodeCount);
         Buffer prevResult = GRBCORE.createVector(GRAPHBLAS.doubleType(), nodeCount);
-        status = GRAPHBLAS.assignVectorDouble(pr, null, null, 1.0 / nodeCount, GrB_ALL, nodeCount, null);
-        assert status == GRBCORE.GrB_SUCCESS;
+        checkStatusCode(GRAPHBLAS.assignVectorDouble(pr, null, null, 1.0 / nodeCount, GrB_ALL, nodeCount, null));
 
         Buffer invertedMask = GRBCORE.createDescriptor();
-        status = GRBCORE.setDescriptorValue(invertedMask, GRBCORE.GrB_MASK, GRBCORE.GrB_COMP);
-        assert status == GRBCORE.GrB_SUCCESS;
+        checkStatusCode(GRBCORE.setDescriptorValue(invertedMask, GRBCORE.GrB_MASK, GRBCORE.GrB_COMP));
 
         final double teleport = (1 - dampingFactor) / nodeCount;
 
@@ -76,25 +71,30 @@ public class PageRankNative {
             //
 
             // Divide previous PageRank with number of outbound edges
-            status = GRBOPSMAT.elemWiseMulIntersectBinOp(importanceVec, null, null, GRAPHBLAS.divBinaryOpDouble(), pr, dOut, null);
-            assert status == GRBCORE.GrB_SUCCESS;
+            checkStatusCode(
+                    GRBOPSMAT.elemWiseMulIntersectBinOp(
+                            importanceVec, null, null, GRAPHBLAS.divBinaryOpDouble(),
+                            pr, dOut, null)
+            );
 
             // Multiply importance by damping factor
-            status = GRAPHBLAS.assignVectorDouble(importanceVec, null, GRAPHBLAS.timesBinaryOpDouble(), dampingFactor, GrB_ALL, nodeCount, null);
-            assert status == GRBCORE.GrB_SUCCESS;
+            checkStatusCode(
+                    GRAPHBLAS.assignVectorDouble(
+                            importanceVec, null, GRAPHBLAS.timesBinaryOpDouble(),
+                            dampingFactor, GrB_ALL, nodeCount, null)
+            );
+
 
 
             // Calculate total PR of all inbound vertices
-            status = GRBOPSMAT.vxm(importanceVec, null, null, semiRing, importanceVec, adjacencyMatrix, null);
-            assert status == GRBCORE.GrB_SUCCESS;
+            checkStatusCode(GRBOPSMAT.vxm(importanceVec, null, null, semiRing, importanceVec, adjacencyMatrix, null));
 
             //
             // Dangling calculation
             //
 
             // Extract all the dangling PR entries from the previous result
-            status = GRBOPSVEC.extract(danglingVec, dOut, null, pr, GrB_ALL, nodeCount, invertedMask);
-            assert status == GRBCORE.GrB_SUCCESS;
+            checkStatusCode(GRBOPSVEC.extract(danglingVec, dOut, null, pr, GrB_ALL, nodeCount, invertedMask));
 
             // Sum the previous PR values of dangling vertices together
             double danglingSum = GRBALG.vectorReduceAllDouble(0.0, null, GRBMONOID.plusMonoidDouble(), danglingVec, null);
@@ -107,21 +107,26 @@ public class PageRankNative {
             // PageRank summarization
             // Add teleport, importanceVec, and danglingVec components together
             //
-            status = GRAPHBLAS.assignVectorDouble(pr, null, null, (teleport + danglingSum), GrB_ALL, nodeCount, null);
-            assert status == GRBCORE.GrB_SUCCESS;
+            checkStatusCode(GRAPHBLAS.assignVectorDouble(pr, null, null, (teleport + danglingSum), GrB_ALL, nodeCount, null));
 
-            GRBOPSVEC.elemWiseAddUnionMonoid(pr, null, null, GRBMONOID.plusMonoidDouble(), pr, importanceVec, null);
+            checkStatusCode(
+                    GRBOPSVEC.elemWiseAddUnionMonoid(pr, null, null, GRBMONOID.plusMonoidDouble(), pr, importanceVec, null));
 
             // Calculate result difference
-            GRBOPSVEC.elemWiseAddUnionBinOp(prevResult, null, null, GRAPHBLAS.minusBinaryOpDouble(), prevResult, pr, null);
-            GRBCORE.vectorApply(prevResult, null, null, GRAPHBLAS.absUnaryOpDouble(), prevResult, null);
+            checkStatusCode(
+                    GRBOPSVEC.elemWiseAddUnionBinOp(
+                            prevResult, null, null, GRAPHBLAS.minusBinaryOpDouble(), prevResult, pr, null)
+            );
+            checkStatusCode(
+                    GRBCORE.vectorApply(prevResult, null, null, GRAPHBLAS.absUnaryOpDouble(), prevResult, null)
+            );
             resultDiff = GRBALG.vectorReduceAllDouble(0.0, null, GRBMONOID.plusMonoidDouble(), prevResult, null);
         }
 
         double[] values = new double[Math.toIntExact(nodeCount)];
         long[] indices = new long[Math.toIntExact(nodeCount)];
 
-        GRAPHBLAS.extractVectorTuplesDouble(pr, values, indices);
+        checkStatusCode(GRAPHBLAS.extractVectorTuplesDouble(pr, values, indices));
 
         GRBCORE.freeVector(dOut);
         GRBCORE.freeVector(tmp_one_array);
@@ -144,8 +149,6 @@ public class PageRankNative {
         // assert adj-matrix to be in CSC
         assert GRBCORE.getFormat(adjacencyMatrix) == GRBCORE.GxB_BY_COL;
         GRBCORE.setGlobalInt(GRBCORE.GxB_NTHREADS, concurrency);
-
-        long status;
 
         long nodeCount = GRBCORE.ncols(adjacencyMatrix);
         // so first iteration is always run
@@ -191,8 +194,7 @@ public class PageRankNative {
         checkStatusCode(GRAPHBLAS.assignVectorDouble(pr, null, null, 1.0 / nodeCount, GrB_ALL, nodeCount, null));
 
         Buffer invertedMask = GRBCORE.createDescriptor();
-        status = GRBCORE.setDescriptorValue(invertedMask, GRBCORE.GrB_MASK, GRBCORE.GrB_COMP);
-        assert status == GRBCORE.GrB_SUCCESS;
+        checkStatusCode(GRBCORE.setDescriptorValue(invertedMask, GRBCORE.GrB_MASK, GRBCORE.GrB_COMP));
 
         final double teleport = (1 - dampingFactor) / nodeCount;
 
