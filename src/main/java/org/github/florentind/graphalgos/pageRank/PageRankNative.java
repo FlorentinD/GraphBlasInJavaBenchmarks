@@ -63,7 +63,7 @@ public class PageRankNative {
         Buffer plusFirstSemiring = GRBCORE.createSemiring(GRBMONOID.plusMonoidDouble(), GRAPHBLAS.firstBinaryOpDouble());
 
         for (; iteration < maxIterations && resultDiff > tolerance; iteration++) {
-            // !Difference: in C would just swap prevResult and result
+            // ?? !Difference: in C would just swap prevResult and result
             GRBOPSVEC.assign(prevResult, null, GRAPHBLAS.secondBinaryOpDouble(), pr, GrB_ALL, nodeCount, null);
 
             //
