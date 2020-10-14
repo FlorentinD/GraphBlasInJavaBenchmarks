@@ -2,14 +2,10 @@
 package org.github.florentind.bench.ejmlOps;
 
 import org.ejml.data.DMatrixSparseCSC;
-import org.github.florentind.core.ejml.EjmlGraph;
-import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
-import org.neo4j.graphalgo.beta.generator.RelationshipDistribution;
-import org.neo4j.graphalgo.config.RandomGraphGeneratorConfig;
-import org.neo4j.graphalgo.core.Aggregation;
-import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
+import org.ejml.sparse.csc.RandomMatrices_DSCC;
 import org.openjdk.jmh.annotations.*;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 
@@ -33,16 +29,6 @@ public abstract class MatrixOpsBaseBenchmark {
 
     @Setup
     public void setup() {
-        // TODO: replace with RandomMatrix generator when its faster
-        matrix = EjmlGraph.create(RandomGraphGenerator.builder()
-                .nodeCount(dimension)
-                .averageDegree(avgDegree)
-                .seed(42L)
-                .aggregation(Aggregation.MAX)
-                .allocationTracker(AllocationTracker.empty())
-                .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.YES)
-                .relationshipDistribution(RelationshipDistribution.valueOf(degreeDistribution))
-                .build().generate()).matrix();
-//        matrix = RandomMatrices_DSCC.rectangle(dimension, dimension, dimension * avgDegree, new Random(42));
+        matrix = RandomMatrices_DSCC.generateUniform(dimension, dimension, avgDegree, 1, 2, new Random(42));
     }
 }
