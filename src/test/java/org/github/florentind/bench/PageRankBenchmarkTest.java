@@ -60,6 +60,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
         var pageRanks = new org.jgrapht.alg.scoring.PageRank(jGraph).getScores();
         double[] jGraphTResult = pageRanks.values().stream().mapToDouble(v -> (Double) v).toArray();
 
+        // jGraphT does not return the actual needed iterations unfortunately
         assertArrayEquals(goldStandard.getRight(), jGraphTResult, 1e-2);
     }
 

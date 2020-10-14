@@ -1,12 +1,14 @@
 package org.github.florentind.graphalgos.pageRank;
 
+import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.sparse.csc.CommonOps_DSCC;
-import org.junit.jupiter.api.BeforeEach;
+import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.nio.Buffer;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -26,7 +28,7 @@ public class WeightedPageRankTest {
         equallyWeighted.set(2, 1, 1);
         equallyWeighted.set(3, 0, 0.5);
         equallyWeighted.set(3, 1, 0.5);
-        equallyWeighted.set(4, 1, 1 / 3.0 );
+        equallyWeighted.set(4, 1, 1 / 3.0);
         equallyWeighted.set(4, 3, 1 / 3.0);
         equallyWeighted.set(4, 5, 1 / 3.0);
         equallyWeighted.set(5, 1, 0.5);
@@ -60,7 +62,7 @@ public class WeightedPageRankTest {
         };
 
         return Stream.of(
-                Arguments.of("equally weighted edges",equallyWeighted, new double[]{
+                Arguments.of("equally weighted edges", equallyWeighted, new double[]{
                         0.046528597509547166,
                         0.36731632503597234,
                         0.3409378593057864,
@@ -71,7 +73,7 @@ public class WeightedPageRankTest {
                         0.028720529147028995,
                         0.028720529147028995,
                         0.028720529147028995}
-                        ),
+                ),
                 Arguments.of("non equally weighted", weighted, scoresForWeighted),
                 Arguments.of("non normalized", nonNormalizedMatrix, scoresForWeighted)
         );
@@ -88,32 +90,30 @@ public class WeightedPageRankTest {
         );
 
 
-
         assertEquals(20, result.iterations());
         // other tolerance as maxIterations reached and not tolerance
         assertArrayEquals(expectedScores, result.result(), 1e-2f);
     }
 
-    // TODO native version of weighted graphblas pagerank?
-//    @ParameterizedTest
-//    @MethodSource("weightedGraphs")
-//    public void pageRankNative(DMatrixSparseCSC adjMatrix, double[] expectedScores) {
-//        GRBCORE.initNonBlocking();
-//
-//        Buffer nativeMatrix = ToNativeMatrixConverter.convert(adjMatrix);
-//
-//        PageRankResult result = PageRankNative.compute(
-//                nativeMatrix,
-//                DAMPING_FACTOR,
-//                TOLERANCE,
-//                MAX_ITERATIONS,
-//                1
-//        );
-//
-//        assertEquals(20, result.iterations());
-//        // other tolerance as maxIterations reached and not tolerance
-//        assertArrayEquals(expectedScores, result.result(), 1e-2f);
-//
-//        GRBCORE.grbFinalize();
-//    }
+    @ParameterizedTest
+    @MethodSource("weightedGraphs")
+    public void pageRankNative(String desc, DMatrixSparseCSC adjMatrix, double[] expectedScores) {
+        GRBCORE.initNonBlocking();
+
+        Buffer nativeMatrix = ToNativeMatrixConverter.convert(adjMatrix);
+
+        PageRankResult result = PageRankNative.computeWeighted(
+                nativeMatrix,
+                DAMPING_FACTOR,
+                TOLERANCE,
+                MAX_ITERATIONS,
+                1
+        );
+
+        assertEquals(20, result.iterations());
+        // other tolerance as maxIterations reached and not tolerance
+        assertArrayEquals(expectedScores, result.result(), 1e-2f);
+
+        GRBCORE.grbFinalize();
+    }
 }

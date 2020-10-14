@@ -14,6 +14,10 @@ public class PageRankPregelBenchmark extends PageRankBaseBenchmark {
     @Param({"1", "8"})
     private int concurrency;
 
+    // as Pregel is to slow for 3 million nodes
+    @Param({"300000"})
+    int nodeCount;
+
     private PageRankPregel.PageRankPregelConfig config;
 
     private Pregel<PageRankPregel.PageRankPregelConfig> pregel;

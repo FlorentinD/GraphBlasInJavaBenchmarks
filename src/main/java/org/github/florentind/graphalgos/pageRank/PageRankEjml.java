@@ -75,11 +75,11 @@ public class PageRankEjml {
             CommonOps_DArray.apply(importanceVec, i -> i * dampingFactor);
 
             // Calculate total PR of all inbound nodes
-            // !! Difference to reference: input vector must be different to initial output vector (otherwise dirty reads) for `multTransA`
+            // !! Difference to reference: input vector must be different to initial output vector (otherwise dirty reads) for `mult`
             //  --> importanceResultVec (instead of allocating a new result array per iteration)
-            importanceResultVec = MatrixVectorMultWithSemiRing_DSCC.multTransA(
-                    adjacencyMatrix,
+            importanceResultVec = MatrixVectorMultWithSemiRing_DSCC.mult(
                     importanceVec,
+                    adjacencyMatrix,
                     importanceResultVec,
                     DSemiRings.PLUS_TIMES,
                     null,
@@ -151,6 +151,10 @@ public class PageRankEjml {
         boolean weightsNormalized = Arrays.stream(weightSums).allMatch(sum -> sum == 1 || sum == 0);
 
         if (!weightsNormalized) {
+            // TODO: benchmark this variant, as its way cleaner (and can be used for native version)
+            // TODO: use eWiseMult(DMatrixSparseCSC, DMatrixRMaj) .. supporting also simple broadcasting
+            //var weightSumsMatrix = CommonOps_DSCC.diag(weightSums);
+            //adjacencyMatrix = CommonOps_DSCC.mult(weightSumsMatrix, adjacencyMatrix, null);
             // create copy to not change input matrix
             adjacencyMatrix = adjacencyMatrix.copy();
 
@@ -189,17 +193,17 @@ public class PageRankEjml {
             // Importance calculation
             //
 
-            // TODO: apply faster if first arraycopy pr -> importanceVec and then apply on same vector?
+            // TODO: is apply faster if first arraycopy pr to importanceVec and then apply on same vector?
 
             // Multiply prev pr by damping factor and save into importanceVec
             CommonOps_DArray.apply(pr, importanceVec, i -> i * dampingFactor);
 
             // Calculate total PR of all inbound nodes
-            // !! Difference to reference: input vector must be different to initial output vector (otherwise dirty reads) for `multTransA`
+            // !! Difference to reference: input vector must be different to initial output vector (otherwise dirty reads) for `mult`
             //  --> importanceResultVec (instead of allocating a new result array per iteration)
-            importanceResultVec = MatrixVectorMultWithSemiRing_DSCC.multTransA(
-                    adjacencyMatrix,
+            importanceResultVec = MatrixVectorMultWithSemiRing_DSCC.mult(
                     importanceVec,
+                    adjacencyMatrix,
                     importanceResultVec,
                     DSemiRings.PLUS_TIMES,
                     null,
@@ -212,7 +216,7 @@ public class PageRankEjml {
             //
 
             // Sum the previous PR values of dangling nodes together
-            // !! Difference to reference:  mask in reduceScalar is for the input-vector
+            // !! Difference to reference:  mask in reduceScalar is for the input-vector (difference to GraphBLAS API)
             // --> not extracting dangling pr entries before
             double danglingSum = CommonOps_DArray.reduceScalar(pr, DMonoids.PLUS, danglingNodesMask);
 
@@ -224,6 +228,8 @@ public class PageRankEjml {
             // PageRank summarization
             // Add teleport, importanceVec, and dangling_vec components together
             //
+            // TODO: remove importanceResultVec and store it directly in pr
+            //  -> only apply here (pr + teleport + danglingSum)
             Arrays.fill(pr, teleport + danglingSum);
             CommonOps_DArray.elementWiseAdd(pr, importanceResultVec, pr, DMonoids.PLUS);
 

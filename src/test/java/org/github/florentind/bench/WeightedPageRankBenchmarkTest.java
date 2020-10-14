@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WeightedPageRankBenchmarkTest extends BaseBenchmarkTest {
-    private static final int NODE_COUNT = 3;
+    private static final int NODE_COUNT = 300_000;
     private static final int MAX_ITERATIONS = 20;
     private static final double DAMPING_FACTOR = 0.85;
     private static final double TOLERANCE = 1e-32;
@@ -89,13 +89,12 @@ public class WeightedPageRankBenchmarkTest extends BaseBenchmarkTest {
         assertArrayEquals(goldStandard.getRight(), pregelResult.getRight(), 1e-2);
     }
 
-    @Disabled
     @Test
     void testNative() {
         GRBCORE.initNonBlocking();
 
         Buffer nativeMatrix = ToNativeMatrixConverter.convert(graph, true);
-        var nativeResult = PageRankNative.compute(nativeMatrix, DAMPING_FACTOR, TOLERANCE, MAX_ITERATIONS, CONCURRENCY);
+        var nativeResult = PageRankNative.computeWeighted(nativeMatrix, DAMPING_FACTOR, TOLERANCE, MAX_ITERATIONS, CONCURRENCY);
 
         GRBCORE.grbFinalize();
 

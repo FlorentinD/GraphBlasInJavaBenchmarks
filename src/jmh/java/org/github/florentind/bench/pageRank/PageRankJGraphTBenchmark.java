@@ -10,8 +10,6 @@ import org.openjdk.jmh.infra.Blackhole;
 public class PageRankJGraphTBenchmark extends PageRankBaseBenchmark {
     Graph jGraph;
 
-//    @Param({"300000"})
-//    int nodeCount;
     @Setup
     public void setup() {
         super.setup();
