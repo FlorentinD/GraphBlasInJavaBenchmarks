@@ -1,7 +1,8 @@
-package org.github.florentind.bench.pageRank;
+package org.github.florentind.bench.weightedPageRank;
 
 
 import com.github.fabianmurariu.unsafe.GRBCORE;
+import org.github.florentind.bench.pageRank.PageRankBaseBenchmark;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.graphalgos.pageRank.PageRankNative;
 import org.openjdk.jmh.annotations.Param;
@@ -11,13 +12,13 @@ import org.openjdk.jmh.infra.Blackhole;
 
 import java.nio.Buffer;
 
-public class PageRankNativeBenchmark extends PageRankBaseBenchmark {
+public class WeightedPageRankNativeBenchmark extends PageRankBaseBenchmark {
     Buffer jniMatrix;
 
     @Param({"1", "8"})
     private int concurrency;
 
-    @Param({"true", "false"})
+    @Param({"true"})
     private boolean blockingMode;
 
     @Setup
@@ -38,7 +39,7 @@ public class PageRankNativeBenchmark extends PageRankBaseBenchmark {
 
     @org.openjdk.jmh.annotations.Benchmark
     public void jni(Blackhole bh) {
-        bh.consume(PageRankNative.compute(jniMatrix, dampingFactor, tolerance, maxIterations, concurrency));
+        bh.consume(PageRankNative.computeWeighted(jniMatrix, dampingFactor, tolerance, maxIterations, concurrency));
     }
 
     @TearDown
