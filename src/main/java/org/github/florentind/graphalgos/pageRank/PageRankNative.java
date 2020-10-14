@@ -200,7 +200,7 @@ public class PageRankNative {
 
         int iteration = 0;
 
-        Buffer plusTimesSemiring = GRBCORE.createSemiring(GRBMONOID.plusMonoidDouble(), GRAPHBLAS.timesBinaryOpDouble());
+        Buffer plusFirstSemiring = GRBCORE.createSemiring(GRBMONOID.plusMonoidDouble(), GRAPHBLAS.firstBinaryOpDouble());
 
         for (; iteration < maxIterations && resultDiff > tolerance; iteration++) {
             // !Difference: in C would just swap prevResult and result
@@ -224,8 +224,9 @@ public class PageRankNative {
             );
 
             // Calculate total PR of all inbound vertices
+            // using plusFirst, as nz adj. matrix values are always 1
             checkStatusCode(
-                    GRBOPSMAT.vxm(importanceVec, null, null, plusTimesSemiring, importanceVec, adjacencyMatrix, null)
+                    GRBOPSMAT.vxm(importanceVec, null, null, plusFirstSemiring, importanceVec, adjacencyMatrix, null)
             );
 
 
@@ -280,7 +281,7 @@ public class PageRankNative {
         GRBCORE.freeVector(prevResult);
         GRBCORE.freeDescriptor(invertedMask);
         GRBCORE.freeSemiring(anyDivSemiRing);
-        GRBCORE.freeSemiring(plusTimesSemiring);
+        GRBCORE.freeSemiring(plusFirstSemiring);
 
         return new PageRankResult(values, iteration);
     }

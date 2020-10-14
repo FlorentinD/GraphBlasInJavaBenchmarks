@@ -77,11 +77,12 @@ public class PageRankEjml {
             // Calculate total PR of all inbound nodes
             // !! Difference to reference: input vector must be different to initial output vector (otherwise dirty reads) for `mult`
             //  --> importanceResultVec (instead of allocating a new result array per iteration)
+            // !! using FIRST instead of TIMES as unweighted -> value is always 1 and 1 * x = x
             importanceResultVec = MatrixVectorMultWithSemiRing_DSCC.mult(
                     importanceVec,
                     adjacencyMatrix,
                     importanceResultVec,
-                    DSemiRings.PLUS_TIMES,
+                    DSemiRings.PLUS_FIRST,
                     null,
                     null
             );
@@ -201,6 +202,7 @@ public class PageRankEjml {
             // Calculate total PR of all inbound nodes
             // !! Difference to reference: input vector must be different to initial output vector (otherwise dirty reads) for `mult`
             //  --> importanceResultVec (instead of allocating a new result array per iteration)
+            // PLUS_TIMES as now entries are relevant
             importanceResultVec = MatrixVectorMultWithSemiRing_DSCC.mult(
                     importanceVec,
                     adjacencyMatrix,

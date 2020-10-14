@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PageRankBenchmarkTest extends BaseBenchmarkTest {
-    private static final int NODE_COUNT = 300_000;
+    private static final int NODE_COUNT = 3000_000;
     private static final int MAX_ITERATIONS = 20;
     private static final double DAMPING_FACTOR = 0.85;
     private static final double TOLERANCE = 1e-7;
