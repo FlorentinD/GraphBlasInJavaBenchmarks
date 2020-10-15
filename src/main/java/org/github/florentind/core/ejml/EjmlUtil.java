@@ -11,21 +11,27 @@ public class EjmlUtil {
      * used by weighted pageRank (preprocessing step for pregel variant)
      */
     public static EjmlGraph normalizeOutgoingWeights(EjmlGraph graph) {
-        DMatrixSparseCSC adjMatrixTransposed = graph.matrix();
-        double[] weightSums = CommonOps_DSCC.reduceColumnWise(adjMatrixTransposed, 0, Double::sum, null).data;
+        normalizeColumnWise(graph.matrix());
+        return graph;
+    }
 
-        // extended apply .. using (using column + value per entry)
-        for (int col = 0; col < adjMatrixTransposed.numCols; col++) {
-            int start = adjMatrixTransposed.col_idx[col];
-            int end = adjMatrixTransposed.col_idx[col + 1];
+    /**
+     * Matrix changes, such that the sum per column = 1
+     * @param matrix
+     */
+    public static void normalizeColumnWise(DMatrixSparseCSC matrix) {
+        double[] weightSums = CommonOps_DSCC.reduceColumnWise(matrix, 0, Double::sum, null).data;
+
+        // eWiseMult (with implicit array expansion)
+        for (int col = 0; col < matrix.numCols; col++) {
+            int start = matrix.col_idx[col];
+            int end = matrix.col_idx[col + 1];
 
             double sum = weightSums[col];
 
             for (int i = start; i < end; i++) {
-                adjMatrixTransposed.nz_values[i] /= sum;
+                matrix.nz_values[i] /= sum;
             }
         }
-
-        return graph;
     }
 }
