@@ -1,15 +1,14 @@
 package org.github.florentind.bench.pageRank;
 
 
-import org.neo4j.graphalgo.core.utils.ProgressLogger;
+import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.neo4j.graphalgo.pagerank.ImmutablePageRankStatsConfig;
 import org.neo4j.graphalgo.pagerank.PageRank;
-import org.neo4j.graphalgo.pagerank.PageRankAlgorithmType;
 import org.neo4j.graphalgo.pagerank.PageRankBaseConfig;
+import org.neo4j.graphalgo.pagerank.PageRankFactory;
+import org.neo4j.logging.NullLog;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.infra.Blackhole;
-
-import java.util.stream.LongStream;
 
 public class PageRankGdsBenchmark extends PageRankBaseBenchmark {
 
@@ -33,8 +32,12 @@ public class PageRankGdsBenchmark extends PageRankBaseBenchmark {
 
     @org.openjdk.jmh.annotations.Benchmark
     public void gds(Blackhole bh) {
-        PageRank algorithm = PageRankAlgorithmType.NON_WEIGHTED
-                .create(graph, unweightedConfig, LongStream.empty(), ProgressLogger.NULL_LOGGER);
+        PageRank algorithm = new PageRankFactory<>().build(
+                graph,
+                unweightedConfig,
+                AllocationTracker.empty(),
+                NullLog.getInstance()
+        );
 
         bh.consume(algorithm.compute());
     }

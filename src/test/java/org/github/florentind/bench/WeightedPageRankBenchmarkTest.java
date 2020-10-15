@@ -11,23 +11,21 @@ import org.github.florentind.core.jgrapht.JGraphTConverter;
 import org.github.florentind.graphalgos.pageRank.PageRankEjml;
 import org.github.florentind.graphalgos.pageRank.PageRankNative;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphalgo.beta.generator.PropertyProducer;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.pr.ImmutablePageRankPregelConfig;
 import org.neo4j.graphalgo.beta.pregel.pr.PageRankPregel;
 import org.neo4j.graphalgo.core.concurrency.Pools;
-import org.neo4j.graphalgo.core.utils.ProgressLogger;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.neo4j.graphalgo.pagerank.ImmutablePageRankStreamConfig;
 import org.neo4j.graphalgo.pagerank.PageRank;
-import org.neo4j.graphalgo.pagerank.PageRankAlgorithmType;
+import org.neo4j.graphalgo.pagerank.PageRankFactory;
 import org.neo4j.graphalgo.pagerank.PageRankStreamConfig;
+import org.neo4j.logging.NullLog;
 
 import java.nio.Buffer;
 import java.util.Arrays;
-import java.util.stream.LongStream;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -112,17 +110,22 @@ public class WeightedPageRankBenchmarkTest extends BaseBenchmarkTest {
     }
 
     Triple<String, Integer, double[]> getGdsResult() {
-        PageRankStreamConfig config = ImmutablePageRankStreamConfig.builder()
+        PageRankStreamConfig weightedConfig = ImmutablePageRankStreamConfig.builder()
                 .maxIterations(MAX_ITERATIONS)
                 .dampingFactor(DAMPING_FACTOR)
                 .tolerance(TOLERANCE)
+                .relationshipWeightProperty("weight")
                 .build();
 
-        PageRank pageRank = PageRankAlgorithmType.WEIGHTED
-                .create(graph, config, LongStream.empty(), ProgressLogger.NULL_LOGGER)
-                .compute();
+        PageRank pageRank = new PageRankFactory<>().build(
+                graph,
+                weightedConfig,
+                AllocationTracker.empty(),
+                NullLog.getInstance()
+        );
 
-        double[] normalizedResult = normalizeResult(pageRank.result().array().toArray());
+
+        double[] normalizedResult = normalizeResult(pageRank.compute().result().array().toArray());
         return new ImmutableTriple<>("gdsUnweighted", pageRank.iterations(), normalizedResult);
     }
 
