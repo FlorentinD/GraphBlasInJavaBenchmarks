@@ -26,7 +26,7 @@ public class WeightedPageRankGdsBenchmark extends WeightedPageRankBaseBenchmark 
                 .dampingFactor(dampingFactor)
                 .tolerance(tolerance)
                 .concurrency(concurrency)
-                .relationshipWeightProperty("weight")
+                .relationshipWeightProperty(REL_PROPERTY_NAME)
                 .build();
     }
 

@@ -27,6 +27,7 @@ public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchma
                 .maxIterations(maxIterations)
                 .dampingFactor(dampingFactor)
                 .concurrency(concurrency)
+                .relationshipWeightProperty(REL_PROPERTY_NAME)
                 .build();
 
         // as Pregel implementation has no good way to normalize the weights

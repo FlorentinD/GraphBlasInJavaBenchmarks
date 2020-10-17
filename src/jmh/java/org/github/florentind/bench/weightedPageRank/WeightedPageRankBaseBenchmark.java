@@ -12,7 +12,8 @@ import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.openjdk.jmh.annotations.Param;
 
 public class WeightedPageRankBaseBenchmark extends EjmlGraphBaseBenchmark {
-    @Param({"300000", "3000000"})
+    protected static final String REL_PROPERTY_NAME = "weight";
+    @Param({"3000000"})
     int nodeCount;
 
     @Param({"4"})
@@ -39,7 +40,7 @@ public class WeightedPageRankBaseBenchmark extends EjmlGraphBaseBenchmark {
                 .allocationTracker(AllocationTracker.empty())
                 .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.YES)
                 .relationshipDistribution(RelationshipDistribution.POWER_LAW)
-                .relationshipPropertyProducer(PropertyProducer.random("weight", 0, 1.0))
+                .relationshipPropertyProducer(PropertyProducer.random(REL_PROPERTY_NAME, 0, 1.0))
                 .build().generate();
 
     }

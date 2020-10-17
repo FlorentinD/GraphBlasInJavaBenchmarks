@@ -59,6 +59,8 @@ public class WeightedPageRankBenchmarkTest extends BaseBenchmarkTest {
         super.setup();
 
         goldStandard = getGdsResult();
+
+        assertEquals(MAX_ITERATIONS ,goldStandard.getMiddle());
     }
 
     @Test
@@ -83,7 +85,6 @@ public class WeightedPageRankBenchmarkTest extends BaseBenchmarkTest {
         var pregelResult = getPregelResult();
 
         assertEquals(goldStandard.getMiddle(), pregelResult.getMiddle());
-        // values seem to be different .. but order is still correct?
         assertArrayEquals(goldStandard.getRight(), pregelResult.getRight(), 1e-2);
     }
 
@@ -137,6 +138,7 @@ public class WeightedPageRankBenchmarkTest extends BaseBenchmarkTest {
         var config = ImmutablePageRankPregelConfig.builder()
                 .maxIterations(MAX_ITERATIONS)
                 .dampingFactor(DAMPING_FACTOR)
+                .relationshipWeightProperty("whatever")
                 .concurrency(CONCURRENCY)
                 .build();
 
