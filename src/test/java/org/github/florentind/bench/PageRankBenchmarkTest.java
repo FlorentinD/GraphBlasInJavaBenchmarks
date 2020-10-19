@@ -51,6 +51,8 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
     public void setup() {
         super.setup();
         goldStandard = getGdsResult();
+
+        assertEquals(goldStandard.getMiddle(), MAX_ITERATIONS);
     }
 
     @Test
@@ -114,6 +116,8 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
                 AllocationTracker.empty(),
                 NullLog.getInstance()
         );
+
+        pageRank.compute();
 
         double[] normalizedResult = normalizeResult(pageRank.result().array().toArray());
         return new ImmutableTriple<>("gdsUnweighted", pageRank.iterations(), normalizedResult);

@@ -55,6 +55,7 @@ public class PageRankNative {
 
         Buffer invertedMask = GRBCORE.createDescriptor();
         checkStatusCode(GRBCORE.setDescriptorValue(invertedMask, GRBCORE.GrB_MASK, GRBCORE.GrB_COMP));
+        checkStatusCode(GRBCORE.setDescriptorValue(invertedMask, GRBCORE.GrB_MASK, GRBCORE.GrB_STRUCTURE));
 
         final double teleport = (1 - dampingFactor) / nodeCount;
 
@@ -196,6 +197,7 @@ public class PageRankNative {
 
         Buffer invertedMask = GRBCORE.createDescriptor();
         checkStatusCode(GRBCORE.setDescriptorValue(invertedMask, GRBCORE.GrB_MASK, GRBCORE.GrB_COMP));
+        checkStatusCode(GRBCORE.setDescriptorValue(invertedMask, GRBCORE.GrB_MASK, GRBCORE.GrB_STRUCTURE));
 
         final double teleport = (1 - dampingFactor) / nodeCount;
 
