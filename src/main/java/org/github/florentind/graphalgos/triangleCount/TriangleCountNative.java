@@ -4,57 +4,62 @@ import com.github.fabianmurariu.unsafe.*;
 
 import java.nio.Buffer;
 
+import static com.github.fabianmurariu.unsafe.GRAPHBLAS.*;
+import static com.github.fabianmurariu.unsafe.GRBALG.*;
+import static com.github.fabianmurariu.unsafe.GRBCORE.*;
+import static com.github.fabianmurariu.unsafe.GRBMONOID.*;
+import static com.github.fabianmurariu.unsafe.GRBOPSMAT.*;
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 
 public class TriangleCountNative {
 
     public static long computeTotalSandia(Buffer matrix, int concurrency) {
-        GRBCORE.setGlobalInt(GRBCORE.GxB_NTHREADS, concurrency);
+        setGlobalInt(GxB_NTHREADS, concurrency);
 
         Buffer L = getLowerTriangle(matrix);
-        long nodeCount = GRBCORE.nrows(matrix);
-        Buffer C = GRBCORE.createMatrix(GRAPHBLAS.doubleType(), nodeCount, nodeCount);
+        long nodeCount = nrows(matrix);
+        Buffer C = createMatrix(doubleType(), nodeCount, nodeCount);
 
-        Buffer semiRing = GRBCORE.createSemiring(GRBMONOID.plusMonoidDouble(), GRAPHBLAS.landBinaryOpDouble());
-        checkStatusCode(GRBOPSMAT.mxm(C, L, null, semiRing, L, L, null));
+        Buffer semiRing = createSemiring(plusMonoidDouble(), landBinaryOpDouble());
+        checkStatusCode(mxm(C, L, null, semiRing, L, L, null));
 
 
-        double globalCount = GRBALG.matrixReduceAllDouble(0.0, null, GRBMONOID.plusMonoidDouble(), C, null); // CommonOps_DSCC.reduceScalar(C, Double::sum);
+        double globalCount = matrixReduceAllDouble(0.0, null, plusMonoidDouble(), C, null); // CommonOps_DSCC.reduceScalar(C, Double::sum);
         // assert count is a whole number
         assert (globalCount % 1) == 0;
 
-        GRBCORE.freeMatrix(L);
-        GRBCORE.freeMatrix(C);
-        GRBCORE.freeSemiring(semiRing);
+        freeMatrix(L);
+        freeMatrix(C);
+        freeSemiring(semiRing);
 
         return (long) globalCount;
     }
 
     public static NodeWiseTriangleCountResult computeNodeWise(Buffer matrix, int concurrency) {
-        GRBCORE.setGlobalInt(GRBCORE.GxB_NTHREADS, concurrency);
+        setGlobalInt(GxB_NTHREADS, concurrency);
 
-        Buffer desc = GRBCORE.createDescriptor();
-        checkStatusCode(GRBCORE.setDescriptorValue(desc, GRBCORE.GrB_OUTP, GRBCORE.GrB_REPLACE));
+        Buffer desc = createDescriptor();
+        checkStatusCode(setDescriptorValue(desc, GrB_OUTP, GrB_REPLACE));
 
         Buffer L = getLowerTriangle(matrix);
-        Buffer plusAndSemiring = GRBCORE.createSemiring(GRBMONOID.plusMonoidDouble(), GRAPHBLAS.landBinaryOpDouble());
-        checkStatusCode(GRBOPSMAT.mxm(L, matrix, null, plusAndSemiring, matrix, L, desc));
+        Buffer plusAndSemiring = createSemiring(plusMonoidDouble(), landBinaryOpDouble());
+        checkStatusCode(mxm(L, matrix, null, plusAndSemiring, matrix, L, desc));
 
-        long nodeCount = GRBCORE.nrows(matrix);
-        Buffer nativeResult = GRBCORE.createVector(GRAPHBLAS.longType(), nodeCount);
+        long nodeCount = nrows(matrix);
+        Buffer nativeResult = createVector(longType(), nodeCount);
 
-        checkStatusCode(GRBOPSMAT.matrixReduceMonoid(nativeResult, null, null, GRBMONOID.plusMonoidLong(), L, null));
+        checkStatusCode(matrixReduceMonoid(nativeResult, null, null, plusMonoidLong(), L, null));
 
-        int resultSize = Math.toIntExact(GRBCORE.nvalsVector(nativeResult));
+        int resultSize = Math.toIntExact(nvalsVector(nativeResult));
         double[] resultValues = new double[resultSize];
         long[] indices = new long[resultSize];
 
-        GRAPHBLAS.extractVectorTuplesDouble(nativeResult, resultValues, indices);
+        extractVectorTuplesDouble(nativeResult, resultValues, indices);
 
-        GRBCORE.freeSemiring(plusAndSemiring);
-        GRBCORE.freeDescriptor(desc);
-        GRBCORE.freeVector(nativeResult);
-        GRBCORE.freeMatrix(L);
+        freeSemiring(plusAndSemiring);
+        freeDescriptor(desc);
+        freeVector(nativeResult);
+        freeMatrix(L);
 
         if (resultSize == nodeCount) {
             return new NodeWiseTriangleCountResult(resultValues);
@@ -72,12 +77,12 @@ public class TriangleCountNative {
     }
 
     private static Buffer getTriangle(Buffer matrix, boolean lower) {
-        long nodeCount = GRBCORE.nrows(matrix);
-        Buffer L = GRBCORE.createMatrix(GRAPHBLAS.doubleType(), nodeCount, nodeCount);
+        long nodeCount = nrows(matrix);
+        Buffer L = createMatrix(doubleType(), nodeCount, nodeCount);
 
-        Buffer selectOp = lower ? GRAPHBLAS.selectOpTRIL() : GRAPHBLAS.selectOpTRIU();
+        Buffer selectOp = lower ? selectOpTRIL() : selectOpTRIU();
 
-        checkStatusCode(GRBOPSMAT.select(L, null, null, selectOp, matrix, null, null));
+        checkStatusCode(select(L, null, null, selectOp, matrix, null, null));
 
         return L;
     }

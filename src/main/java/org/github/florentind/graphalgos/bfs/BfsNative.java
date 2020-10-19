@@ -1,12 +1,13 @@
 package org.github.florentind.graphalgos.bfs;
 
-import com.github.fabianmurariu.unsafe.GRAPHBLAS;
-import com.github.fabianmurariu.unsafe.GRBCORE;
-import com.github.fabianmurariu.unsafe.GRBMONOID;
-import com.github.fabianmurariu.unsafe.GRBOPSMAT;
-
 import java.nio.Buffer;
 
+import static com.github.fabianmurariu.unsafe.GRAPHBLAS.*;
+import static com.github.fabianmurariu.unsafe.GRBCORE.*;
+import static com.github.fabianmurariu.unsafe.GRBMONOID.anyMonoidDouble;
+import static com.github.fabianmurariu.unsafe.GRBMONOID.minMonoidInt;
+import static com.github.fabianmurariu.unsafe.GRBOPSMAT.vxm;
+import static com.github.fabianmurariu.unsafe.GRBOPSVEC.assign;
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 
 /**
@@ -20,35 +21,37 @@ public class BfsNative {
      */
     public BfsResult computeLevel(Buffer adjacencyMatrix, int startNode, int maxIterations, int concurrency) {
         // assert adj-matrix to be in CSC
-        assert GRBCORE.getFormat(adjacencyMatrix) == GRBCORE.GxB_BY_COL;
+        assert getFormat(adjacencyMatrix) == GxB_BY_COL;
 
-        checkStatusCode(GRBCORE.setGlobalInt(GRBCORE.GxB_NTHREADS, concurrency));
+        checkStatusCode(setGlobalInt(GxB_NTHREADS, concurrency));
 
-        long nodeCount = GRBCORE.nrows(adjacencyMatrix);
+        long nodeCount = nrows(adjacencyMatrix);
 
         // result vector
-        Buffer resultVector = GRBCORE.createVector(GRAPHBLAS.intType(), nodeCount);
+        Buffer resultVector = createVector(intType(), nodeCount);
         // make result vector dense
-        checkStatusCode(GRAPHBLAS.assignVectorInt(resultVector, null, null, 0, GRBCORE.GrB_ALL, nodeCount, null));
+        checkStatusCode(assignVectorInt(resultVector, null, null, 0, GrB_ALL, nodeCount, null));
         // finish pending work on v
-        GRBCORE.nvalsVector(resultVector);
+        nvalsVector(resultVector);
 
         // queue vector
-        Buffer queueVector = GRBCORE.createVector(GRAPHBLAS.booleanType(), nodeCount);
+        Buffer queueVector = createVector(booleanType(), nodeCount);
         // init node vector
-        GRAPHBLAS.setVectorElementBoolean(queueVector, startNode, true);
+        setVectorElementBoolean(queueVector, startNode, true);
 
         // ! difference to ejml version: here exists an any monoid as well as a pair op
         //              any is non-deterministic -> not possible in ejml semi-rings
         //              any + pair -> determenistic as it will always return 1 if one pair is found
-        Buffer semiRing = GRBCORE.createSemiring(GRBMONOID.anyMonoidDouble(), GRAPHBLAS.pairBinaryOpDouble());
+        Buffer semiRing = createSemiring(anyMonoidDouble(), pairBinaryOpDouble());
 
-        Buffer desc = GRBCORE.createDescriptor();
+        Buffer multDesc = createDescriptor();
         // invert the mask
-        checkStatusCode(GRBCORE.setDescriptorValue(desc, GRBCORE.GrB_MASK ,GRBCORE.GrB_COMP));
+        checkStatusCode(setDescriptorValue(multDesc, GrB_MASK , GrB_COMP));
         // clear q first
-        checkStatusCode(GRBCORE.setDescriptorValue(desc, GRBCORE.GrB_OUTP ,GRBCORE.GrB_REPLACE));
+        checkStatusCode(setDescriptorValue(multDesc, GrB_OUTP , GrB_REPLACE));
 
+        Buffer assignDesc = createDescriptor();
+        checkStatusCode(setDescriptorValue(assignDesc, GrB_MASK, GrB_STRUCTURE));
 
         int level = 1;
         // nodeCount
@@ -60,7 +63,7 @@ public class BfsNative {
             // v<q> = level, using vector assign with q as the mask
             // no option to use GrB_ALL -> but ni = nodeCount leads to it being used
             checkStatusCode(
-                    GRAPHBLAS.assignVectorInt(resultVector, queueVector, null, level, GRBCORE.GrB_ALL, nodeCount, null)
+                    assignVectorInt(resultVector, queueVector, null, level, GrB_ALL, nodeCount, assignDesc)
             );
 
             nodesVisited += nodesInQueue ;
@@ -68,9 +71,9 @@ public class BfsNative {
             if (nodesInQueue == 0 || nodesVisited == nodeCount || level > maxIterations) break ;
 
             // q<¬v> = q lor.land matrix
-            checkStatusCode(GRBOPSMAT.vxm(queueVector, resultVector, null, semiRing, queueVector, adjacencyMatrix, desc));
+            checkStatusCode(vxm(queueVector, resultVector, null, semiRing, queueVector, adjacencyMatrix, multDesc));
 
-            nodesInQueue = GRBCORE.nvalsVector(queueVector);
+            nodesInQueue = nvalsVector(queueVector);
         }
 
         // output vector
@@ -78,15 +81,16 @@ public class BfsNative {
         long[] indices = new long[Math.toIntExact(nodeCount)];
 
         // make sure everything got written
-        GRBCORE.vectorWait(resultVector);
-        checkStatusCode(GRAPHBLAS.extractVectorTuplesInt(resultVector, values, indices));
+        vectorWait(resultVector);
+        checkStatusCode(extractVectorTuplesInt(resultVector, values, indices));
 
 
         // free c-allocated stuff
-        GRBCORE.freeVector(queueVector);
-        GRBCORE.freeVector(resultVector);
-        GRBCORE.freeDescriptor(desc);
-        GRBCORE.freeSemiring(semiRing);
+        freeVector(queueVector);
+        freeVector(resultVector);
+        freeDescriptor(multDesc);
+        freeDescriptor(assignDesc);
+        freeSemiring(semiRing);
 
         // just using values as we know its a dense vector
         return new BfsDenseIntegerResult(values, level - 1, 0);
