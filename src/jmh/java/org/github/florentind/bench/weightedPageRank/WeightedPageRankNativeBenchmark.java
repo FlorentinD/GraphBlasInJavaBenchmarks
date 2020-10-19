@@ -21,6 +21,7 @@ public class WeightedPageRankNativeBenchmark extends WeightedPageRankBaseBenchma
     @Param({"true"})
     private boolean blockingMode;
 
+    @Override
     @Setup
     public void setup() {
         super.setup();

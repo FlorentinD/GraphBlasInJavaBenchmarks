@@ -15,6 +15,7 @@ public class ReduceWithMaskBenchmark extends MatrixOpsBaseBenchmark {
     PrimitiveDMask reduceRowWiseMask;
     PrimitiveDMask reduceColWiseMask;
 
+    @Override
     @Setup
     public void setup() {
         super.setup();

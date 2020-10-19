@@ -27,7 +27,9 @@ public class EjmlGraphBaseBenchmark {
 
     protected EjmlGraph graph;
     // untransposed version
-    protected DMatrixSparseCSC matrix;
+    protected DMatrixSparseCSC getAdjacencyMatrix() {
+       return CommonOps_DSCC.transpose(graph.matrix(), null, null);
+    }
 
 //    DatasetManager datasetManager;
 
@@ -44,7 +46,7 @@ public class EjmlGraphBaseBenchmark {
             .getUnion();
     }
 
-    @Setup(Level.Trial)
+    @Setup
     public void setup() {
 //        datasetManager = new DatasetManager(Path.of("/tmp"));
 
@@ -52,7 +54,6 @@ public class EjmlGraphBaseBenchmark {
         var hugeGraph = getCSRGraph();
 
         graph = EjmlGraph.create(hugeGraph);
-        matrix = CommonOps_DSCC.transpose(graph.matrix(), null, null);
 
         // for usage of higher concurrencies in gds benchmarks
         GdsEdition.instance().setToEnterpriseEdition();

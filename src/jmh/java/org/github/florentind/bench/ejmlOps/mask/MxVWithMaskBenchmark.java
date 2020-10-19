@@ -35,6 +35,7 @@ public class MxVWithMaskBenchmark extends MatrixOpsBaseBenchmark {
     double[] denseVector;
     double[] output;
 
+    @Override
     @Setup
     public void setup() {
         super.setup();

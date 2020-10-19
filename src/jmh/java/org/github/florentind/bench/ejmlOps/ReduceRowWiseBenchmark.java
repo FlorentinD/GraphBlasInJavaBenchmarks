@@ -16,7 +16,7 @@ public class ReduceRowWiseBenchmark extends MatrixOpsBaseBenchmark {
     DMatrixRMaj output;
 
     @Override
-    @Setup(Level.Invocation)
+    @Setup
     public void setup() {
         super.setup();
         output = new DMatrixRMaj(matrix.numRows, 1);

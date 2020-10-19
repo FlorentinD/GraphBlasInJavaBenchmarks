@@ -50,7 +50,8 @@ public class TriangleCountGraphImplBenchmark extends GraphImplBaseBenchmark {
         return generator.generate();
     }
 
-    @Setup(Level.Invocation)
+    @Override
+    @Setup
     public void setup() {
         super.setup();
 

@@ -1,8 +1,10 @@
 package org.github.florentind.bench.bfs;
 
+import org.ejml.data.DMatrixSparseCSC;
 import org.github.florentind.graphalgos.bfs.BfsEjml;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.infra.Blackhole;
 
 public class BfsEjmlBenchmark extends BfsBaseBenchmark {
@@ -10,16 +12,15 @@ public class BfsEjmlBenchmark extends BfsBaseBenchmark {
     @Param({"1"})
     private int concurrency;
 
+    private DMatrixSparseCSC matrix;
 
-// FIXME enable when bfs bug is fixed ( and result is comparable)
+    @Override
+    @Setup
+    public void setup() {
+        super.setup();
 
-//    @org.openjdk.jmh.annotations.Benchmark
-//    public void gdsBfsTraverse(Blackhole bh) {
-//        // Not really level/parent but just returns a list of visited nodes
-//        Traverse algorithm = Traverse.bfs(graph, startNode, (s, t, w) -> Traverse.ExitPredicate.Result.FOLLOW, Traverse.DEFAULT_AGGREGATOR);
-//
-//        bh.consume(algorithm.compute());
-//    }
+        matrix = getAdjacencyMatrix();
+    }
 
     @Benchmark
     public void ejmlSparseBfsBoolean(Blackhole bh) {

@@ -10,6 +10,7 @@ import org.openjdk.jmh.infra.Blackhole;
 public class PageRankJGraphTBenchmark extends PageRankBaseBenchmark {
     Graph jGraph;
 
+    @Override
     @Setup
     public void setup() {
         super.setup();

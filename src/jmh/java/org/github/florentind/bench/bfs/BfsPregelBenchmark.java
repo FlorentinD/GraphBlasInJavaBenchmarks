@@ -33,8 +33,10 @@ public class BfsPregelBenchmark extends BfsBaseBenchmark {
                 .startNode(0)
                 .concurrency(concurrency)
                 .build();
+    }
 
-        // init Pregel structures beforehand
+    @org.openjdk.jmh.annotations.Benchmark
+    public void pregelBfsLevel(Blackhole bh) {
         bfsLevelJob = Pregel.create(
                 graph,
                 config,
@@ -43,6 +45,11 @@ public class BfsPregelBenchmark extends BfsBaseBenchmark {
                 AllocationTracker.empty()
         );
 
+        bh.consume(bfsLevelJob.run());
+    }
+
+    @org.openjdk.jmh.annotations.Benchmark
+    public void pregelBfsParent(Blackhole bh) {
         bfsParentJob = Pregel.create(
                 graph,
                 config,
@@ -50,15 +57,7 @@ public class BfsPregelBenchmark extends BfsBaseBenchmark {
                 Pools.DEFAULT,
                 AllocationTracker.empty()
         );
-    }
 
-    @org.openjdk.jmh.annotations.Benchmark
-    public void pregelBfsLevel(Blackhole bh) {
-        bh.consume(bfsLevelJob.run());
-    }
-
-    @org.openjdk.jmh.annotations.Benchmark
-    public void pregelBfsParent(Blackhole bh) {
         bh.consume(bfsParentJob.run());
     }
 }

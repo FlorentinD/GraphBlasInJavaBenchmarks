@@ -8,6 +8,7 @@ import org.neo4j.graphalgo.beta.pregel.pr.PageRankPregel;
 import org.neo4j.graphalgo.core.concurrency.Pools;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.infra.Blackhole;
 
 public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchmark {
@@ -20,6 +21,7 @@ public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchma
     private Pregel<PageRankPregel.PageRankPregelConfig> pregel;
 
     @Override
+    @Setup
     public void setup() {
         super.setup();
 
@@ -31,7 +33,7 @@ public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchma
                 .build();
 
         // as Pregel implementation has no good way to normalize the weights
-        graph = EjmlUtil.normalizeOutgoingWeights(graph);
+        EjmlUtil.normalizeOutgoingWeights(graph);
 
         // init Pregel structures beforehand
         pregel = Pregel.create(

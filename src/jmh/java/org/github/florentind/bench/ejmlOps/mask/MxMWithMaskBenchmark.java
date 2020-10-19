@@ -17,6 +17,7 @@ public class MxMWithMaskBenchmark extends MatrixOpsBaseBenchmark {
     // TODO potential action: just remove unnecessary elements at the end instead of applying the mask during computation
 
     Mask mask;
+
     @Setup
     public void setup() {
         super.setup();

@@ -45,7 +45,7 @@ public class SwitchMatrixFormatBenchmark {
     boolean byCol;
 
 
-    @Setup(Level.Trial)
+    @Setup
     public void setup() {
         graph = RandomGraphGenerator.builder()
                 .nodeCount(nodeCount)

@@ -21,6 +21,7 @@ public class BfsNativeBenchmark extends BfsBaseBenchmark {
 
     protected Buffer jniMatrix;
 
+    @Override
     @Setup
     public void setup() {
         super.setup();
@@ -34,7 +35,7 @@ public class BfsNativeBenchmark extends BfsBaseBenchmark {
 
         assert blockingMode == (GRBCORE.getGlobalInt(GRBCORE.GxB_MODE) == GRBCORE.GrB_BLOCKING);
 
-        jniMatrix = ToNativeMatrixConverter.convert(matrix);
+        jniMatrix = ToNativeMatrixConverter.convert(getAdjacencyMatrix());
     }
 
 

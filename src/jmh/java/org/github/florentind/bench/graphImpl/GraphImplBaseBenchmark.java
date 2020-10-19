@@ -34,7 +34,7 @@ public class GraphImplBaseBenchmark {
             .getUnion();
     }
 
-    @Setup(Level.Invocation)
+    @Setup
     public void setup() {
         var hugeGraph = getCSRGraph();
 
