@@ -32,6 +32,11 @@ public class BfsDenseDoubleResult implements BfsResult {
         return result[nodeId];
     }
 
+    @Override
+    public boolean visited(int nodeId) {
+        return result[nodeId] != notFoundValue;
+    }
+
     public double[] result() {
         return this.result;
     }

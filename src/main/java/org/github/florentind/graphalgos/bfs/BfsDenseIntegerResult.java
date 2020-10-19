@@ -32,4 +32,10 @@ public class BfsDenseIntegerResult implements BfsResult {
     public double get(int nodeId) {
         return values[nodeId];
     }
+
+    @Override
+    public boolean visited(int nodeId) {
+        return values[nodeId] != notFoundValue;
+    }
+
 }

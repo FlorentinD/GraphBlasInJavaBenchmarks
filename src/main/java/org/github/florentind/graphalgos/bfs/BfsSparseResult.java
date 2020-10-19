@@ -28,6 +28,11 @@ public class BfsSparseResult implements BfsResult {
         return result.get(0, nodeId, notFoundValue);
     }
 
+    @Override
+    public boolean visited(int nodeId) {
+        return result.isAssigned(0, nodeId);
+    }
+
     public DMatrixSparseCSC result() {
         return this.result;
     }

@@ -6,4 +6,6 @@ public interface BfsResult {
     int nodesVisited();
 
     double get(int nodeId);
+
+    boolean visited(int nodeId);
 }

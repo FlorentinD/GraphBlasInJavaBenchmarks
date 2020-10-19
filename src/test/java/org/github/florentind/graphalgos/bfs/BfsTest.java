@@ -15,8 +15,10 @@ import java.nio.Buffer;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 import static org.github.florentind.graphalgos.bfs.BfsEjml.BfsVariation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @SuppressWarnings({"UnusedMethod"})
 public class BfsTest {
@@ -28,7 +30,7 @@ public class BfsTest {
     private static Stream<Arguments> bfsVariantSource() {
 
         return Stream.of(
-                Arguments.of(BfsVariation.BOOLEAN, new double[]{1, 1, 1, 1, 1, 1, 1}),
+                //Arguments.of(BfsVariation.BOOLEAN, new double[]{1, 1, 1, 1, 1, 1, 1}),
                 Arguments.of(BfsVariation.LEVEL, new double[]{1, 2, 3, 2, 3, 4, 3}),
                 Arguments.of(BfsVariation.PARENTS, new double[]{1, 1, 4, 1, 2, 3, 2})
 
@@ -100,19 +102,31 @@ public class BfsTest {
         assertEquals(denseIt.nodesVisited(), sparseIt.nodesVisited());
     }
 
-    @Test
-    public void testNativeBfs() {
+    @ParameterizedTest
+    @MethodSource("bfsVariantSource")
+    public void testNativeBfs(BfsVariation variation, double[] expected) {
         GRBCORE.initNonBlocking();
 
         Buffer nativeMatrix = ToNativeMatrixConverter.convert(inputMatrix);
 
-        var result = new BfsNative().computeLevel(nativeMatrix, 0, 6, 1);
+        BfsResult result = null;
 
-        GRBCORE.freeMatrix(nativeMatrix);
-        GRBCORE.grbFinalize();
+        switch (variation) {
+            case LEVEL:
+                result = new BfsNative().computeLevel(nativeMatrix, 0, 6, 1);
+                break;
+            case PARENTS:
+                result = new BfsNative().computeParent(nativeMatrix, 0, 6, 1);
+                break;
+            default:
+                fail();
+        }
+
+        checkStatusCode(GRBCORE.freeMatrix(nativeMatrix));
+        checkStatusCode(GRBCORE.grbFinalize());
 
         // only level variant implemented atm
-        assertBfsResult(new double[]{1, 2, 3, 2, 3, 4, 3}, result);
+        assertBfsResult(expected, result);
         // as the result is set at the beginning of each iteration
         assertEquals(EXPECTED_ITERATIONS, result.iterations());
     }

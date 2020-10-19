@@ -13,8 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphalgo.api.Graph;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
-import org.neo4j.graphalgo.beta.pregel.PregelComputation;
-import org.neo4j.graphalgo.beta.pregel.bfs.BFSLevelPregel;
 import org.neo4j.graphalgo.beta.pregel.bfs.BFSParentPregel;
 import org.neo4j.graphalgo.beta.pregel.bfs.BFSPregelConfig;
 import org.neo4j.graphalgo.beta.pregel.bfs.ImmutableBFSPregelConfig;
@@ -26,11 +24,12 @@ import java.nio.Buffer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
-    private static final int NODE_COUNT = 30_000;
+public class BfsParentBenchmarkTest extends BaseBenchmarkTest {
+    private static final int NODE_COUNT = 30;
     private static final int MAX_ITERATIONS = 100;
     private static final int CONCURRENCY = 16;
     private static final int START_NODE = 0;
+
 
     @Override
     long nodeCount() {
@@ -79,7 +78,12 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
         assertEquals(goldStandard.nodesVisited(), actual.nodesVisited(), "Number of nodes visited does not equal");
 
         for (int i = 0; i < NODE_COUNT; i++) {
-            assertEquals(goldStandard.get(i), actual.get(i), "Different for node " + i);
+            boolean isVisited = goldStandard.visited(i);
+            assertEquals(isVisited, actual.visited(i));
+
+            if (isVisited) {
+                assertEquals(goldStandard.get(i), actual.get(i), "Different for node " + i);
+            }
         }
     }
 
@@ -92,13 +96,10 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
                 .concurrency(CONCURRENCY)
                 .build();
 
-        PregelComputation<BFSPregelConfig> computation;
-        computation = new BFSLevelPregel();
-
         Pregel<BFSPregelConfig> bfsLevelJob = Pregel.create(
                 graph,
                 config,
-                computation,
+                new BFSParentPregel(),
                 Pools.DEFAULT,
                 AllocationTracker.empty()
         );
@@ -107,41 +108,40 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
 
 
         // making the result equal to the graphblas version
-        HugeLongArray resultValues = result.nodeValues().longProperties(BFSLevelPregel.LEVEL);
+        HugeLongArray resultValues = result.nodeValues().longProperties(BFSParentPregel.PARENT);
         double[] resultArray = new double[Math.toIntExact(nodeCount())];
         for (int i = 0; i < NODE_COUNT; i++) {
             double resultValue = resultValues.get(i);
-            // +1 as for level: graphblas versions starts at 1 instead of 0 (and not found in pregel == -1)
+            // +1  for parent: ids have an offset of 1 for graphblas as 0 would be false in the bool semi-ring
             resultValue += 1;
             resultArray[i] = resultValue;
         }
 
-        return new BfsDenseDoubleResult(resultArray, result.ranIterations(), (long) 0);
+        return new BfsDenseDoubleResult(resultArray, result.ranIterations() + 1, Long.MAX_VALUE);
     }
 
     private BfsResult getEjmlSparseResult(EjmlGraph ejmlGraph, int startNode) {
         var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
-        return new BfsEjml().computeSparse(unTransposedMatrix, BfsEjml.BfsVariation.LEVEL, new int[]{startNode}, MAX_ITERATIONS);
+        return new BfsEjml().computeSparse(unTransposedMatrix, BfsEjml.BfsVariation.PARENTS, new int[]{startNode}, MAX_ITERATIONS);
     }
 
     private BfsResult getEjmlDenseResult(EjmlGraph ejmlGraph, int startNode) {
         var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
-        return new BfsEjml().computeDense(unTransposedMatrix, BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
+        return new BfsEjml().computeDense(unTransposedMatrix, BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getEjmlDenseSparseResult(EjmlGraph ejmlGraph, int startNode) {
         var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
-        return new BfsEjml().computeDenseSparse(unTransposedMatrix, BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
+        return new BfsEjml().computeDenseSparse(unTransposedMatrix, BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getJniResult(EjmlGraph ejmlGraph, int startNode) {
         GRBCORE.initNonBlocking();
 
-        var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
+        Buffer jniMatrix = ToNativeMatrixConverter.convert(ejmlGraph);
 
-        Buffer jniMatrix = ToNativeMatrixConverter.convert(unTransposedMatrix);
+        var result = new BfsNative().computeParent(jniMatrix, startNode, MAX_ITERATIONS, 1);
 
-        var result = new BfsNative().computeLevel(jniMatrix, startNode, MAX_ITERATIONS, 1);
         NativeHelper.checkStatusCode(GRBCORE.freeMatrix(jniMatrix));
 
         return result;
