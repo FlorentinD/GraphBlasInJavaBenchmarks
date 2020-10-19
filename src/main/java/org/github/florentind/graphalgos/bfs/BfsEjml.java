@@ -155,7 +155,6 @@ public class BfsEjml {
             }
 
             // combine iterationResult and result
-            // TODO: use a dense result vector for here!
             result = MaskUtil_DSCC.combineOutputs(result, iterationResult, null, null);
 
             // check for fixPoint
@@ -176,11 +175,11 @@ public class BfsEjml {
 
         // init result vector
 
-            if (bfsVariation == BfsVariation.PARENTS) {
-                inputVector.set(0, startNode, startNode + 1);
-            } else {
-                inputVector.set(0, startNode, 1);
-            }
+        if (bfsVariation == BfsVariation.PARENTS) {
+            inputVector.set(0, startNode, startNode + 1);
+        } else {
+            inputVector.set(0, startNode, 1);
+        }
 
         // for reusing memory
         IGrowArray gw = new IGrowArray();
@@ -193,12 +192,18 @@ public class BfsEjml {
         // find out why id actually matters for sparse mult
         DMonoid first_monoid = new DMonoid(0, (a, b) -> a);
         DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : new DSemiRing(first_monoid, first_monoid);
+        Arrays.fill(result, semiRing.add.id);
 
         int iteration = 1;
 
         // negated -> dont compute values for visited nodes
         // replace -> iterationResult is basically the new inputVector
-        Mask mask = DMasks.builder(result).withNumCols(nodeCount).withNegated(true).withReplace(true).build();
+        Mask mask = DMasks.builder(result)
+                .withZeroElement(semiRing.add.id)
+                .withNumCols(nodeCount)
+                .withNegated(true)
+                .withReplace(true)
+                .build();
 
         for (;; iteration++) {
             nodesVisited += inputVector.nz_length;
