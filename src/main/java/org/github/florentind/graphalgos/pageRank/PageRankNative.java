@@ -77,16 +77,12 @@ public class PageRankNative {
 
             // Divide previous PageRank with number of outbound edges
             checkStatusCode(
-                    elemWiseMulIntersectBinOp(
-                            importanceVec, null, null, divBinaryOpDouble(),
-                            pr, dOut, null)
+                    elemWiseMulIntersectBinOp(importanceVec, null, null, divBinaryOpDouble(), pr, dOut, null)
             );
 
             // Multiply importance by damping factor
             checkStatusCode(
-                    assignVectorDouble(
-                            importanceVec, null, timesBinaryOpDouble(),
-                            dampingFactor, GrB_ALL, nodeCount, null)
+                    assignVectorDouble(importanceVec, null, timesBinaryOpDouble(), dampingFactor, GrB_ALL, nodeCount, null)
             );
 
 
@@ -118,13 +114,8 @@ public class PageRankNative {
                     elemWiseAddUnionMonoid(pr, null, null, plusMonoidDouble(), pr, importanceVec, null));
 
             // Calculate result difference
-            checkStatusCode(
-                    elemWiseAddUnionBinOp(
-                            prevResult, null, null, minusBinaryOpDouble(), prevResult, pr, null)
-            );
-            checkStatusCode(
-                    vectorApply(prevResult, null, null, absUnaryOpDouble(), prevResult, null)
-            );
+            checkStatusCode(elemWiseAddUnionBinOp(prevResult, null, null, minusBinaryOpDouble(), prevResult, pr, null));
+            checkStatusCode(vectorApply(prevResult, null, null, absUnaryOpDouble(), prevResult, null));
             resultDiff = vectorReduceAllDouble(0.0, null, plusMonoidDouble(), prevResult, null);
         }
 
@@ -173,18 +164,13 @@ public class PageRankNative {
 
         // Ideally could use eWiseMult vector + matrix (broadcast)
         // as sumMatrix / adjMatrix to scale rowwise .. actual operator needs to do prev-weight / weightSum
-        checkStatusCode(
-                vectorApply(sumOutWeights, null, null, mulInvUnaryOpDouble(), sumOutWeights, null)
-        );
+        checkStatusCode(vectorApply(sumOutWeights, null, null, mulInvUnaryOpDouble(), sumOutWeights, null));
         int sumCount = Math.toIntExact(nvalsVector(sumOutWeights));
         double[] sums = new double[sumCount];
         long[] sumIndices = new long[sumCount];
         checkStatusCode(extractVectorTuplesDouble(sumOutWeights, sums, sumIndices));
         // TODO: better way to set diagonal in matrix based on a vector?
-        checkStatusCode(
-                buildMatrixFromTuplesDouble(sumOutWeightsDia, sumIndices,
-                        sumIndices, sums, sumCount, firstBinaryOpDouble())
-        );
+        checkStatusCode(buildMatrixFromTuplesDouble(sumOutWeightsDia, sumIndices, sumIndices, sums, sumCount, firstBinaryOpDouble()));
 
         // any, as based diagonal only produces computation done per entry
         Buffer anyDivSemiRing = createSemiring(anyMonoidDouble(), timesBinaryOpDouble());
@@ -211,9 +197,7 @@ public class PageRankNative {
 
         for (; iteration < maxIterations && resultDiff > tolerance; iteration++) {
             // !Difference: in C would just swap prevResult and result
-            checkStatusCode(
-                    assign(prevResult, null, secondBinaryOpDouble(), pr, GrB_ALL, nodeCount, null)
-            );
+            checkStatusCode(assign(prevResult, null, secondBinaryOpDouble(), pr, GrB_ALL, nodeCount, null));
 
             //
             // Importance calculation
@@ -221,14 +205,10 @@ public class PageRankNative {
 
 
             // unweighted would divide here by degree
-            checkStatusCode(
-                    assign(importanceVec, null, secondBinaryOpDouble(), pr, GrB_ALL, nodeCount, null)
-            );
+            checkStatusCode(assign(importanceVec, null, secondBinaryOpDouble(), pr, GrB_ALL, nodeCount, null));
 
             // Multiply importance by damping factor
-            checkStatusCode(
-                    assignVectorDouble(importanceVec, null, timesBinaryOpDouble(), dampingFactor, GrB_ALL, nodeCount, null)
-            );
+            checkStatusCode(assignVectorDouble(importanceVec, null, timesBinaryOpDouble(), dampingFactor, GrB_ALL, nodeCount, null));
 
             // Calculate total PR of all inbound vertices
             // using plusFirst, as nz adj. matrix values are always 1
@@ -242,9 +222,7 @@ public class PageRankNative {
             //
 
             // Extract all the dangling PR entries from the previous result
-            checkStatusCode(
-                    extract(danglingVec, sumOutWeights, null, pr, GrB_ALL, nodeCount, invertedMask)
-            );
+            checkStatusCode(extract(danglingVec, sumOutWeights, null, pr, GrB_ALL, nodeCount, invertedMask));
 
             // Sum the previous PR values of dangling vertices together
             double danglingSum = vectorReduceAllDouble(0.0, null, plusMonoidDouble(), danglingVec, null);
@@ -257,22 +235,13 @@ public class PageRankNative {
             // PageRank summarization
             // Add teleport, importanceVec, and danglingVec components together
             //
-            checkStatusCode(
-                    assignVectorDouble(pr, null, null, (teleport + danglingSum), GrB_ALL, nodeCount, null)
-            );
+            checkStatusCode(assignVectorDouble(pr, null, null, (teleport + danglingSum), GrB_ALL, nodeCount, null));
 
-            checkStatusCode(
-                    elemWiseAddUnionMonoid(pr, null, null, plusMonoidDouble(), pr, importanceVec, null)
-            );
+            checkStatusCode(elemWiseAddUnionMonoid(pr, null, null, plusMonoidDouble(), pr, importanceVec, null));
 
             // Calculate result difference
-            checkStatusCode(
-                    elemWiseAddUnionBinOp(prevResult, null, null, minusBinaryOpDouble(), prevResult, pr, null)
-            );
-
-            checkStatusCode(
-                    vectorApply(prevResult, null, null, absUnaryOpDouble(), prevResult, null)
-            );
+            checkStatusCode(elemWiseAddUnionBinOp(prevResult, null, null, minusBinaryOpDouble(), prevResult, pr, null));
+            checkStatusCode(vectorApply(prevResult, null, null, absUnaryOpDouble(), prevResult, null));
             resultDiff = vectorReduceAllDouble(0.0, null, plusMonoidDouble(), prevResult, null);
         }
 

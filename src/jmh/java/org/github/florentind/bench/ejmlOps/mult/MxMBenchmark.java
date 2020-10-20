@@ -15,15 +15,15 @@ import java.util.HashMap;
 
 
 public class MxMBenchmark extends MxMBaseBenchmark {
-    private static final String PLUS_TIMES = "Plus, Times";
-    private static final String OR_AND = "Or, And";
-    private static final String PLUS_AND = "Plus, And";
-    private static final String OR_TIMES = "Or, Times";
-    private static final String PLUS_FIRST = "Plus, First";
-    private static final String PLUS_BFIRST = "Plus, Boolean-First";
-    private static final String PLUS_ONE = "Plus, One (const)";
-    private static final String MIN_MAX = "Min, Max";
-    private static final String NONE = "Plus, Times (inlined)";
+    protected static final String PLUS_TIMES = "Plus, Times";
+    protected static final String OR_AND = "Or, And";
+    protected static final String PLUS_AND = "Plus, And";
+    protected static final String OR_TIMES = "Or, Times";
+    protected static final String PLUS_FIRST = "Plus, First";
+    protected static final String PLUS_BFIRST = "Plus, Boolean-First";
+    protected static final String PLUS_ONE = "Plus, One (const)";
+    protected static final String MIN_MAX = "Min, Max";
+    protected static final String NONE = "Plus, Times (inlined)";
 
 
     HashMap<String, DSemiRing> semiRings = new HashMap<>() {{
@@ -37,7 +37,7 @@ public class MxMBenchmark extends MxMBaseBenchmark {
         put(PLUS_ONE, new DSemiRing(DMonoids.PLUS, new DMonoid(0, (x,y) -> 1)));
     }};
 
-    @Param({NONE, PLUS_ONE})
+    @Param({NONE, PLUS_TIMES, PLUS_AND, PLUS_FIRST, PLUS_BFIRST, PLUS_ONE, OR_TIMES, OR_AND, MIN_MAX})
     private String semiRing;
 
     @Benchmark
