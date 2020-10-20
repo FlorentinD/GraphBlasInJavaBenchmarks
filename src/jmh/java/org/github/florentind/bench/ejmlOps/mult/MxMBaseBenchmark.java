@@ -20,16 +20,16 @@ public class MxMBaseBenchmark {
 
     protected DMatrixSparseCSC matrix;
 
-    @Param({"100000"})
+    @Param({"10000","100000","1000000"})
     private int dimension;
 
-    // not 10^7 as out of java heap space was insufficient
-    @Param({"200000"})
-    private int elementCount;
+    // TODO also scale avgEntriesPerColumn?
+    @Param({"4"})
+    private int avgEntriesPerColumn;
 
     @Setup
     public void setup() {
-        matrix = RandomMatrices_DSCC.rectangle(dimension, dimension, elementCount, new Random(42));
+        matrix = RandomMatrices_DSCC.generateUniform(dimension, dimension, avgEntriesPerColumn, 0, 1, new Random(42));
         result = new DMatrixSparseCSC(matrix.numRows, matrix.numCols);
     }
 

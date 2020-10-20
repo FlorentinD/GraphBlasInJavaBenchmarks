@@ -1,0 +1,8 @@
+Benchmark                                  (avgEntriesPerColumn)  (dimension)           (semiRing)  Mode  Cnt     Score     Error  Units
+ejmlOps.mult.MxMWithSemiRingBenchmark.mxm                      4      1000000          Plus, Times  avgt    5  1253.417 ±  21.425  ms/op
+ejmlOps.mult.MxMWithSemiRingBenchmark.mxm                      4      1000000              Or, And  avgt    5  1228.152 ±  86.346  ms/op
+ejmlOps.mult.MxMWithSemiRingBenchmark.mxm                      4      1000000            Plus, And  avgt    5  1253.240 ±  33.809  ms/op
+ejmlOps.mult.MxMWithSemiRingBenchmark.mxm                      4      1000000            Or, Times  avgt    5  1251.461 ± 106.063  ms/op
+ejmlOps.mult.MxMWithSemiRingBenchmark.mxm                      4      1000000          Plus, First  avgt    5  1230.277 ±  10.927  ms/op
+ejmlOps.mult.MxMWithSemiRingBenchmark.mxm                      4      1000000  Plus, Boolean-First  avgt    5  1253.316 ± 100.887  ms/op
+ejmlOps.mult.MxMWithSemiRingBenchmark.mxm                      4      1000000             Min, Max  avgt    5  1372.996 ±  51.877  ms/op
