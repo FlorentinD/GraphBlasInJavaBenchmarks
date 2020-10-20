@@ -18,17 +18,18 @@ import java.util.concurrent.TimeUnit;
 public abstract class MatrixOpsBaseBenchmark {
     protected DMatrixSparseCSC matrix;
 
-    @Param({"300000"})
+    @Param({"10000","100000","1000000"})
     private int dimension;
 
+    // TODO also scale avgEntriesPerColumn?
     @Param({"4"})
-    private int avgDegree;
+    private int avgEntriesPerColumn;
 
     @Param({"UNIFORM"})
     private String degreeDistribution;
 
     @Setup
     public void setup() {
-        matrix = RandomMatrices_DSCC.generateUniform(dimension, dimension, avgDegree, 1, 2, new Random(42));
+        matrix = RandomMatrices_DSCC.generateUniform(dimension, dimension, avgEntriesPerColumn, 1, 2, new Random(42));
     }
 }
