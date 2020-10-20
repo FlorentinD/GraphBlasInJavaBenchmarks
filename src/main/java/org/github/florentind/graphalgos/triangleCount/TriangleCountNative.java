@@ -54,6 +54,7 @@ public class TriangleCountNative {
         double[] resultValues = new double[resultSize];
         long[] indices = new long[resultSize];
 
+        vectorWait(nativeResult);
         extractVectorTuplesDouble(nativeResult, resultValues, indices);
 
         freeSemiring(plusAndSemiring);

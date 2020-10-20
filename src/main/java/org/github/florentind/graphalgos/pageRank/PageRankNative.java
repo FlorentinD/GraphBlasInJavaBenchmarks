@@ -248,6 +248,7 @@ public class PageRankNative {
         double[] values = new double[Math.toIntExact(nodeCount)];
         long[] indices = new long[Math.toIntExact(nodeCount)];
 
+        vectorWait(pr);
         checkStatusCode(extractVectorTuplesDouble(pr, values, indices));
 
         freeVector(sumOutWeights);

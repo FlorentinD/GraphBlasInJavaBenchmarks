@@ -64,9 +64,7 @@ public class BfsNative {
         for (; ; level++) {
             // v<q> = level, using vector assign with q as the mask
             // no option to use GrB_ALL -> but ni = nodeCount leads to it being used
-            checkStatusCode(
-                    assignVectorInt(resultVector, queueVector, null, level, GrB_ALL, nodeCount, assignDesc)
-            );
+            checkStatusCode(assignVectorInt(resultVector, queueVector, null, level, GrB_ALL, nodeCount, assignDesc));
 
             nodesVisited += nodesInQueue ;
             // check for fixPoint
