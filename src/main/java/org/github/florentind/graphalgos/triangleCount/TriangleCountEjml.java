@@ -3,15 +3,14 @@ package org.github.florentind.graphalgos.triangleCount;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.masks.DMasks;
 import org.ejml.masks.Mask;
-import org.ejml.ops.DMonoids;
-import org.ejml.ops.DSemiRing;
-import org.ejml.ops.DSemiRings;
-import org.ejml.ops.IBinaryPredicates;
+import org.ejml.ops.*;
 import org.ejml.sparse.csc.CommonOpsWithSemiRing_DSCC;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 
 public class TriangleCountEjml {
-    static DSemiRing plusAndSemiring = new DSemiRing(DMonoids.PLUS, DMonoids.AND);
+    // TODO faster than PLUS_AND?
+    // simple const 1 as mult op as sparse entries are both expected to be 1
+    static DSemiRing multSemiring = new DSemiRing(DMonoids.PLUS, new DMonoid(0, (x,y) -> 1));
 
     /**
      * based on slides 91-93 in
@@ -24,15 +23,12 @@ public class TriangleCountEjml {
         DMatrixSparseCSC L = getLowerTriangle(matrix);
         DMatrixSparseCSC U = CommonOps_DSCC.select(matrix, IBinaryPredicates.higherTriangle, null, null);
 
-        // AND instead of TIMES as actual values do not matter
-        DSemiRing semiRing = new DSemiRing(DMonoids.PLUS, DMonoids.AND);
-
         Mask mask = null;
         if (useMask) {
             mask = DMasks.builder(matrix, true).build();
         }
 
-        DMatrixSparseCSC B = CommonOpsWithSemiRing_DSCC.mult(L, U, null, semiRing, mask, null);
+        DMatrixSparseCSC B = CommonOpsWithSemiRing_DSCC.mult(L, U, null, multSemiring, mask, null);
         DMatrixSparseCSC C;
         if (!useMask) {
             // using L for output mem as L is not used afterwards
@@ -52,7 +48,7 @@ public class TriangleCountEjml {
         DMatrixSparseCSC L = getLowerTriangle(matrix);
 
         Mask mask = DMasks.builder(L, true).build();
-        DMatrixSparseCSC C = CommonOpsWithSemiRing_DSCC.mult(L, L, null, plusAndSemiring, mask, null);
+        DMatrixSparseCSC C = CommonOpsWithSemiRing_DSCC.mult(L, L, null, multSemiring, mask, null);
 
         double globalCount = CommonOps_DSCC.reduceScalar(C, Double::sum);
         // assert count is a whole number
@@ -80,10 +76,10 @@ public class TriangleCountEjml {
 
         if (useLowerTriangle) {
             DMatrixSparseCSC L = getLowerTriangle(matrix);
-            DMatrixSparseCSC tri = CommonOpsWithSemiRing_DSCC.mult(matrix, L, null, plusAndSemiring, mask, null);
+            DMatrixSparseCSC tri = CommonOpsWithSemiRing_DSCC.mult(matrix, L, null, multSemiring, mask, null);
             result = CommonOps_DSCC.reduceRowWise(tri, 0, Double::sum, null).data;
         } else {
-            DMatrixSparseCSC tri = CommonOpsWithSemiRing_DSCC.mult(matrix, matrix, null, plusAndSemiring, mask, null);
+            DMatrixSparseCSC tri = CommonOpsWithSemiRing_DSCC.mult(matrix, matrix, null, multSemiring, mask, null);
             result = CommonOps_DSCC.reduceColumnWise(tri, 0, Double::sum, null).data;
 
             for (int i = 0; i < result.length; i++) {
@@ -97,5 +93,9 @@ public class TriangleCountEjml {
 
     private static DMatrixSparseCSC getLowerTriangle(DMatrixSparseCSC matrix) {
         return CommonOps_DSCC.select(matrix, IBinaryPredicates.lowerTriangle, null, null);
+    }
+
+    private static DMatrixSparseCSC getUpperTriangle(DMatrixSparseCSC matrix) {
+        return CommonOps_DSCC.select(matrix, IBinaryPredicates.higherTriangle, null, null);
     }
 }

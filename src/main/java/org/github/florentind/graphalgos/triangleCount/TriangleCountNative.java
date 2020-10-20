@@ -20,7 +20,7 @@ public class TriangleCountNative {
         long nodeCount = nrows(matrix);
         Buffer C = createMatrix(doubleType(), nodeCount, nodeCount);
 
-        Buffer semiRing = createSemiring(plusMonoidDouble(), landBinaryOpDouble());
+        Buffer semiRing = createSemiring(plusMonoidDouble(), firstBinaryOpDouble());
         checkStatusCode(mxm(C, L, null, semiRing, L, L, null));
 
 
