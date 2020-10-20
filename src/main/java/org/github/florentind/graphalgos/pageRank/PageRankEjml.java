@@ -66,7 +66,7 @@ public class PageRankEjml {
             // Sum the previous PR values of dangling nodes together
             // !! Difference to reference:  mask in reduceScalar is for the input-vector
             // --> not extracting dangling pr entries before
-            double danglingSum = CommonOps_DArray.reduceScalar(pr, DMonoids.PLUS, danglingNodesMask);
+            double danglingSum = CommonOps_DArray.reduceScalar(pr, 0, DMonoids.PLUS.func, danglingNodesMask);
 
 
             // Multiply by damping factor and 1 / |V|
@@ -110,7 +110,7 @@ public class PageRankEjml {
             // calculate diff (for tolerance check)
             CommonOps_DArray.elementWiseMult(prevResult, pr, prevResult, (a,b) -> a - b);
             CommonOps_DArray.apply(prevResult, Math::abs);
-            resultDiff = CommonOps_DArray.reduceScalar(prevResult, DMonoids.PLUS);
+            resultDiff = CommonOps_DArray.reduceScalar(prevResult,0, DMonoids.PLUS.func);
         }
 
         return new PageRankResult(pr, iterations);
@@ -191,7 +191,7 @@ public class PageRankEjml {
             // Sum the previous PR values of dangling nodes together
             // !! Difference to reference:  mask in reduceScalar is for the input-vector (difference to GraphBLAS API)
             // --> not extracting dangling pr entries before
-            double danglingSum = CommonOps_DArray.reduceScalar(pr, DMonoids.PLUS, danglingNodesMask);
+            double danglingSum = CommonOps_DArray.reduceScalar(pr, 0, DMonoids.PLUS.func, danglingNodesMask);
 
             // Multiply by damping factor and 1 / |V|
             danglingSum *= (dampingFactor / nodeCount);
@@ -231,7 +231,7 @@ public class PageRankEjml {
             // calculate diff (for tolerance check)
             CommonOps_DArray.elementWiseMult(prevResult, pr, prevResult, (a,b) -> a - b);
             CommonOps_DArray.apply(prevResult, Math::abs);
-            resultDiff = CommonOps_DArray.reduceScalar(prevResult, DMonoids.PLUS);
+            resultDiff = CommonOps_DArray.reduceScalar(prevResult, 0, DMonoids.PLUS.func);
         }
 
         return new PageRankResult(pr, iterations);

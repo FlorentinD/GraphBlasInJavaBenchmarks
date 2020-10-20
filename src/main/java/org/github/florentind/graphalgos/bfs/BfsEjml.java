@@ -37,7 +37,6 @@ public class BfsEjml {
             result[startNode] = 1;
         }
 
-
         // or use dense matrix and reduceScalar to count non-zero elements
         double[] iterationResult = new double[adjacencyMatrix.numCols];
 
@@ -60,11 +59,8 @@ public class BfsEjml {
             prevVisitedNodes = visitedNodes;
 
             // add newly visited nodes
-            for (double v : iterationResult) {
-                if (v != semiRing.add.id) {
-                    visitedNodes++;
-                }
-            }
+            // TODO check if this has an overhead
+            visitedNodes = (int) CommonOps_DArray.reduceScalar(iterationResult, visitedNodes, (acc, v) -> (v != semiRing.add.id) ? ++acc : acc);
 
             inputVector = iterationResult.clone();
 
