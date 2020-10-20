@@ -57,7 +57,7 @@ public class ToMatrixBenchmark {
                 .seed(42L)
                 .aggregation(Aggregation.MAX)
                 .allocationTracker(AllocationTracker.empty())
-                .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.YES)
+                .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.NO)
                 .relationshipDistribution(RelationshipDistribution.valueOf(degreeDistribution))
                 .build().generate();
 

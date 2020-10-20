@@ -8,7 +8,7 @@ ext {
             // FIXME: currently need to build this locally from FlorentinD/ejml/mask_rebased
             'ejml':                         '0.40-SNAPSHOT',
             // FIXME: replace with stable version (currently locally build) due to pregel examples and tmp bfs bug-fix
-            'gds':                          '1.4.0-alpha07',
+            'gds':                          '1.5.0-alpha01',
             'neo4j':                        '4.1.1',
             'gdl':                          '0.3.5',
             'hamcrest':                     '2.1',

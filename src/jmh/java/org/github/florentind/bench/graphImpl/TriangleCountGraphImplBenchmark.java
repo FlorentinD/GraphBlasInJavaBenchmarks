@@ -1,7 +1,6 @@
 package org.github.florentind.bench.graphImpl;
 
 
-import org.neo4j.graphalgo.Orientation;
 import org.neo4j.graphalgo.api.CSRGraph;
 import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
 import org.neo4j.graphalgo.beta.generator.RelationshipDistribution;
@@ -13,12 +12,9 @@ import org.neo4j.graphalgo.triangle.IntersectingTriangleCount;
 import org.neo4j.graphalgo.triangle.IntersectingTriangleCountFactory;
 import org.neo4j.graphalgo.triangle.TriangleCountBaseConfig;
 import org.neo4j.logging.NullLog;
-import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.infra.Blackhole;
-
-import java.util.Optional;
 
 public class TriangleCountGraphImplBenchmark extends GraphImplBaseBenchmark {
 
@@ -35,19 +31,13 @@ public class TriangleCountGraphImplBenchmark extends GraphImplBaseBenchmark {
 
     @Override
     CSRGraph getCSRGraph() {
-        RandomGraphGenerator generator = new RandomGraphGenerator(
-            nodeCount,
-            avgDegree,
-            RelationshipDistribution.POWER_LAW,
-            42L,
-            Optional.empty(),
-            Optional.empty(),
-            Aggregation.MAX,
-            Orientation.NATURAL,
-            RandomGraphGeneratorConfig.AllowSelfLoops.YES,
-            AllocationTracker.empty()
-        );
-        return generator.generate();
+        return RandomGraphGenerator.builder()
+                .nodeCount(nodeCount)
+                .averageDegree(avgDegree)
+                .relationshipDistribution(RelationshipDistribution.POWER_LAW)
+                .aggregation(Aggregation.SINGLE)
+                .seed(42)
+                .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.NO).build().generate();
     }
 
     @Override

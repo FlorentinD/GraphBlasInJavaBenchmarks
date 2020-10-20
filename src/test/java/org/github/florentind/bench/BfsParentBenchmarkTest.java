@@ -25,9 +25,9 @@ import java.nio.Buffer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BfsParentBenchmarkTest extends BaseBenchmarkTest {
-    private static final int NODE_COUNT = 30;
+    private static final int NODE_COUNT = 300_000;
     private static final int MAX_ITERATIONS = 100;
-    private static final int CONCURRENCY = 16;
+    private static final int CONCURRENCY = 1;
     private static final int START_NODE = 0;
 
 
@@ -50,6 +50,8 @@ public class BfsParentBenchmarkTest extends BaseBenchmarkTest {
         super.setup();
         ejmlGraph = EjmlGraph.create(graph);
         goldStandard = getJniResult(ejmlGraph, START_NODE);
+
+        System.out.println("goldStandard.iterations() = " + goldStandard.iterations());
     }
 
     @Test
@@ -117,7 +119,7 @@ public class BfsParentBenchmarkTest extends BaseBenchmarkTest {
             resultArray[i] = resultValue;
         }
 
-        return new BfsDenseDoubleResult(resultArray, result.ranIterations() + 1, Long.MAX_VALUE);
+        return new BfsDenseDoubleResult(resultArray, result.ranIterations(), Long.MAX_VALUE);
     }
 
     private BfsResult getEjmlSparseResult(EjmlGraph ejmlGraph, int startNode) {

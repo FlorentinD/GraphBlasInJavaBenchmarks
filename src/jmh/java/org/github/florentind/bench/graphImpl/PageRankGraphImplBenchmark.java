@@ -1,7 +1,6 @@
 package org.github.florentind.bench.graphImpl;
 
 
-import org.neo4j.graphalgo.Orientation;
 import org.neo4j.graphalgo.api.CSRGraph;
 import org.neo4j.graphalgo.beta.generator.PropertyProducer;
 import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
@@ -14,12 +13,9 @@ import org.neo4j.graphalgo.pagerank.PageRank;
 import org.neo4j.graphalgo.pagerank.PageRankBaseConfig;
 import org.neo4j.graphalgo.pagerank.PageRankFactory;
 import org.neo4j.logging.NullLog;
-import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.infra.Blackhole;
-
-import java.util.Optional;
 
 
 public class PageRankGraphImplBenchmark extends GraphImplBaseBenchmark {
@@ -40,19 +36,14 @@ public class PageRankGraphImplBenchmark extends GraphImplBaseBenchmark {
 
     @Override
     CSRGraph getCSRGraph() {
-        RandomGraphGenerator generator = new RandomGraphGenerator(
-            nodeCount,
-            avgDegree,
-            RelationshipDistribution.POWER_LAW,
-            42L,
-            Optional.empty(),
-            Optional.of(new PropertyProducer.Random(RELATIONSHIP_PROPERTY, -3, 3)),
-            Aggregation.MAX,
-            Orientation.NATURAL,
-            RandomGraphGeneratorConfig.AllowSelfLoops.YES,
-            AllocationTracker.empty()
-        );
-        return generator.generate();
+        return RandomGraphGenerator.builder()
+                .nodeCount(nodeCount)
+                .averageDegree(avgDegree)
+                .relationshipDistribution(RelationshipDistribution.POWER_LAW)
+                .aggregation(Aggregation.SINGLE)
+                .relationshipPropertyProducer(PropertyProducer.random(RELATIONSHIP_PROPERTY, -3, 3))
+                .seed(42)
+                .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.NO).build().generate();
     }
 
     @Override

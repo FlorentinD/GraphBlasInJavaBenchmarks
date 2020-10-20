@@ -33,7 +33,7 @@ public class BfsBaseBenchmark extends EjmlGraphBaseBenchmark {
                 .seed(42L)
                 .aggregation(Aggregation.MAX)
                 .allocationTracker(AllocationTracker.empty())
-                .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.YES)
+                .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.NO)
                 .relationshipDistribution(RelationshipDistribution.POWER_LAW)
                 .build().generate();
 
