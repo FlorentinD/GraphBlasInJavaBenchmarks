@@ -147,18 +147,12 @@ public class PageRankEjml {
         boolean weightsNormalized = Arrays.stream(weightSums).allMatch(sum -> sum == 1 || sum == 0);
 
         if (!weightsNormalized) {
-            // TODO: benchmark this variant, as its way cleaner (and can be used for native version)
-            // TODO: use eWiseMult(DMatrixSparseCSC, DMatrixRMaj) .. supporting also simple broadcasting
-            //var weightSumsMatrix = CommonOps_DSCC.diag(weightSums);
-            //adjacencyMatrix = CommonOps_DSCC.mult(weightSumsMatrix, adjacencyMatrix, null);
             // create copy to not change input matrix
             adjacencyMatrix = adjacencyMatrix.copy();
 
             // normalize weights .. op based on row + values
-            // TODO: normalize on matrix copy and write as a general operator
-            for (int i = 0; i < adjacencyMatrix.nz_length; i++) {
-                adjacencyMatrix.nz_values[i] = adjacencyMatrix.nz_values[i] / weightSums[adjacencyMatrix.nz_rows[i]];
-            }
+            // TODO is this slower?
+            CommonOps_DSCC.applyRowIdx(adjacencyMatrix, (rowIdx, val) -> val / weightSums[rowIdx], adjacencyMatrix);
         }
 
         // Mask set for every node with a nodeDegree > 0 (e.g. weightSum == 1)
