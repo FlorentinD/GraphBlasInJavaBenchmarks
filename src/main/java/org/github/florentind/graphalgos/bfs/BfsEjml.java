@@ -71,11 +71,7 @@ public class BfsEjml {
             }
 
             if (bfsVariation == BfsVariation.PARENTS) {
-                for (int i = 0; i < inputVector.length; i++) {
-                    if (inputVector[i] != semiRing.add.id) {
-                        inputVector[i] = i + 1;
-                    }
-                }
+                CommonOps_DArray.applyIdx(inputVector, inputVector, (idx, val) -> (val != semiRing.add.id) ? idx + 1 : val);
             }
 
             result = MaskUtil_DSCC.combineOutputs(result, iterationResult, mask, null, true);
@@ -138,16 +134,8 @@ public class BfsEjml {
             }
 
             if (bfsVariation == BfsVariation.PARENTS) {
-                // TODO: generalize to apply for a (row, col, value) -> newValue
                 // set value to its own id
-                for (int col = 0; col < inputVector.numCols; col++) {
-                    int idx = inputVector.col_idx[col];
-                    int endIdx = inputVector.col_idx[col + 1];
-
-                    for (; idx < endIdx; idx++) {
-                        inputVector.nz_values[idx] = col + 1;
-                    }
-                }
+                CommonOps_DSCC.applyColumnIdx(inputVector, (colIdx, val) -> colIdx+1, inputVector);
             }
 
             // combine iterationResult and result
@@ -214,13 +202,7 @@ public class BfsEjml {
 
             if (bfsVariation == BfsVariation.PARENTS) {
                 // set value to its own id
-                for (int col = 0; col < inputVector.numCols; col++) {
-                    // as inputVector only has 1 row ..
-                    int nz_idx = inputVector.col_idx[col];
-                    if (nz_idx != inputVector.col_idx[col + 1]) {
-                        inputVector.nz_values[nz_idx] = col + 1;
-                    }
-                }
+                CommonOps_DSCC.applyColumnIdx(inputVector, (colIdx, val) -> colIdx+1, inputVector);
             }
 
             // check for fixPoint
