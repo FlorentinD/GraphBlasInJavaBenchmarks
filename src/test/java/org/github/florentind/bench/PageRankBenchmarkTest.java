@@ -108,6 +108,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
                 .maxIterations(MAX_ITERATIONS)
                 .dampingFactor(DAMPING_FACTOR)
                 .tolerance(TOLERANCE)
+                .concurrency(CONCURRENCY)
                 .build();
 
         PageRank pageRank = new PageRankFactory<>().build(

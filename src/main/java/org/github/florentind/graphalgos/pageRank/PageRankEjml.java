@@ -129,7 +129,7 @@ public class PageRankEjml {
      * @return pr-scores (sum of all scores = 1)
      */
     public PageRankResult computeWeighted(DMatrixSparseCSC adjacencyMatrix, double dampingFactor, double tolerance, int maxIterations) {
-        // TODO: this might be mostly duplicate code from normal version
+        // TODO: have a flag whether weights are already normalized?
         // Differences: normalize weights on copy adjacency matrix stuff -> no division by outDegree needed at beginning of iteration
 
         int nodeCount = adjacencyMatrix.getNumCols();
@@ -139,8 +139,6 @@ public class PageRankEjml {
         int iterations = 0;
 
         // Calculating outbound degrees of all nodes
-        // TODO is this needed? e.g. replaced by sum?
-        //  boolean flag to normalize stored weights .. adjust adjacency matrix stored weights
         double[] weightSums = CommonOps_DSCC.reduceRowWise(adjacencyMatrix, 0.0, Double::sum, null).data;
 
         // similar to native version, could refactor this into a helper method
@@ -149,9 +147,7 @@ public class PageRankEjml {
         if (!weightsNormalized) {
             // create copy to not change input matrix
             adjacencyMatrix = adjacencyMatrix.copy();
-
             // normalize weights .. op based on row + values
-            // TODO is this slower?
             CommonOps_DSCC.applyRowIdx(adjacencyMatrix, (rowIdx, val) -> val / weightSums[rowIdx], adjacencyMatrix);
         }
 

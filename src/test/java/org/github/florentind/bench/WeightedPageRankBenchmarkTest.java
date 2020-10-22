@@ -31,11 +31,11 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WeightedPageRankBenchmarkTest extends BaseBenchmarkTest {
-    private static final int NODE_COUNT = 300_000;
+    private static final int NODE_COUNT = 3000_000;
     private static final int MAX_ITERATIONS = 20;
     private static final double DAMPING_FACTOR = 0.85;
     private static final double TOLERANCE = 1e-32;
-    private static final int CONCURRENCY = 1;
+    private static final int CONCURRENCY = 8;
 
     @Override
     long nodeCount() {
@@ -115,6 +115,7 @@ public class WeightedPageRankBenchmarkTest extends BaseBenchmarkTest {
                 .maxIterations(MAX_ITERATIONS)
                 .dampingFactor(DAMPING_FACTOR)
                 .tolerance(TOLERANCE)
+                .concurrency(CONCURRENCY)
                 .relationshipWeightProperty("weight")
                 .build();
 
