@@ -24,9 +24,9 @@ public class BfsEjml {
 
     public BfsDenseDoubleResult computeDense(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int startNode, int maxIterations) {
         // if the inputVector entry is not zero -> return true (sparse adjacency matrix -> entry exists == true)
-        DMonoid firstNotZeroMonoid = new DMonoid(0, (a, b) -> (a != 0) ? 1 : 0);
+        DBinaryOperator firstNotZeroOp = (a, b) -> (a != 0) ? 1 : 0;
         // as dense here: cannot use FIRST instead of OR
-        DSemiRing levelSemiRing = new DSemiRing(DMonoids.OR, firstNotZeroMonoid);
+        DSemiRing levelSemiRing = new DSemiRing(DMonoids.OR, firstNotZeroOp);
         DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : levelSemiRing;
         double[] result = new double[adjacencyMatrix.numCols];
         Arrays.fill(result, semiRing.add.id);
@@ -90,11 +90,11 @@ public class BfsEjml {
         DMatrixSparseCSC result = new DMatrixSparseCSC(startNodes.length, adjacencyMatrix.numCols);
 
         // init result vector
-        for (int i = 0; i < startNodes.length; i++) {
+        for (int startNode : startNodes) {
             if (bfsVariation == BfsVariation.PARENTS) {
-                result.set(0, startNodes[i], startNodes[i] + 1);
+                result.set(0, startNode, startNode + 1);
             } else {
-                result.set(0, startNodes[i], 1);
+                result.set(0, startNode, 1);
             }
         }
 
@@ -198,7 +198,7 @@ public class BfsEjml {
             }
 
             // TODO assign scalar for level or boolean (inputVector as a mask)
-            result = CommonOps_DArray.assign(result, inputVector);
+            CommonOps_DArray.assign(result, inputVector);
 
             if (bfsVariation == BfsVariation.PARENTS) {
                 // set value to its own id

@@ -33,8 +33,8 @@ public class MxMBenchmark extends MxMBaseBenchmark {
         put(OR_TIMES, new DSemiRing(DMonoids.OR, DMonoids.TIMES));
         put(PLUS_FIRST, DSemiRings.PLUS_FIRST);
         put(MIN_MAX, DSemiRings.MIN_MAX);
-        put(PLUS_BFIRST, new DSemiRing(DMonoids.PLUS, new DMonoid(0, (x,y) -> (x == 0) ? 0 : 1 )));
-        put(PLUS_ONE, new DSemiRing(DMonoids.PLUS, new DMonoid(0, (x,y) -> 1)));
+        put(PLUS_BFIRST, new DSemiRing(DMonoids.PLUS, (x,y) -> (x == 0) ? 0 : 1 ));
+        put(PLUS_ONE, new DSemiRing(DMonoids.PLUS, (x,y) -> 1));
     }};
 
     @Param({NONE, PLUS_TIMES, PLUS_AND, PLUS_FIRST, PLUS_BFIRST, PLUS_ONE, OR_TIMES, OR_AND, MIN_MAX})

@@ -10,7 +10,7 @@ import org.ejml.sparse.csc.CommonOps_DSCC;
 public class TriangleCountEjml {
     // TODO faster than PLUS_AND?
     // simple const 1 as mult op as sparse entries are both expected to be 1
-    static DSemiRing multSemiring = new DSemiRing(DMonoids.PLUS, new DMonoid(0, (x,y) -> 1));
+    static DSemiRing multSemiring = new DSemiRing(DMonoids.PLUS, (x,y) -> 1);
 
     /**
      * based on slides 91-93 in
@@ -67,7 +67,6 @@ public class TriangleCountEjml {
      * based on slides 104 - 105 in
      * http://mit.bme.hu/~szarnyas/grb/graphblas-introduction.pdf
      *
-     * @param matrix
      */
     public static NodeWiseTriangleCountResult computeNodeWise(DMatrixSparseCSC matrix, boolean useLowerTriangle) {
         Mask mask = DMasks.builder(matrix, true).build();
