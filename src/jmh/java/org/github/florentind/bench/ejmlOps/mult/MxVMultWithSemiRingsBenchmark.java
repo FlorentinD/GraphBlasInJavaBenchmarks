@@ -28,7 +28,7 @@ public class MxVMultWithSemiRingsBenchmark extends MxVMultBaseBenchmark {
 
     @Benchmark
     public void mxv() {
-        MatrixVectorMultWithSemiRing_DSCC.mult(matrix, denseInputVector, output, semiRings.get(semiRing), null, null);
+        MatrixVectorMultWithSemiRing_DSCC.mult(matrix, denseInputVector, output, semiRings.get(semiRing), null, null, true);
     }
 
     @Benchmark

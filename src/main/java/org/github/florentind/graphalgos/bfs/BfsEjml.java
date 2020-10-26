@@ -49,12 +49,12 @@ public class BfsEjml {
 
         // negated -> dont compute values for visited nodes
         // replace -> iterationResult is basically the new inputVector
-        PrimitiveDMask mask = DMasks.builder(result).withZeroElement(semiRing.add.id).withNegated(true).withReplace(true).build();
+        PrimitiveDMask mask = DMasks.builder(result).withZeroElement(semiRing.add.id).withNegated(true).build();
 
         for (; (iteration <= maxIterations) && !isFixPoint; iteration++) {
             // clear iterationsResult to only contain newly discovered nodes
             Arrays.fill(iterationResult, semiRing.add.id);
-            iterationResult = MatrixVectorMultWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null);
+            iterationResult = MatrixVectorMultWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true);
 
             prevVisitedNodes = visitedNodes;
 
@@ -118,8 +118,8 @@ public class BfsEjml {
         for (;; iteration++) {
             // negated -> dont compute values for visited nodes
             // replace -> iterationResult is basically the new inputVector
-            Mask mask = DMasks.builder(result, true).withNegated(true).withReplace(true).build();
-            iterationResult = CommonOpsWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, gw, gx);
+            Mask mask = DMasks.builder(result, true).withNegated(true).build();
+            iterationResult = CommonOpsWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true, null, null);
 
             nodesVisited += iterationResult.nz_length;
 
@@ -186,7 +186,6 @@ public class BfsEjml {
                 .withZeroElement(semiRing.add.id)
                 .withNumCols(nodeCount)
                 .withNegated(true)
-                .withReplace(true)
                 .build();
 
         for (;; iteration++) {
@@ -210,7 +209,7 @@ public class BfsEjml {
                 break;
             }
 
-            iterationResult = CommonOpsWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, gw, gx);
+            iterationResult = CommonOpsWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true, gw, gx);
 
             // switch references .. less costly then clone
             DMatrixSparseCSC tmp = inputVector;

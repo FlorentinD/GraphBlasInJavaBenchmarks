@@ -42,7 +42,6 @@ public class PageRankEjml {
         // as here we have explicit mask objects
         PrimitiveDMask danglingNodesMask = DMasks.builder(outDegrees)
                 .withZeroElement(0)
-                .withReplace(true)
                 .withNegated(true)
                 .build();
 
@@ -95,7 +94,8 @@ public class PageRankEjml {
                     importanceVec,
                     DSemiRings.PLUS_FIRST,
                     null,
-                    null
+                    null,
+                    true
             );
 
             //
@@ -157,7 +157,6 @@ public class PageRankEjml {
         // as here we have explicit mask objects
         PrimitiveDMask danglingNodesMask = DMasks.builder(weightSums)
                 .withZeroElement(0)
-                .withReplace(true)
                 .withNegated(true)
                 .build();
 
@@ -205,7 +204,8 @@ public class PageRankEjml {
                     importanceVec,
                     DSemiRings.PLUS_TIMES,
                     null,
-                    null
+                    null,
+                    true
             );
 
             //

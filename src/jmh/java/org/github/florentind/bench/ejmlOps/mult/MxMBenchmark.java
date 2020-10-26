@@ -1,7 +1,6 @@
 
 package org.github.florentind.bench.ejmlOps.mult;
 
-import org.ejml.ops.DMonoid;
 import org.ejml.ops.DMonoids;
 import org.ejml.ops.DSemiRing;
 import org.ejml.ops.DSemiRings;
@@ -21,7 +20,7 @@ public class MxMBenchmark extends MxMBaseBenchmark {
     protected static final String OR_TIMES = "Or, Times";
     protected static final String PLUS_FIRST = "Plus, First";
     protected static final String PLUS_BFIRST = "Plus, Boolean-First";
-    protected static final String PLUS_ONE = "Plus, One (const)";
+    protected static final String PLUS_PAIR = "Plus, Pair";
     protected static final String MIN_MAX = "Min, Max";
     protected static final String NONE = "Plus, Times (inlined)";
 
@@ -34,10 +33,10 @@ public class MxMBenchmark extends MxMBaseBenchmark {
         put(PLUS_FIRST, DSemiRings.PLUS_FIRST);
         put(MIN_MAX, DSemiRings.MIN_MAX);
         put(PLUS_BFIRST, new DSemiRing(DMonoids.PLUS, (x,y) -> (x == 0) ? 0 : 1 ));
-        put(PLUS_ONE, new DSemiRing(DMonoids.PLUS, (x,y) -> 1));
+        put(PLUS_PAIR, new DSemiRing(DMonoids.PLUS, (x, y) -> 1));
     }};
 
-    @Param({NONE, PLUS_TIMES, PLUS_AND, PLUS_FIRST, PLUS_BFIRST, PLUS_ONE, OR_TIMES, OR_AND, MIN_MAX})
+    @Param({NONE, PLUS_TIMES, PLUS_AND, PLUS_FIRST, PLUS_BFIRST, PLUS_PAIR, OR_TIMES, OR_AND, MIN_MAX})
     private String semiRing;
 
     @Benchmark
@@ -45,7 +44,7 @@ public class MxMBenchmark extends MxMBaseBenchmark {
         if (semiRing.equals(NONE)) {
             CommonOps_DSCC.mult(matrix, matrix, result);
         } else {
-            CommonOpsWithSemiRing_DSCC.mult(matrix, matrix, result, semiRings.get(semiRing), null, null);
+            CommonOpsWithSemiRing_DSCC.mult(matrix, matrix, result, semiRings.get(semiRing), null, null, true);
         }
         bh.consume(result);
     }
