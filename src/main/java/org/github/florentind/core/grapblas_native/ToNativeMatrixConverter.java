@@ -7,6 +7,7 @@ import org.github.florentind.core.ejml.EjmlRelationships;
 import org.neo4j.graphalgo.api.Graph;
 
 import java.nio.Buffer;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -82,26 +83,49 @@ public class ToNativeMatrixConverter {
 
         long[] colIds = new long[relCount];
         long[] rowIds = new long[relCount];
-        double[] values = new double[relCount];
 
         AtomicInteger index = new AtomicInteger();
 
         int nodeCount = Math.toIntExact(graph.nodeCount());
-        Buffer resultMatrix = GRBCORE.createMatrix(GRAPHBLAS.doubleType(), nodeCount, nodeCount);
+        Buffer resultMatrix;
 
-        graph.forEachNode(node -> {
-            graph.forEachRelationship(node, EjmlRelationships.DEFAULT_RELATIONSHIP_PROPERTY, (src, trg, weight) -> {
-                int indexValue = index.getAndIncrement();
-                colIds[indexValue] = trg;
-                rowIds[indexValue] = src;
-                values[indexValue] = weight;
+        if (graph.hasRelationshipProperty()) {
+            double[] values = new double[relCount];
+            resultMatrix = GRBCORE.createMatrix(GRAPHBLAS.doubleType(), nodeCount, nodeCount);
+
+            graph.forEachNode(node -> {
+                graph.forEachRelationship(node, EjmlRelationships.DEFAULT_RELATIONSHIP_PROPERTY, (src, trg, weight) -> {
+                    int indexValue = index.getAndIncrement();
+                    colIds[indexValue] = trg;
+                    rowIds[indexValue] = src;
+                    values[indexValue] = weight;
+                    return true;
+                });
                 return true;
             });
-            return true;
-        });
 
-        long statusCode = GRAPHBLAS.buildMatrixFromTuplesDouble(resultMatrix, rowIds, colIds, values, relCount, GRAPHBLAS.firstBinaryOpDouble());
-        assert statusCode == GRBCORE.GrB_SUCCESS : "Status code was: " + statusCode + " Did you call GrB.init()?";
+            long statusCode = GRAPHBLAS.buildMatrixFromTuplesDouble(resultMatrix, rowIds, colIds, values, relCount, GRAPHBLAS.firstBinaryOpDouble());
+            assert statusCode == GRBCORE.GrB_SUCCESS : "Status code was: " + statusCode + " Did you call GrB.init()?";
+        } else {
+            // unweighted case -> boolean matrix entries are sufficient
+            boolean[] values = new boolean[relCount];
+            Arrays.fill(values, true);
+
+            resultMatrix = GRBCORE.createMatrix(GRAPHBLAS.booleanType(), nodeCount, nodeCount);
+
+            graph.forEachNode(node -> {
+                graph.forEachRelationship(node, (src, trg) -> {
+                    int indexValue = index.getAndIncrement();
+                    colIds[indexValue] = trg;
+                    rowIds[indexValue] = src;
+                    return true;
+                });
+                return true;
+            });
+
+            long statusCode = GRAPHBLAS.buildMatrixFromTuplesBoolean(resultMatrix, rowIds, colIds, values, relCount, GRAPHBLAS.firstBinaryOpDouble());
+            assert statusCode == GRBCORE.GrB_SUCCESS : "Status code was: " + statusCode + " Did you call GrB.init()?";
+        }
 
         return resultMatrix;
     }

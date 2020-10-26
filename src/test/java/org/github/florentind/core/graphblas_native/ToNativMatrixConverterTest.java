@@ -4,11 +4,11 @@ import com.github.fabianmurariu.unsafe.GRAPHBLAS;
 import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.ejml.data.DMatrixSparseCSC;
 import org.github.florentind.core.ejml.EjmlRelationships;
-import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.core.grapblas_native.NativeMatrixToString;
-import org.junit.jupiter.api.Test;
+import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.neo4j.graphalgo.beta.generator.PropertyProducer;
 import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
 import org.neo4j.graphalgo.beta.generator.RelationshipDistribution;
 import org.neo4j.graphalgo.core.Aggregation;
@@ -40,19 +40,26 @@ public class ToNativMatrixConverterTest {
         assertEquals(ejmlMatrix.nz_length, GRBCORE.nvalsMatrix(nativeMatrix));
     }
 
-    @Test
-    void convertFromGraph() {
+    @ParameterizedTest
+    @ValueSource(strings = {"false", "true"})
+    void convertFromGraph(boolean weighted) {
         GRBCORE.initNonBlocking();
 
-        var graph = RandomGraphGenerator.builder()
+        var graphBuilder = RandomGraphGenerator.builder()
                 .nodeCount(10)
                 .averageDegree(3)
-                .aggregation(Aggregation.DEFAULT)
-                .relationshipDistribution(RelationshipDistribution.POWER_LAW)
+                .aggregation(Aggregation.SINGLE)
+                .relationshipDistribution(RelationshipDistribution.POWER_LAW);
+
+        if (weighted) {
+            graphBuilder.relationshipPropertyProducer(PropertyProducer.fixed("weight", 42.42));
+        }
+
+        var graph = graphBuilder
                 .build()
                 .generate();
 
-        Buffer nativeMatrix = ToNativeMatrixConverter.convert(graph, true);
+        Buffer nativeMatrix = ToNativeMatrixConverter.convert(graph);
 
         assertEquals(graph.relationshipCount(), GRBCORE.nvalsMatrix(nativeMatrix));
 
