@@ -16,25 +16,13 @@ public class BfsNativeBenchmark extends BfsBaseBenchmark {
     @Param({"1", "8"})
     private int concurrency;
 
-    @Param({"false"})
-    private boolean blockingMode;
-
     protected Buffer jniMatrix;
 
     @Override
     @Setup
     public void setup() {
         super.setup();
-
-        if (blockingMode) {
-            // according to GraphBLAS only for debugging, but more resembles the ejml version
-            GRBCORE.initBlocking();
-        }else {
-            GRBCORE.initNonBlocking();
-        }
-
-        assert blockingMode == (GRBCORE.getGlobalInt(GRBCORE.GxB_MODE) == GRBCORE.GrB_BLOCKING);
-
+        GRBCORE.initNonBlocking();
         jniMatrix = ToNativeMatrixConverter.convert(getAdjacencyMatrix());
     }
 
@@ -44,10 +32,10 @@ public class BfsNativeBenchmark extends BfsBaseBenchmark {
         bh.consume(new BfsNative().computeLevel(jniMatrix, startNode, maxIterations, concurrency));
     }
 
+    @Override
     @TearDown
     public void tearDown() {
         super.tearDown();
-
         GRBCORE.freeMatrix(jniMatrix);
         GRBCORE.grbFinalize();
     }

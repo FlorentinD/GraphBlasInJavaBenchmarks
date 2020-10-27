@@ -18,23 +18,11 @@ public class WeightedPageRankNativeBenchmark extends WeightedPageRankBaseBenchma
     @Param({"1", "8"})
     private int concurrency;
 
-    @Param({"true"})
-    private boolean blockingMode;
-
     @Override
     @Setup
     public void setup() {
         super.setup();
-
-        if (blockingMode) {
-            // according to GraphBLAS only for debugging, but more resembles the ejml version
-            GRBCORE.initBlocking();
-        } else {
-            GRBCORE.initNonBlocking();
-        }
-
-        assert blockingMode == (GRBCORE.getGlobalInt(GRBCORE.GxB_MODE) == GRBCORE.GrB_BLOCKING);
-
+        GRBCORE.initNonBlocking();
         jniMatrix = ToNativeMatrixConverter.convert(graph);
     }
 
@@ -43,10 +31,10 @@ public class WeightedPageRankNativeBenchmark extends WeightedPageRankBaseBenchma
         bh.consume(PageRankNative.computeWeighted(jniMatrix, dampingFactor, tolerance, maxIterations, concurrency));
     }
 
+    @Override
     @TearDown
     public void tearDown() {
         super.tearDown();
-
         GRBCORE.freeMatrix(jniMatrix);
         GRBCORE.grbFinalize();
     }

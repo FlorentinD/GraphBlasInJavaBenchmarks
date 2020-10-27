@@ -17,22 +17,10 @@ public class PageRankNativeBenchmark extends PageRankBaseBenchmark {
     @Param({"1", "8"})
     private int concurrency;
 
-    @Param({"true", "false"})
-    private boolean blockingMode;
-
     @Setup
     public void setup() {
         super.setup();
-
-        if (blockingMode) {
-            // according to GraphBLAS only for debugging, but more resembles the ejml version
-            GRBCORE.initBlocking();
-        } else {
-            GRBCORE.initNonBlocking();
-        }
-
-        assert blockingMode == (GRBCORE.getGlobalInt(GRBCORE.GxB_MODE) == GRBCORE.GrB_BLOCKING);
-
+        GRBCORE.initNonBlocking();
         jniMatrix = ToNativeMatrixConverter.convert(graph);
     }
 

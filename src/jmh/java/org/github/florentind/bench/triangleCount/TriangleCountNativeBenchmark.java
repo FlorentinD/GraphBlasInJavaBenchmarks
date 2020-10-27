@@ -17,22 +17,10 @@ public class TriangleCountNativeBenchmark extends TriangleCountBaseBenchmark {
     @Param({"1", "8"})
     private int concurrency;
 
-    @Param({"true", "false"})
-    private boolean blockingMode;
-
     @Setup
     public void setup() {
         super.setup();
-
-        if (blockingMode) {
-            // according to GraphBLAS only for debugging, but more resembles the ejml version
-            GRBCORE.initBlocking();
-        } else {
-            GRBCORE.initNonBlocking();
-        }
-
-        assert blockingMode == (GRBCORE.getGlobalInt(GRBCORE.GxB_MODE) == GRBCORE.GrB_BLOCKING);
-
+        GRBCORE.initNonBlocking();
         jniMatrix = ToNativeMatrixConverter.convert(graph);
     }
 
@@ -46,6 +34,7 @@ public class TriangleCountNativeBenchmark extends TriangleCountBaseBenchmark {
         bh.consume(TriangleCountNative.computeNodeWise(jniMatrix, concurrency));
     }
 
+    @Override
     @TearDown
     public void tearDown() {
         super.tearDown();
