@@ -33,7 +33,7 @@ public class ReduceWithMaskBenchmark extends MatrixOpsBaseBenchmark {
 
     @Benchmark
     public void reduceRowWiseWithMask(Blackhole bh) {
-        bh.consume(CommonOps_DSCC.reduceRowWise(matrix, 0.0, Double::sum, null , reduceRowWiseMask, null));
+        bh.consume(CommonOps_DSCC.reduceRowWise(matrix, 0.0, Double::sum, null , reduceRowWiseMask, null, true));
     }
 
     @Benchmark
@@ -43,7 +43,7 @@ public class ReduceWithMaskBenchmark extends MatrixOpsBaseBenchmark {
 
     @Benchmark
     public void reduceColWiseWithMask(Blackhole bh) {
-        bh.consume(CommonOps_DSCC.reduceColumnWise(matrix, 0.0, Double::sum, null , reduceColWiseMask, null));
+        bh.consume(CommonOps_DSCC.reduceColumnWise(matrix, 0.0, Double::sum, null , reduceColWiseMask, null, true));
     }
 
 }

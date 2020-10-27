@@ -47,21 +47,21 @@ public class MxVWithMaskBenchmark extends MatrixOpsBaseBenchmark {
 
     @Benchmark
     public void mxvWithMask(Blackhole bh) {
-        bh.consume(MatrixVectorMultWithSemiRing_DSCC.mult(matrix, denseVector, output, DSemiRings.AND_OR, mask, null));
+        bh.consume(MatrixVectorMultWithSemiRing_DSCC.mult(matrix, denseVector, output, DSemiRings.AND_OR, mask, null, true));
     }
 
     @Benchmark
     public void mxv(Blackhole bh) {
-        bh.consume(MatrixVectorMultWithSemiRing_DSCC.mult(matrix, denseVector, output, DSemiRings.AND_OR, null, null));
+        bh.consume(MatrixVectorMultWithSemiRing_DSCC.mult(matrix, denseVector, output, DSemiRings.AND_OR));
     }
 
     @Benchmark
     public void vxmWithMask(Blackhole bh) {
-        bh.consume(MatrixVectorMultWithSemiRing_DSCC.mult(denseVector, matrix, output, DSemiRings.AND_OR, mask, null));
+        bh.consume(MatrixVectorMultWithSemiRing_DSCC.mult(denseVector, matrix, output, DSemiRings.AND_OR, mask, null, true));
     }
 
     @Benchmark
     public void vxm(Blackhole bh) {
-        bh.consume(MatrixVectorMultWithSemiRing_DSCC.mult(denseVector, matrix, output, DSemiRings.AND_OR, null, null));
+        bh.consume(MatrixVectorMultWithSemiRing_DSCC.mult(denseVector, matrix, output, DSemiRings.AND_OR));
     }
 }

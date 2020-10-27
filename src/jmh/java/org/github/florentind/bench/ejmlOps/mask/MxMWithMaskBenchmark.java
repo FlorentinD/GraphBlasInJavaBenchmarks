@@ -26,11 +26,11 @@ public class MxMWithMaskBenchmark extends MatrixOpsBaseBenchmark {
 
     @Benchmark
     public void mxmWithMask(Blackhole bh) {
-        bh.consume(CommonOpsWithSemiRing_DSCC.mult(matrix, matrix, null, DSemiRings.AND_OR, mask, null));
+        bh.consume(CommonOpsWithSemiRing_DSCC.mult(matrix, matrix, null, DSemiRings.AND_OR, mask, null, true));
     }
 
     @Benchmark
     public void mxm(Blackhole bh) {
-        bh.consume(CommonOpsWithSemiRing_DSCC.mult(matrix, matrix, null, DSemiRings.AND_OR, null, null));
+        bh.consume(CommonOpsWithSemiRing_DSCC.mult(matrix, matrix, null, DSemiRings.AND_OR, null, null, true));
     }
 }
