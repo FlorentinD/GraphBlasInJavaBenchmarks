@@ -2,10 +2,10 @@ package org.github.florentind.graphalgos.triangleCount;
 
 import java.util.Arrays;
 
-public class NodeWiseTriangleCountResult {
+public class EjmlNodeWiseTriangleCountResult implements TriangleCountResult {
     protected double[] result;
 
-    public NodeWiseTriangleCountResult(double[] result) {
+    public EjmlNodeWiseTriangleCountResult(double[] result) {
         this.result = result;
     }
 

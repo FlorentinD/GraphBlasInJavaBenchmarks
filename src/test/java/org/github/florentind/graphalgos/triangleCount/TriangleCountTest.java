@@ -9,9 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.nio.Buffer;
-import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TriangleCountTest {
@@ -81,7 +79,7 @@ public class TriangleCountTest {
 
         Buffer jniMatrix = ToNativeMatrixConverter.convert(inputMatrix);
 
-        NodeWiseTriangleCountResult result = TriangleCountNative.computeNodeWise(jniMatrix, 1);
+        var result = TriangleCountNative.computeNodeWise(jniMatrix, 1);
 
         for (int i = 0; i < EXPECTED_NODEWISE_TC.length; i++) {
             assertEquals(EXPECTED_NODEWISE_TC[i], result.get(i));

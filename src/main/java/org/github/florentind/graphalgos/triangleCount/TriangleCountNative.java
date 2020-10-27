@@ -1,7 +1,5 @@
 package org.github.florentind.graphalgos.triangleCount;
 
-import com.github.fabianmurariu.unsafe.*;
-
 import java.nio.Buffer;
 
 import static com.github.fabianmurariu.unsafe.GRAPHBLAS.*;
@@ -12,38 +10,37 @@ import static com.github.fabianmurariu.unsafe.GRBOPSMAT.*;
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 
 public class TriangleCountNative {
+    // TODO compare C<L> = L * L with C<L> = U_t * L (exploiting column-wise storage)
 
     public static long computeTotalSandia(Buffer matrix, int concurrency) {
         setGlobalInt(GxB_NTHREADS, concurrency);
 
         Buffer L = getLowerTriangle(matrix);
         long nodeCount = nrows(matrix);
-        Buffer C = createMatrix(doubleType(), nodeCount, nodeCount);
+        Buffer C = createMatrix(longType(), nodeCount, nodeCount);
 
-        Buffer semiRing = createSemiring(plusMonoidDouble(), firstBinaryOpDouble());
-        checkStatusCode(mxm(C, L, null, semiRing, L, L, null));
+        Buffer plusPairSemiring = createSemiring(plusMonoidLong(), pairBinaryOpLong());
+        checkStatusCode(mxm(C, L, null, plusPairSemiring, L, L, null));
 
 
-        double globalCount = matrixReduceAllDouble(0.0, null, plusMonoidDouble(), C, null); // CommonOps_DSCC.reduceScalar(C, Double::sum);
-        // assert count is a whole number
-        assert (globalCount % 1) == 0;
+        long globalCount = matrixReduceAllLong(0, null, plusMonoidLong(), C, null);
 
         freeMatrix(L);
         freeMatrix(C);
-        freeSemiring(semiRing);
+        freeSemiring(plusPairSemiring);
 
-        return (long) globalCount;
+        return globalCount;
     }
 
-    public static NodeWiseTriangleCountResult computeNodeWise(Buffer matrix, int concurrency) {
+    public static TriangleCountResult computeNodeWise(Buffer matrix, int concurrency) {
         setGlobalInt(GxB_NTHREADS, concurrency);
 
         Buffer desc = createDescriptor();
         checkStatusCode(setDescriptorValue(desc, GrB_OUTP, GrB_REPLACE));
 
         Buffer L = getLowerTriangle(matrix);
-        Buffer plusAndSemiring = createSemiring(plusMonoidDouble(), landBinaryOpDouble());
-        checkStatusCode(mxm(L, matrix, null, plusAndSemiring, matrix, L, desc));
+        Buffer plusPairSemiring = createSemiring(plusMonoidLong(), pairBinaryOpLong());
+        checkStatusCode(mxm(L, matrix, null, plusPairSemiring, matrix, L, desc));
 
         long nodeCount = nrows(matrix);
         Buffer nativeResult = createVector(longType(), nodeCount);
@@ -51,21 +48,21 @@ public class TriangleCountNative {
         checkStatusCode(matrixReduceMonoid(nativeResult, null, null, plusMonoidLong(), L, null));
 
         int resultSize = Math.toIntExact(nvalsVector(nativeResult));
-        double[] resultValues = new double[resultSize];
+        long[] resultValues = new long[resultSize];
         long[] indices = new long[resultSize];
 
         vectorWait(nativeResult);
-        extractVectorTuplesDouble(nativeResult, resultValues, indices);
+        extractVectorTuplesLong(nativeResult, resultValues, indices);
 
-        freeSemiring(plusAndSemiring);
+        freeSemiring(plusPairSemiring);
         freeDescriptor(desc);
         freeVector(nativeResult);
         freeMatrix(L);
 
         if (resultSize == nodeCount) {
-            return new NodeWiseTriangleCountResult(resultValues);
+            return new NativeNodeWiseTriangleCountResult(resultValues);
         } else {
-            return new SparseNodeWiseTriangleCountResult(indices, resultValues);
+            return new NativeSparseNodeWiseTriangleCountResult(indices, resultValues);
         }
     }
 
@@ -79,7 +76,8 @@ public class TriangleCountNative {
 
     private static Buffer getTriangle(Buffer matrix, boolean lower) {
         long nodeCount = nrows(matrix);
-        Buffer L = createMatrix(doubleType(), nodeCount, nodeCount);
+        // needs to be of type long, as its reused to store the triangle counts
+        Buffer L = createMatrix(longType(), nodeCount, nodeCount);
 
         Buffer selectOp = lower ? selectOpTRIL() : selectOpTRIU();
 

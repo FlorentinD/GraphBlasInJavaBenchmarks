@@ -10,7 +10,8 @@ import org.ejml.sparse.csc.CommonOps_DSCC;
 public class TriangleCountEjml {
     // TODO faster than PLUS_AND?
     // simple PAIR as mult op as sparse entries are both expected to be 1
-    static DSemiRing multSemiring = new DSemiRing(DMonoids.PLUS, (x,y) -> 1);
+    static DBinaryOperator PAIR = (x, y) -> 1;
+    static DSemiRing multSemiring = new DSemiRing(DMonoids.PLUS, PAIR);
 
     /**
      * based on slides 91-93 in
@@ -68,7 +69,7 @@ public class TriangleCountEjml {
      * http://mit.bme.hu/~szarnyas/grb/graphblas-introduction.pdf
      *
      */
-    public static NodeWiseTriangleCountResult computeNodeWise(DMatrixSparseCSC matrix, boolean useLowerTriangle) {
+    public static TriangleCountResult computeNodeWise(DMatrixSparseCSC matrix, boolean useLowerTriangle) {
         Mask mask = DMasks.builder(matrix, true).build();
 
         double[] result;
@@ -88,7 +89,7 @@ public class TriangleCountEjml {
             }
         }
 
-        return new NodeWiseTriangleCountResult(result);
+        return new EjmlNodeWiseTriangleCountResult(result);
     }
 
     private static DMatrixSparseCSC getLowerTriangle(DMatrixSparseCSC matrix) {
