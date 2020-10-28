@@ -41,7 +41,6 @@ public class PageRankEjml {
         // Difference to reference: inverting at this point already
         // as here we have explicit mask objects
         PrimitiveDMask danglingNodesMask = DMasks.builder(outDegrees)
-                .withZeroElement(0)
                 .withNegated(true)
                 .build();
 
@@ -106,7 +105,7 @@ public class PageRankEjml {
             CommonOps_DArray.elementWiseAdd(pr, importanceVec, pr, DMonoids.PLUS);
 
 
-            // !! Difference to reference: no tolerance contained
+            // !! Difference to reference: no tolerance contained there
             // calculate diff (for tolerance check)
             CommonOps_DArray.elementWiseMult(prevResult, pr, prevResult, (a,b) -> a - b);
             CommonOps_DArray.apply(prevResult, Math::abs);
@@ -138,7 +137,7 @@ public class PageRankEjml {
         double resultDiff = 1;
         int iterations = 0;
 
-        // Calculating outbound degrees of all nodes
+        // Calculating sum of outgoing edge weights for each vertex
         double[] weightSums = CommonOps_DSCC.reduceRowWise(adjacencyMatrix, 0.0, Double::sum, null).data;
 
         // similar to native version, could refactor this into a helper method
@@ -156,7 +155,6 @@ public class PageRankEjml {
         // Difference to reference: not creating a boolean vector for non-dangling nodes and inverting at this point already
         // as here we have explicit mask objects
         PrimitiveDMask danglingNodesMask = DMasks.builder(weightSums)
-                .withZeroElement(0)
                 .withNegated(true)
                 .build();
 

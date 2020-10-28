@@ -7,11 +7,12 @@ import org.ejml.ops.*;
 import org.ejml.sparse.csc.CommonOpsWithSemiRing_DSCC;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 
+import static org.github.florentind.core.ejml.EjmlUtil.PAIR_OP;
+
 public class TriangleCountEjml {
     // TODO faster than PLUS_AND?
     // simple PAIR as mult op as sparse entries are both expected to be 1
-    static DBinaryOperator PAIR = (x, y) -> 1;
-    static DSemiRing multSemiring = new DSemiRing(DMonoids.PLUS, PAIR);
+    static DSemiRing multSemiring = new DSemiRing(DMonoids.PLUS, PAIR_OP);
 
     /**
      * based on slides 91-93 in

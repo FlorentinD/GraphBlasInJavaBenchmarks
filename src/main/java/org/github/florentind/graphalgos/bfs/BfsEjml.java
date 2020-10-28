@@ -14,11 +14,10 @@ import org.ejml.sparse.csc.mult.MatrixVectorMultWithSemiRing_DSCC;
 
 import java.util.Arrays;
 
+import static org.github.florentind.core.ejml.EjmlUtil.*;
+
 // variants: boolean/parents/level/multi-bfs  + sparse/dense result vector
 public class BfsEjml {
-    // TODO: version that uses the same operators as used in graphblas (probably using dense vectors .. as easier)
-
-
     // TODO: is the tmp iterationResult really necessary? (just the inputVector could be enough)
 
 
@@ -83,10 +82,8 @@ public class BfsEjml {
         return new BfsDenseDoubleResult(result, iteration - 1, semiRing.add.id);
     }
 
+    // TODO try using a sparse vector
     public BfsSparseResult computeSparse(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int[] startNodes, int maxIterations) {
-        // TODO: use transposed result matrix as startNodes.length << adjacencyMatrix.length
-        //         need to transpose result of VxM before combining
-        //          -> use a DSparseVector and write MatrixSparseVector mult op (then just one start node allowed)
         DMatrixSparseCSC result = new DMatrixSparseCSC(startNodes.length, adjacencyMatrix.numCols);
 
         // init result vector
@@ -107,11 +104,8 @@ public class BfsEjml {
 
         int nodesVisited = startNodes.length;
 
-        // as the id of the monoid is never used for sparse mult .. this works nicely to use FIRST even for plus here
-        // find out why id actually matters for sparse mult
-        DMonoid first_monoid = new DMonoid(0, (a, b) -> a);
-
-        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : new DSemiRing(first_monoid, first_monoid);
+        // first, as ANY is not existing in ejml
+        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : FIRST_PAIR;
 
         int iteration = 1;
 
@@ -119,7 +113,7 @@ public class BfsEjml {
             // negated -> dont compute values for visited nodes
             // replace -> iterationResult is basically the new inputVector
             Mask mask = DMasks.builder(result, true).withNegated(true).build();
-            iterationResult = CommonOpsWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true, null, null);
+            iterationResult = CommonOpsWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true, gw, gx);
 
             nodesVisited += iterationResult.nz_length;
 
@@ -139,6 +133,7 @@ public class BfsEjml {
             }
 
             // combine iterationResult and result
+            // TODO: replace with an assign operation (also seen as an add for sparse structures?)
             result = MaskUtil_DSCC.combineOutputs(result, iterationResult, null, null);
 
             // check for fixPoint
@@ -172,10 +167,8 @@ public class BfsEjml {
 
         int nodesVisited = 0;
 
-        // as the id of the monoid is never used for sparse mult .. this works nicely to use FIRST even for plus here
-        // find out why id actually matters for sparse mult
-        DMonoid first_monoid = new DMonoid(0, (a, b) -> a);
-        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : new DSemiRing(first_monoid, first_monoid);
+        // first, as ANY is not existing in ejml
+        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : FIRST_PAIR;
         Arrays.fill(result, semiRing.add.id);
 
         int iteration = 1;
