@@ -30,10 +30,8 @@ public class BfsTest {
     private static Stream<Arguments> bfsVariantSource() {
 
         return Stream.of(
-                //Arguments.of(BfsVariation.BOOLEAN, new double[]{1, 1, 1, 1, 1, 1, 1}),
                 Arguments.of(BfsVariation.LEVEL, new double[]{1, 2, 3, 2, 3, 4, 3}),
                 Arguments.of(BfsVariation.PARENTS, new double[]{1, 1, 4, 1, 2, 3, 2})
-
         );
     }
 
