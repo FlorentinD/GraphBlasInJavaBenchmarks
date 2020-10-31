@@ -53,27 +53,30 @@ public class BfsEjml {
         for (; (iteration <= maxIterations) && !isFixPoint; iteration++) {
             // clear iterationsResult to only contain newly discovered nodes
             Arrays.fill(iterationResult, semiRing.add.id);
+
+            if (bfsVariation == BfsVariation.PARENTS) {
+                CommonOps_DArray.applyIdx(inputVector, inputVector, (idx, val) -> (val != semiRing.add.id) ? idx + 1 : val);
+            }
+
             iterationResult = MatrixVectorMultWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true);
 
             prevVisitedNodes = visitedNodes;
 
             // add newly visited nodes
-            // TODO check if this has an overhead
             visitedNodes = (int) CommonOps_DArray.reduceScalar(iterationResult, visitedNodes, (acc, v) -> (v != semiRing.add.id) ? ++acc : acc);
 
-            inputVector = iterationResult.clone();
-
             if (bfsVariation == BfsVariation.LEVEL) {
-                // TODO: check if apply has any overhead compared to inlined for-loop (potentially due to uneccesary assignments of semiRing.add.id)
-                int finalIteration = iteration;
-                // TODO: use assignScalar .. (+ benchmark)
-                CommonOps_DArray.apply(iterationResult, i -> (i != semiRing.add.id) ? finalIteration + 1 : semiRing.add.id);
+                PrimitiveDMask resultMask = DMasks.builder(iterationResult).withZeroElement(semiRing.add.id).build();
+                CommonOps_DArray.assignScalar(result, iteration + 1, resultMask);
             } else {
                 // parents version
-                CommonOps_DArray.applyIdx(inputVector, inputVector, (idx, val) -> (val != semiRing.add.id) ? idx + 1 : val);
+                result = MaskUtil_DSCC.combineOutputs(result, iterationResult, mask, null, true);
             }
 
-            result = MaskUtil_DSCC.combineOutputs(result, iterationResult, mask, null, true);
+            // switch pointers as iterationResult is the inputVector for next iteration
+            double[] tmp = iterationResult;
+            iterationResult = inputVector;
+            inputVector = tmp;
 
             isFixPoint = (visitedNodes == prevVisitedNodes) || (visitedNodes == nodeCount);
         }
