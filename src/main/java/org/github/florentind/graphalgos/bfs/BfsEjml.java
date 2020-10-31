@@ -14,7 +14,7 @@ import org.ejml.sparse.csc.mult.MatrixVectorMultWithSemiRing_DSCC;
 
 import java.util.Arrays;
 
-import static org.github.florentind.core.ejml.EjmlUtil.*;
+import static org.github.florentind.core.ejml.EjmlUtil.FIRST_PAIR;
 
 // variants: boolean/parents/level/multi-bfs  + sparse/dense result vector
 public class BfsEjml {
@@ -30,55 +30,52 @@ public class BfsEjml {
         double[] result = new double[nodeCount];
         Arrays.fill(result, semiRing.add.id);
 
+        double[] inputVector = result.clone();
+
         if (bfsVariation == BfsVariation.PARENTS) {
-            result[startNode] = startNode + 1;
+            inputVector[startNode] = startNode + 1;
         } else {
-            result[startNode] = 1;
+            inputVector[startNode] = 1;
         }
 
-        // or use dense matrix and reduceScalar to count non-zero elements
         double[] iterationResult = new double[nodeCount];
 
-        int visitedNodes = 1;
-        int prevVisitedNodes;
-
-        double[] inputVector = result.clone();
-        boolean isFixPoint = false;
+        int visitedNodes = 0;
+        int nodesInQueue = 1;
         int iteration = 1;
 
         // negated -> dont compute values for visited nodes
         // replace -> iterationResult is basically the new inputVector
         PrimitiveDMask mask = DMasks.builder(result).withZeroElement(semiRing.add.id).withNegated(true).build();
 
-        for (; (iteration <= maxIterations) && !isFixPoint; iteration++) {
-            // clear iterationsResult to only contain newly discovered nodes
-            Arrays.fill(iterationResult, semiRing.add.id);
+        for (; ; iteration++) {
+            if (bfsVariation == BfsVariation.LEVEL) {
+                PrimitiveDMask resultMask = DMasks.builder(inputVector).withZeroElement(semiRing.add.id).build();
+                CommonOps_DArray.assignScalar(result, iteration, resultMask);
+            } else {
+                // parents version
+                // TODO also use an assign/add?
+                result = MaskUtil_DSCC.combineOutputs(result, inputVector, mask, null, true);
+            }
+
+            visitedNodes += nodesInQueue;
+            if (nodesInQueue == 0 || visitedNodes == nodeCount || iteration > maxIterations) break;
 
             if (bfsVariation == BfsVariation.PARENTS) {
                 CommonOps_DArray.applyIdx(inputVector, inputVector, (idx, val) -> (val != semiRing.add.id) ? idx + 1 : val);
             }
 
+            // clear iterationsResult to only contain newly discovered nodes
+            Arrays.fill(iterationResult, semiRing.add.id);
             iterationResult = MatrixVectorMultWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true);
-
-            prevVisitedNodes = visitedNodes;
-
-            // add newly visited nodes
-            visitedNodes = (int) CommonOps_DArray.reduceScalar(iterationResult, visitedNodes, (acc, v) -> (v != semiRing.add.id) ? ++acc : acc);
-
-            if (bfsVariation == BfsVariation.LEVEL) {
-                PrimitiveDMask resultMask = DMasks.builder(iterationResult).withZeroElement(semiRing.add.id).build();
-                CommonOps_DArray.assignScalar(result, iteration + 1, resultMask);
-            } else {
-                // parents version
-                result = MaskUtil_DSCC.combineOutputs(result, iterationResult, mask, null, true);
-            }
 
             // switch pointers as iterationResult is the inputVector for next iteration
             double[] tmp = iterationResult;
             iterationResult = inputVector;
             inputVector = tmp;
 
-            isFixPoint = (visitedNodes == prevVisitedNodes) || (visitedNodes == nodeCount);
+            // add newly visited nodes
+            nodesInQueue = (int) CommonOps_DArray.reduceScalar(inputVector, 0, (acc, v) -> (v != semiRing.add.id) ? ++acc : acc);
         }
 
         return new BfsDenseDoubleResult(result, iteration - 1, semiRing.add.id);
@@ -112,11 +109,11 @@ public class BfsEjml {
 
         int iteration = 1;
 
-        for (;; iteration++) {
+        for (; ; iteration++) {
 
             if (bfsVariation == BfsVariation.PARENTS) {
                 // set value to its own id
-                CommonOps_DSCC.applyColumnIdx(inputVector, (colIdx, val) -> colIdx+1, inputVector);
+                CommonOps_DSCC.applyColumnIdx(inputVector, (colIdx, val) -> colIdx + 1, inputVector);
             }
 
             // negated -> dont compute values for visited nodes
@@ -185,13 +182,13 @@ public class BfsEjml {
                 .withNegated(true)
                 .build();
 
-        for (;; iteration++) {
+        for (; ; iteration++) {
             nodesVisited += inputVector.nz_length;
 
             if (bfsVariation == BfsVariation.PARENTS) {
                 CommonOps_DArray.assign(result, inputVector);
                 // set value to its own id
-                CommonOps_DSCC.applyColumnIdx(inputVector, (colIdx, val) -> colIdx+1, inputVector);
+                CommonOps_DSCC.applyColumnIdx(inputVector, (colIdx, val) -> colIdx + 1, inputVector);
             } else {
                 // assign scalar for level (inputVector as a mask)
                 CommonOps_DArray.assignScalar(result, iteration, inputVector);
