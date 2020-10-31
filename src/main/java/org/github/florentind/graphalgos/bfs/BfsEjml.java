@@ -113,6 +113,12 @@ public class BfsEjml {
         int iteration = 1;
 
         for (;; iteration++) {
+
+            if (bfsVariation == BfsVariation.PARENTS) {
+                // set value to its own id
+                CommonOps_DSCC.applyColumnIdx(inputVector, (colIdx, val) -> colIdx+1, inputVector);
+            }
+
             // negated -> dont compute values for visited nodes
             // replace -> iterationResult is basically the new inputVector
             Mask mask = DMasks.builder(result, true).withNegated(true).build();
@@ -120,25 +126,22 @@ public class BfsEjml {
 
             nodesVisited += iterationResult.nz_length;
 
-
-            // set inputVector based on newly discovered nodes
-            inputVector = iterationResult.copy();
-
             if (bfsVariation == BfsVariation.LEVEL) {
                 int currentIteration = iteration + 1;
                 CommonOps_DSCC.apply(iterationResult, x -> currentIteration);
-            } else {
-                // parents version
-                // set value to its own id
-                CommonOps_DSCC.applyColumnIdx(inputVector, (colIdx, val) -> colIdx+1, inputVector);
             }
 
             // combine iterationResult and result
             // TODO: replace with an assign operation (also seen as an add for sparse structures?)
             result = MaskUtil_DSCC.combineOutputs(result, iterationResult, null, null);
 
+            // set inputVector based on newly discovered nodes
+            DMatrixSparseCSC tmp = inputVector;
+            inputVector = iterationResult;
+            iterationResult = tmp;
+
             // check for fixPoint
-            if ((iterationResult.nz_length == 0) || (nodesVisited == nodeCount) || (iteration >= maxIterations)) {
+            if ((inputVector.nz_length == 0) || (nodesVisited == nodeCount) || (iteration >= maxIterations)) {
                 break;
             }
         }
