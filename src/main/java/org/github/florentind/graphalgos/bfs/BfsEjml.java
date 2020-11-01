@@ -20,7 +20,7 @@ import static org.github.florentind.core.ejml.EjmlUtil.FIRST_PAIR;
 public class BfsEjml {
     // iteration-result needed, as mult cannot write into the same object in ejml
 
-    public BfsDenseDoubleResult computeDense(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int startNode, int maxIterations) {
+      public BfsDenseDoubleResult computeDense(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int startNode, int maxIterations) {
         int nodeCount = adjacencyMatrix.numCols;
         // if the inputVector entry is not zero -> return true (sparse adjacency matrix -> entry exists == true)
         DBinaryOperator firstNotZeroOp = (a, b) -> (a != 0) ? 1 : 0;
@@ -65,8 +65,6 @@ public class BfsEjml {
                 CommonOps_DArray.applyIdx(inputVector, inputVector, (idx, val) -> (val != semiRing.add.id) ? idx + 1 : val);
             }
 
-            // clear iterationsResult to only contain newly discovered nodes
-            Arrays.fill(iterationResult, semiRing.add.id);
             iterationResult = MatrixVectorMultWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true);
 
             // switch pointers as iterationResult is the inputVector for next iteration
