@@ -85,24 +85,27 @@ public class BfsEjml {
     public BfsSparseResult computeSparse(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int[] startNodes, int maxIterations) {
         int nodeCount = adjacencyMatrix.numCols;
         DMatrixSparseCSC result = new DMatrixSparseCSC(startNodes.length, nodeCount);
+        DMatrixSparseCSC inputVector = result.createLike();
 
         // init result vector
         for (int startNode : startNodes) {
             if (bfsVariation == BfsVariation.PARENTS) {
-                result.set(0, startNode, startNode + 1);
+                inputVector.set(0, startNode, startNode + 1);
             } else {
-                result.set(0, startNode, 1);
+                inputVector.set(0, startNode, 1);
             }
         }
 
-        DMatrixSparseCSC inputVector = result.copy();
-        DMatrixSparseCSC iterationResult = null;
+        // work space for saving iterationResult and combinedResult
+        DMatrixSparseCSC iterationResult = result.createLike();
 
         // for reusing memory
         IGrowArray gw = new IGrowArray();
         DGrowArray gx = new DGrowArray();
+        DMatrixSparseCSC tmp;
 
-        int nodesVisited = startNodes.length;
+        int visitedNodes = 0;
+        int nodesInQueue = startNodes.length;
 
         // first, as ANY is not existing in ejml
         DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : FIRST_PAIR;
@@ -110,6 +113,24 @@ public class BfsEjml {
         int iteration = 1;
 
         for (; ; iteration++) {
+            if (bfsVariation == BfsVariation.LEVEL) {
+                // TODO: use assignScalar here too? (need mask iterator for that)
+                //      -> avoid costly combineResults
+                int currentIteration = iteration;
+                CommonOps_DSCC.apply(inputVector, x -> currentIteration);
+            }
+
+            // assign inputVector entries to result (ideally use assign/assignScalar instead of a simple add)
+            // using "iterationResult" as a workspace
+            // TODO: replace with assign operation
+            MaskUtil_DSCC.add(result, inputVector, iterationResult, null, null, gw, gx);
+            tmp = result;
+            result = iterationResult;
+            iterationResult = tmp;
+
+            visitedNodes += nodesInQueue;
+            // check for fixPoint
+            if (nodesInQueue == 0 || visitedNodes == nodeCount || iteration > maxIterations) break;
 
             if (bfsVariation == BfsVariation.PARENTS) {
                 // set value to its own id
@@ -121,30 +142,17 @@ public class BfsEjml {
             Mask mask = DMasks.builder(result, true).withNegated(true).build();
             iterationResult = CommonOpsWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true, gw, gx);
 
-            nodesVisited += iterationResult.nz_length;
-
-            if (bfsVariation == BfsVariation.LEVEL) {
-                int currentIteration = iteration + 1;
-                CommonOps_DSCC.apply(iterationResult, x -> currentIteration);
-            }
-
-            // combine iterationResult and result
-            // TODO: replace with an assign operation (also seen as an add for sparse structures?)
-            result = MaskUtil_DSCC.combineOutputs(result, iterationResult, null, null);
 
             // set inputVector based on newly discovered nodes
-            DMatrixSparseCSC tmp = inputVector;
+            tmp = inputVector;
             inputVector = iterationResult;
             iterationResult = tmp;
 
-            // check for fixPoint
-            if ((inputVector.nz_length == 0) || (nodesVisited == nodeCount) || (iteration >= maxIterations)) {
-                break;
-            }
+            nodesInQueue = inputVector.nz_length;
         }
 
         // expect the result to be a row vector / row vectors
-        return new BfsSparseResult(result, iteration, semiRing.add.id);
+        return new BfsSparseResult(result, iteration - 1, semiRing.add.id);
     }
 
 
