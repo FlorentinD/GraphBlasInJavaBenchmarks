@@ -1,13 +1,13 @@
 package org.github.florentind.graphalgos.bfs;
 
-import org.ejml.data.DMatrixSparseCSC;
+import org.ejml.data.DVectorSparse;
 
 public class BfsSparseResult implements BfsResult {
-    private final DMatrixSparseCSC result;
+    private final DVectorSparse result;
     private final double notFoundValue;
     private final int iterations;
 
-    public BfsSparseResult(DMatrixSparseCSC result, int iterations, double fallBackValue) {
+    public BfsSparseResult(DVectorSparse result, int iterations, double fallBackValue) {
         this.result = result;
         this.iterations = iterations;
         notFoundValue = fallBackValue;
@@ -20,20 +20,16 @@ public class BfsSparseResult implements BfsResult {
 
     @Override
     public int nodesVisited() {
-        return this.result.getNonZeroLength();
+        return this.result.nz_length();
     }
 
     @Override
     public double get(int nodeId) {
-        return result.get(0, nodeId, notFoundValue);
+        return result.get(nodeId, notFoundValue);
     }
 
     @Override
     public boolean visited(int nodeId) {
-        return result.isAssigned(0, nodeId);
-    }
-
-    public DMatrixSparseCSC result() {
-        return this.result;
+        return result.isAssigned(nodeId);
     }
 }

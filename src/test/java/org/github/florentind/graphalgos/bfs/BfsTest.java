@@ -23,9 +23,11 @@ import static org.junit.jupiter.api.Assertions.fail;
 @SuppressWarnings({"UnusedMethod"})
 public class BfsTest {
     private static final int EXPECTED_ITERATIONS = 3;
+    private static final int START_NODE = 0;
     DMatrixSparseCSC inputMatrix;
 
     BfsEjml bfs = new BfsEjml();
+    private static final int MAX_ITERATIONS = 20;
 
     private static Stream<Arguments> bfsVariantSource() {
 
@@ -51,14 +53,13 @@ public class BfsTest {
         inputMatrix.set(6, 2, 1);
         inputMatrix.set(6, 3, 1);
         inputMatrix.set(6, 4, 1);
+        inputMatrix.sortIndices(null);
     }
 
     @ParameterizedTest
     @MethodSource("bfsVariantSource")
     public void testSparseEjmlVariations(BfsVariation variation, double[] expected) {
-        int[] startNodes = {0};
-        int maxIterations = 20;
-        BfsSparseResult result = bfs.computeSparse(inputMatrix, variation, startNodes, maxIterations);
+        BfsSparseResult result = bfs.computeSparse(inputMatrix, variation, START_NODE, MAX_ITERATIONS);
 
         assertBfsResult(expected, result);
         assertEquals(EXPECTED_ITERATIONS, result.iterations());
@@ -67,10 +68,7 @@ public class BfsTest {
     @ParameterizedTest
     @MethodSource("bfsVariantSource")
     public void testDenseEjmlVariations(BfsVariation variation, double[] expected) {
-        int startNode = 0;
-        int maxIterations = 20;
-
-        var result = bfs.computeDense(inputMatrix, variation, startNode, maxIterations);
+        var result = bfs.computeDense(inputMatrix, variation, START_NODE, MAX_ITERATIONS);
 
         assertBfsResult(expected, result);
         assertEquals(EXPECTED_ITERATIONS, result.iterations());
@@ -79,10 +77,7 @@ public class BfsTest {
     @ParameterizedTest
     @MethodSource("bfsVariantSource")
     public void testSparseDenseEjmlVariations(BfsVariation variation, double[] expected) {
-        int startNode = 0;
-        int maxIterations = 20;
-
-        var result = bfs.computeDenseSparse(inputMatrix, variation, startNode, maxIterations);
+        var result = bfs.computeDenseSparse(inputMatrix, variation, START_NODE, MAX_ITERATIONS);
 
         System.out.println("result.result() = " + Arrays.toString(result.result()));
         assertBfsResult(expected, result);
@@ -91,10 +86,11 @@ public class BfsTest {
 
     @Test
     public void testEmptyResult() {
-        BfsResult denseIt = bfs.computeDense(new DMatrixSparseCSC(2, 2), BfsVariation.LEVEL, 0, 5);
+        DMatrixSparseCSC emptyMatrix = new DMatrixSparseCSC(2, 2);
+        emptyMatrix.sortIndices(null);
+        BfsResult denseIt = bfs.computeDense(emptyMatrix, BfsVariation.LEVEL, 0, 5);
 
-        int[] startNodes = {0};
-        BfsResult sparseIt = bfs.computeSparse(new DMatrixSparseCSC(2, 2), BfsVariation.LEVEL, startNodes, 5);
+        BfsResult sparseIt = bfs.computeSparse(emptyMatrix, BfsVariation.LEVEL, START_NODE, 5);
 
         assertEquals(denseIt.iterations(), sparseIt.iterations());
         assertEquals(denseIt.nodesVisited(), sparseIt.nodesVisited());

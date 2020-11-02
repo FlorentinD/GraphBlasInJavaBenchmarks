@@ -24,14 +24,12 @@ public class BfsEjmlBenchmark extends BfsBaseBenchmark {
 
     @Benchmark
     public void ejmlSparseBfsLevel(Blackhole bh) {
-        int[] startNodes = {startNode};
-        bh.consume(new BfsEjml().computeSparse(matrix, BfsEjml.BfsVariation.LEVEL, startNodes, maxIterations));
+        bh.consume(new BfsEjml().computeSparse(matrix, BfsEjml.BfsVariation.LEVEL, startNode, maxIterations));
     }
 
     @org.openjdk.jmh.annotations.Benchmark
     public void ejmlSparseBfsParent(Blackhole bh) {
-        int[] startNodes = {startNode};
-        bh.consume(new BfsEjml().computeSparse(matrix, BfsEjml.BfsVariation.PARENTS, startNodes, maxIterations));
+        bh.consume(new BfsEjml().computeSparse(matrix, BfsEjml.BfsVariation.PARENTS, startNode, maxIterations));
     }
 
     @Benchmark
@@ -42,7 +40,6 @@ public class BfsEjmlBenchmark extends BfsBaseBenchmark {
 
     @org.openjdk.jmh.annotations.Benchmark
     public void ejmlDenseSparseBfsParent(Blackhole bh) {
-        int[] startNodes = {startNode};
         bh.consume(new BfsEjml().computeDenseSparse(matrix, BfsEjml.BfsVariation.PARENTS, startNode, maxIterations));
     }
 

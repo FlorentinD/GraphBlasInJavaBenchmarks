@@ -124,7 +124,8 @@ public class BfsParentBenchmarkTest extends BaseBenchmarkTest {
 
     private BfsResult getEjmlSparseResult(EjmlGraph ejmlGraph, int startNode) {
         var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
-        return new BfsEjml().computeSparse(unTransposedMatrix, BfsEjml.BfsVariation.PARENTS, new int[]{startNode}, MAX_ITERATIONS);
+        unTransposedMatrix.sortIndices(null);
+        return new BfsEjml().computeSparse(unTransposedMatrix, BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getEjmlDenseResult(EjmlGraph ejmlGraph, int startNode) {

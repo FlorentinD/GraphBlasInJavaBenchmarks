@@ -14,7 +14,7 @@ public class MxVMultBaseBenchmark extends MatrixOpsBaseBenchmark {
 
     protected double[] output;
 
-    @Param({"0.01", "0.2", "0.8"})
+    @Param({"0.01", "0.8"})
     private float inputVectorDensity;
 
     @Override

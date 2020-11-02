@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class MatrixOpsBaseBenchmark {
     protected DMatrixSparseCSC matrix;
 
-    @Param({"10000","100000","1000000"})
+    @Param({"100000","1000000"})
     private int dimension;
 
     // TODO also scale avgEntriesPerColumn?

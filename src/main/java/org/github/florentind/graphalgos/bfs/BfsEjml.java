@@ -2,6 +2,7 @@ package org.github.florentind.graphalgos.bfs;
 
 import org.ejml.data.DGrowArray;
 import org.ejml.data.DMatrixSparseCSC;
+import org.ejml.data.DVectorSparse;
 import org.ejml.data.IGrowArray;
 import org.ejml.masks.DMasks;
 import org.ejml.masks.Mask;
@@ -10,6 +11,7 @@ import org.ejml.ops.*;
 import org.ejml.sparse.csc.CommonOpsWithSemiRing_DSCC;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.ejml.sparse.csc.MaskUtil_DSCC;
+import org.ejml.sparse.csc.mult.MatrixSparseVectorMultWithSemiRing_DSCC;
 import org.ejml.sparse.csc.mult.MatrixVectorMultWithSemiRing_DSCC;
 
 import java.util.Arrays;
@@ -79,31 +81,29 @@ public class BfsEjml {
         return new BfsDenseDoubleResult(result, iteration - 1, semiRing.add.id);
     }
 
-    // TODO try using a sparse vector
-    public BfsSparseResult computeSparse(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int[] startNodes, int maxIterations) {
+    public BfsSparseResult computeSparse(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int startNode, int maxIterations) {
         int nodeCount = adjacencyMatrix.numCols;
-        DMatrixSparseCSC result = new DMatrixSparseCSC(startNodes.length, nodeCount);
-        DMatrixSparseCSC inputVector = result.createLike();
+        DVectorSparse result = new DVectorSparse(nodeCount, nodeCount);
+        DVectorSparse inputVector = result.createLike();
 
         // init result vector
-        for (int startNode : startNodes) {
-            if (bfsVariation == BfsVariation.PARENTS) {
-                inputVector.set(0, startNode, startNode + 1);
-            } else {
-                inputVector.set(0, startNode, 1);
-            }
+        if (bfsVariation == BfsVariation.PARENTS) {
+            inputVector.set(startNode, startNode + 1);
+        } else {
+            inputVector.set(startNode, 1);
         }
 
+
         // work space for saving iterationResult and combinedResult
-        DMatrixSparseCSC iterationResult = result.createLike();
+        DVectorSparse iterationResult = result.createLike();
 
         // for reusing memory
         IGrowArray gw = new IGrowArray();
         DGrowArray gx = new DGrowArray();
-        DMatrixSparseCSC tmp;
+        DVectorSparse tmp;
 
         int visitedNodes = 0;
-        int nodesInQueue = startNodes.length;
+        int nodesInQueue = 1;
 
         // first, as ANY is not existing in ejml
         DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : FIRST_PAIR;
@@ -113,15 +113,14 @@ public class BfsEjml {
         for (; ; iteration++) {
             if (bfsVariation == BfsVariation.LEVEL) {
                 // TODO: use assignScalar here too? (need mask iterator for that)
-                //      -> avoid costly combineResults
                 int currentIteration = iteration;
-                CommonOps_DSCC.apply(inputVector, x -> currentIteration);
+                CommonOps_DSCC.apply(inputVector.oneDimMatrix, x -> currentIteration);
             }
 
             // assign inputVector entries to result (ideally use assign/assignScalar instead of a simple add)
             // using "iterationResult" as a workspace
             // TODO: replace with assign operation
-            MaskUtil_DSCC.add(result, inputVector, iterationResult, null, null, gw, gx);
+            CommonOpsWithSemiRing_DSCC.add(result.oneDimMatrix, inputVector.oneDimMatrix, iterationResult.oneDimMatrix, semiRing ,null, null, true, gw, gx);
             tmp = result;
             result = iterationResult;
             iterationResult = tmp;
@@ -132,21 +131,20 @@ public class BfsEjml {
 
             if (bfsVariation == BfsVariation.PARENTS) {
                 // set value to its own id
-                CommonOps_DSCC.applyColumnIdx(inputVector, (colIdx, val) -> colIdx + 1, inputVector);
+                CommonOps_DSCC.applyIdx(inputVector, (rowIdx, val) -> rowIdx + 1, inputVector);
             }
 
             // negated -> dont compute values for visited nodes
             // replace -> iterationResult is basically the new inputVector
             Mask mask = DMasks.builder(result, true).withNegated(true).build();
-            iterationResult = CommonOpsWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true, gw, gx);
-
+            iterationResult = MatrixSparseVectorMultWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true, gw);
 
             // set inputVector based on newly discovered nodes
             tmp = inputVector;
             inputVector = iterationResult;
             iterationResult = tmp;
 
-            nodesInQueue = inputVector.nz_length;
+            nodesInQueue = inputVector.nz_length();
         }
 
         // expect the result to be a row vector / row vectors

@@ -116,7 +116,7 @@ public class BfsNative {
         // finish pending work on v
         nvalsVector(resultVector);
 
-        // node-id vector
+        // node-id vector (not needed using GRAPHBLAS 2.0 (index aware apply can be used)
         Buffer idVector = createVector(intType(), nodeCount);
         // TODO: faster than building based on arrays? (JNI overhead ..)
         for (int i = 0; i < nodeCount; i++) {

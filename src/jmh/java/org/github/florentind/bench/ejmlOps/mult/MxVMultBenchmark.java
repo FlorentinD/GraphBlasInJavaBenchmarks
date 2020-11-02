@@ -8,6 +8,7 @@ import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.ejml.sparse.csc.mult.MatrixSparseVectorMultWithSemiRing_DSCC;
 import org.ejml.sparse.csc.mult.MatrixVectorMult_DSCC;
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.infra.Blackhole;
 
 
@@ -15,21 +16,18 @@ public class MxVMultBenchmark extends MxVMultBaseBenchmark {
     DVectorSparse sparseInputVector;
     DMatrixSparseCSC sparse1DimMatrix;
 
-    // observation:
-    //      vector-matrix mult:
-
-
     @Override
+    @Setup
     public void setup() {
         super.setup();
         sparseInputVector = new DVectorSparse(denseInputVector, 0);
         sparse1DimMatrix = CommonOps_DSCC.transpose(sparseInputVector.oneDimMatrix, null, null);
     }
 
-    @Benchmark
-    public void mxv(Blackhole bh) {
-        MatrixVectorMult_DSCC.mult(matrix, denseInputVector, 0, output, 0);
-    }
+//    @Benchmark
+//    public void mxv(Blackhole bh) {
+//        MatrixVectorMult_DSCC.mult(matrix, denseInputVector, 0, output, 0);
+//    }
 
     @Benchmark
     public void vxm(Blackhole bh) {

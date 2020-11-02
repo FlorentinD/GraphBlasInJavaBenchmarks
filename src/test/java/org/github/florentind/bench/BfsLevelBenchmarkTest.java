@@ -121,7 +121,8 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
 
     private BfsResult getEjmlSparseResult(EjmlGraph ejmlGraph, int startNode) {
         var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
-        return new BfsEjml().computeSparse(unTransposedMatrix, BfsEjml.BfsVariation.LEVEL, new int[]{startNode}, MAX_ITERATIONS);
+        unTransposedMatrix.sortIndices(null);
+        return new BfsEjml().computeSparse(unTransposedMatrix, BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getEjmlDenseResult(EjmlGraph ejmlGraph, int startNode) {
@@ -141,7 +142,7 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
 
         Buffer jniMatrix = ToNativeMatrixConverter.convert(unTransposedMatrix);
 
-        var result = new BfsNative().computeLevel(jniMatrix, startNode, MAX_ITERATIONS, 1);
+        var result = new BfsNative().computeLevel(jniMatrix, startNode, MAX_ITERATIONS, CONCURRENCY);
         NativeHelper.checkStatusCode(GRBCORE.freeMatrix(jniMatrix));
 
         return result;
