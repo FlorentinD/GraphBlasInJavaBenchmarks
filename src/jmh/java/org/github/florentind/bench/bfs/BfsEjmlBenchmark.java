@@ -34,7 +34,6 @@ public class BfsEjmlBenchmark extends BfsBaseBenchmark {
 
     @Benchmark
     public void ejmlDenseSparseBfsLevel(Blackhole bh) {
-        int[] startNodes = {startNode};
         bh.consume(new BfsEjml().computeDenseSparse(matrix, BfsEjml.BfsVariation.LEVEL, startNode, maxIterations));
     }
 

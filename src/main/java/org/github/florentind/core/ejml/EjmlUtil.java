@@ -40,4 +40,15 @@ public class EjmlUtil {
             }
         }
     }
+
+    /**
+     *
+     * @param ejmlGraph
+     * @return untransposed adjacencyMatrix
+     */
+    public static DMatrixSparseCSC getAdjacencyMatrix(EjmlGraph ejmlGraph) {
+        var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
+        unTransposedMatrix.sortIndices(null);
+        return unTransposedMatrix;
+    }
 }

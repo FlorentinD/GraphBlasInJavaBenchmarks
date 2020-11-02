@@ -2,8 +2,8 @@ package org.github.florentind.bench;
 
 
 import org.ejml.data.DMatrixSparseCSC;
-import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
+import org.github.florentind.core.ejml.EjmlUtil;
 import org.neo4j.graphalgo.StoreLoaderBuilder;
 import org.neo4j.graphalgo.api.CSRGraph;
 import org.neo4j.graphalgo.compat.GdsGraphDatabaseAPI;
@@ -28,7 +28,7 @@ public class EjmlGraphBaseBenchmark {
     protected EjmlGraph graph;
     // untransposed version
     protected DMatrixSparseCSC getAdjacencyMatrix() {
-       return CommonOps_DSCC.transpose(graph.matrix(), null, null);
+        return EjmlUtil.getAdjacencyMatrix(graph);
     }
 
 //    DatasetManager datasetManager;

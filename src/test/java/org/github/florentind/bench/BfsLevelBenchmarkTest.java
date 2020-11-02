@@ -3,6 +3,7 @@ package org.github.florentind.bench;
 import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
+import org.github.florentind.core.ejml.EjmlUtil;
 import org.github.florentind.core.grapblas_native.NativeHelper;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.graphalgos.bfs.BfsDenseDoubleResult;
@@ -15,7 +16,6 @@ import org.neo4j.graphalgo.api.Graph;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.PregelComputation;
 import org.neo4j.graphalgo.beta.pregel.bfs.BFSLevelPregel;
-import org.neo4j.graphalgo.beta.pregel.bfs.BFSParentPregel;
 import org.neo4j.graphalgo.beta.pregel.bfs.BFSPregelConfig;
 import org.neo4j.graphalgo.beta.pregel.bfs.ImmutableBFSPregelConfig;
 import org.neo4j.graphalgo.core.concurrency.Pools;
@@ -120,19 +120,15 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
     }
 
     private BfsResult getEjmlSparseResult(EjmlGraph ejmlGraph, int startNode) {
-        var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
-        unTransposedMatrix.sortIndices(null);
-        return new BfsEjml().computeSparse(unTransposedMatrix, BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
+        return new BfsEjml().computeSparse(EjmlUtil.getAdjacencyMatrix(ejmlGraph), BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getEjmlDenseResult(EjmlGraph ejmlGraph, int startNode) {
-        var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
-        return new BfsEjml().computeDense(unTransposedMatrix, BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
+        return new BfsEjml().computeDense(EjmlUtil.getAdjacencyMatrix(ejmlGraph), BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getEjmlDenseSparseResult(EjmlGraph ejmlGraph, int startNode) {
-        var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
-        return new BfsEjml().computeDenseSparse(unTransposedMatrix, BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
+        return new BfsEjml().computeDenseSparse(EjmlUtil.getAdjacencyMatrix(ejmlGraph), BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getJniResult(EjmlGraph ejmlGraph, int startNode) {

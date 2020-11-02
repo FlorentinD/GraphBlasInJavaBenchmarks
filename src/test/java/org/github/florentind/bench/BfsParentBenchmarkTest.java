@@ -1,8 +1,8 @@
 package org.github.florentind.bench;
 
 import com.github.fabianmurariu.unsafe.GRBCORE;
-import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
+import org.github.florentind.core.ejml.EjmlUtil;
 import org.github.florentind.core.grapblas_native.NativeHelper;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.graphalgos.bfs.BfsDenseDoubleResult;
@@ -123,19 +123,15 @@ public class BfsParentBenchmarkTest extends BaseBenchmarkTest {
     }
 
     private BfsResult getEjmlSparseResult(EjmlGraph ejmlGraph, int startNode) {
-        var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
-        unTransposedMatrix.sortIndices(null);
-        return new BfsEjml().computeSparse(unTransposedMatrix, BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
+        return new BfsEjml().computeSparse(EjmlUtil.getAdjacencyMatrix(ejmlGraph), BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getEjmlDenseResult(EjmlGraph ejmlGraph, int startNode) {
-        var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
-        return new BfsEjml().computeDense(unTransposedMatrix, BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
+        return new BfsEjml().computeDense(EjmlUtil.getAdjacencyMatrix(ejmlGraph), BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getEjmlDenseSparseResult(EjmlGraph ejmlGraph, int startNode) {
-        var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
-        return new BfsEjml().computeDenseSparse(unTransposedMatrix, BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
+        return new BfsEjml().computeDenseSparse(EjmlUtil.getAdjacencyMatrix(ejmlGraph), BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getJniResult(EjmlGraph ejmlGraph, int startNode) {

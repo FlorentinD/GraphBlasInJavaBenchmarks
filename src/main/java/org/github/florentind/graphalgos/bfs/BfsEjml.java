@@ -156,19 +156,18 @@ public class BfsEjml {
     public BfsDenseDoubleResult computeDenseSparse(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int startNode, int maxIterations) {
         int nodeCount = adjacencyMatrix.numCols;
         double[] result = new double[nodeCount];
-        DMatrixSparseCSC inputVector = new DMatrixSparseCSC(1, nodeCount);
+        DVectorSparse inputVector = new DVectorSparse(nodeCount, nodeCount);
 
         // init result vector
         if (bfsVariation == BfsVariation.PARENTS) {
-            inputVector.set(0, startNode, startNode + 1);
+            inputVector.set(startNode, startNode + 1);
         } else {
-            inputVector.set(0, startNode, 1);
+            inputVector.set(startNode, 1);
         }
 
         // for reusing memory
         IGrowArray gw = new IGrowArray();
-        DGrowArray gx = new DGrowArray();
-        DMatrixSparseCSC iterationResult = null;
+        DVectorSparse iterationResult = null;
 
         int nodesVisited = 0;
 
@@ -182,31 +181,31 @@ public class BfsEjml {
         // replace -> iterationResult is basically the new inputVector
         Mask mask = DMasks.builder(result)
                 .withZeroElement(semiRing.add.id)
-                .withNumCols(nodeCount)
+                .withNumCols(1)
                 .withNegated(true)
                 .build();
 
         for (; ; iteration++) {
-            nodesVisited += inputVector.nz_length;
+            nodesVisited += inputVector.nz_length();
 
             if (bfsVariation == BfsVariation.PARENTS) {
-                CommonOps_DArray.assign(result, inputVector);
+                CommonOps_DArray.assign(result, inputVector.oneDimMatrix);
                 // set value to its own id
-                CommonOps_DSCC.applyColumnIdx(inputVector, (colIdx, val) -> colIdx + 1, inputVector);
+                CommonOps_DSCC.applyIdx(inputVector, (colIdx, val) -> colIdx + 1, inputVector);
             } else {
                 // assign scalar for level (inputVector as a mask)
-                CommonOps_DArray.assignScalar(result, iteration, inputVector);
+                CommonOps_DArray.assignScalar(result, iteration, inputVector.oneDimMatrix);
             }
 
             // check for fixPoint
-            if ((inputVector.nz_length == 0) || (nodesVisited == nodeCount) || (iteration >= maxIterations)) {
+            if ((inputVector.nz_length() == 0) || (nodesVisited == nodeCount) || (iteration >= maxIterations)) {
                 break;
             }
 
-            iterationResult = CommonOpsWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true, gw, gx);
+            iterationResult = MatrixSparseVectorMultWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true, gw);
 
             // switch references .. less costly then clone
-            DMatrixSparseCSC tmp = inputVector;
+            DVectorSparse tmp = inputVector;
             inputVector = iterationResult;
             iterationResult = tmp;
         }
