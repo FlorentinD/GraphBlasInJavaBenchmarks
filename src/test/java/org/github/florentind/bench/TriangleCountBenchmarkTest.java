@@ -97,7 +97,7 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {false})
+    @ValueSource(booleans = {true})
     public void testNodeWiseEjml(boolean useLowerTriangle) {
         // ! no need to transpose as symmetric anyway
         var result = TriangleCountEjml.computeNodeWise(ejmlGraph.matrix(), useLowerTriangle);

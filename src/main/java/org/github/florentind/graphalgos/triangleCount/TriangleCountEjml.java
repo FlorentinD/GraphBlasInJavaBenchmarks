@@ -77,7 +77,7 @@ public class TriangleCountEjml {
 
         if (useLowerTriangle) {
             DMatrixSparseCSC L = getLowerTriangle(matrix);
-            // TODO: try L * matrix combined with reduceColumnWise
+            // matrix * L is much faster than L * matrix (due to sparse matrix mult implementation in ejml)
             DMatrixSparseCSC tri = CommonOpsWithSemiRing_DSCC.mult(matrix, L, null, multSemiring, mask, null, true);
             result = CommonOps_DSCC.reduceRowWise(tri, 0, Double::sum, null).data;
         } else {
