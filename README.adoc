@@ -24,10 +24,14 @@ git checkout mask_rebased
 ./gradlew autogenerate
 ./gradlew install
 
-# SuiteSparse:Graphblas (make sure to install under `usr/local` f.i. via make gbinstall)
-git clone git@github.com:DrTimothyAldenDavis/SuiteSparse.git
-cd Suitesparse/
-sudo make gbinstall -j32 INSTALL=/usr/local/
+# SuiteSparse:Graphblas (make sure to install under `usr/local` and you might not need setting the LD_LIBRARY_PATH)
+# might need to add `/usr/local/lib` to `/etc/ld.so.conf` to avoid an `UnsatisfiedLinkError`
+# or add run `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib; ldconfig` before
+# or some other magic like waiting for 1h and it solves the `UnsatisfiedLinkError` itself
+git clone git@github.com:DrTimothyAldenDavis/GraphBLAS.git
+cd GraphBLAS/
+make
+sudo make install -j32 INSTALL=/usr/local/
 cd ..
 
 # graphblas-java-native (my fork, as I added some mappings which are not merged yet?)
