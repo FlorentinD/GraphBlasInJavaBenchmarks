@@ -32,15 +32,13 @@ git checkout mask_rebased
 # ! AVX2 flag needs to manually set in the CMakeList (false by default)
 git clone git@github.com:DrTimothyAldenDavis/GraphBLAS.git
 cd GraphBLAS/
-make
+make JOBS=32
 sudo make install -j32 INSTALL=/usr/local/
 cd ..
 
 # graphblas-java-native (my fork, as I added some mappings which are not merged yet?)
-git@github.com:FlorentinD/graphblas-java-native.git
+git@github.com:fabianmurariu/graphblas-java-native.git
 cd graphblas-java-native/
-# branch with newest commit
-git checkout otherMappings
 cd graphblas-java/
 # this might need a restart to work
 mvn clean install
