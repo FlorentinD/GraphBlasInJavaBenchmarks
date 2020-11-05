@@ -8,6 +8,7 @@ import org.ejml.sparse.csc.CommonOps_DSCC;
 
 public class EjmlUtil {
     public static final DBinaryOperator PAIR_OP = (x, y) -> 1;
+    public static final DBinaryOperator SECOND_OP = (x, y) -> y;
     public static final DMonoid FIRST_MONOID = new DMonoid(0, (a, b) -> a);
     public static final DSemiRing FIRST_PAIR = new DSemiRing(FIRST_MONOID, PAIR_OP);
 

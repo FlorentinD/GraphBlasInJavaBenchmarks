@@ -1,6 +1,5 @@
 package org.github.florentind.graphalgos.bfs;
 
-import org.ejml.data.DGrowArray;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.data.DVectorSparse;
 import org.ejml.data.IGrowArray;
@@ -8,11 +7,12 @@ import org.ejml.masks.DMasks;
 import org.ejml.masks.Mask;
 import org.ejml.masks.PrimitiveDMask;
 import org.ejml.ops.*;
-import org.ejml.sparse.csc.CommonOpsWithSemiRing_DSCC;
 import org.ejml.sparse.csc.CommonOps_DSCC;
+import org.ejml.sparse.csc.CommonVectorOps_DSCC;
 import org.ejml.sparse.csc.MaskUtil_DSCC;
 import org.ejml.sparse.csc.mult.MatrixSparseVectorMultWithSemiRing_DSCC;
 import org.ejml.sparse.csc.mult.MatrixVectorMultWithSemiRing_DSCC;
+import org.github.florentind.core.ejml.EjmlUtil;
 
 import java.util.Arrays;
 
@@ -99,7 +99,6 @@ public class BfsEjml {
 
         // for reusing memory
         IGrowArray gw = new IGrowArray();
-        DGrowArray gx = new DGrowArray();
         DVectorSparse tmp;
 
         int visitedNodes = 0;
@@ -112,18 +111,11 @@ public class BfsEjml {
 
         for (; ; iteration++) {
             if (bfsVariation == BfsVariation.LEVEL) {
-                // TODO: use assignScalar here too? (need mask iterator for that)
-                int currentIteration = iteration;
-                CommonOps_DSCC.apply(inputVector.oneDimMatrix, x -> currentIteration);
+                CommonVectorOps_DSCC.assignScalar(result, iteration, inputVector, gw);
+            } else {
+                // assign inputVector entries to result (assign is here basically the same as add)
+                CommonVectorOps_DSCC.add(result, inputVector, EjmlUtil.SECOND_OP, gw);
             }
-
-            // assign inputVector entries to result (ideally use assign/assignScalar instead of a simple add)
-            // using "iterationResult" as a workspace
-            // TODO: replace with assign operation
-            CommonOpsWithSemiRing_DSCC.add(result.oneDimMatrix, inputVector.oneDimMatrix, iterationResult.oneDimMatrix, semiRing ,null, null, true, gw, gx);
-            tmp = result;
-            result = iterationResult;
-            iterationResult = tmp;
 
             visitedNodes += nodesInQueue;
             // check for fixPoint
