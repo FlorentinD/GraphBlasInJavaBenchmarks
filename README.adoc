@@ -27,7 +27,9 @@ git checkout mask_rebased
 # SuiteSparse:Graphblas (make sure to install under `usr/local` and you might not need setting the LD_LIBRARY_PATH)
 # might need to add `/usr/local/lib` to `/etc/ld.so.conf` to avoid an `UnsatisfiedLinkError`
 # or add run `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib; ldconfig` before
+# Problem: `ld` ignores symbolic links in `usr/local/lib`
 # or some other magic like waiting for 1h and it solves the `UnsatisfiedLinkError` itself
+# ! AVX2 flag needs to manually set in the CMakeList (false by default)
 git clone git@github.com:DrTimothyAldenDavis/GraphBLAS.git
 cd GraphBLAS/
 make
