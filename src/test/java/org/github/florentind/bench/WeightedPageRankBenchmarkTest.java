@@ -153,7 +153,7 @@ public class WeightedPageRankBenchmarkTest extends BaseBenchmarkTest {
         );
 
         var result = pageRankJob.run();
-        String propertyName = computation.nodeSchema().elements().get(0).propertyKey();
+        String propertyName = "pagerank";
         double[] normalizedResult = normalizeResult(result.nodeValues().doubleProperties(propertyName).toArray());
         return new ImmutableTriple<>("pregel", result.ranIterations(), normalizedResult);
     }
