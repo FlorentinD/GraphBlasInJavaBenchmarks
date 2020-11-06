@@ -14,6 +14,10 @@ public class BfsEjmlBenchmark extends BfsBaseBenchmark {
 
     private DMatrixSparseCSC matrix;
 
+    // as vxm largely depends whether its sorted or not
+    @Param({"true", "false"})
+    private boolean sortedIndices;
+
     @Override
     @Setup
     public void setup() {

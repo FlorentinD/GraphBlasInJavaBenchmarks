@@ -12,7 +12,7 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 
 public class BfsBaseBenchmark extends EjmlGraphBaseBenchmark {
-    @Param({"300000", "3000000"})
+    @Param({"100000", "500000", "1000000",  "5000000"})
     int nodeCount;
 
     @Param({"4"})

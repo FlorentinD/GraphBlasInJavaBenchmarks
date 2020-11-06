@@ -28,8 +28,12 @@ public abstract class MatrixOpsBaseBenchmark {
     @Param({"UNIFORM"})
     private String degreeDistribution;
 
+    @Param({"true", "false"})
+    private boolean matrixIndicesSorted;
+
     @Setup
     public void setup() {
         matrix = RandomMatrices_DSCC.generateUniform(dimension, dimension, avgEntriesPerColumn, 1, 2, new Random(42));
+        matrix.indicesSorted = matrixIndicesSorted;
     }
 }

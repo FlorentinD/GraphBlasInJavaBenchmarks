@@ -23,13 +23,18 @@ public class BfsNativeBenchmark extends BfsBaseBenchmark {
     public void setup() {
         super.setup();
         GRBCORE.initNonBlocking();
-        jniMatrix = ToNativeMatrixConverter.convert(getAdjacencyMatrix());
+        jniMatrix = ToNativeMatrixConverter.convert(graph);
     }
 
 
     @Benchmark
     public void jniBfsLevel(Blackhole bh) {
         bh.consume(new BfsNative().computeLevel(jniMatrix, startNode, maxIterations, concurrency));
+    }
+
+    @Benchmark
+    public void jniBfsParent(Blackhole bh) {
+        bh.consume(new BfsNative().computeParent(jniMatrix, startNode, maxIterations, concurrency));
     }
 
     @Override
