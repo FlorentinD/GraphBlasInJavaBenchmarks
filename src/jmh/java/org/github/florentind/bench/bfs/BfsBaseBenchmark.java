@@ -9,6 +9,7 @@ import org.neo4j.graphalgo.config.RandomGraphGeneratorConfig;
 import org.neo4j.graphalgo.core.Aggregation;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Setup;
 
 public class BfsBaseBenchmark extends EjmlGraphBaseBenchmark {
     @Param({"300000", "3000000"})
@@ -17,12 +18,19 @@ public class BfsBaseBenchmark extends EjmlGraphBaseBenchmark {
     @Param({"4"})
     int avgDegree;
 
-    @Param({"0"})
+    // node in the middle (id-wise)
     int startNode;
 
     // TODO: retrieve actually run iterations
     @Param({"100"})
     protected int maxIterations;
+
+    @Override
+    @Setup
+    public void setup() {
+        super.setup();
+        startNode = nodeCount / 2;
+    }
 
 
     @Override

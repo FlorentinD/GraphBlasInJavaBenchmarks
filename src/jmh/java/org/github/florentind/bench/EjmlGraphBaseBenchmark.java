@@ -26,9 +26,13 @@ public class EjmlGraphBaseBenchmark {
     GdsGraphDatabaseAPI db;
 
     protected EjmlGraph graph;
+
+    @Param({"true"})
+    private boolean sortedIndices;
+
     // untransposed version
     protected DMatrixSparseCSC getAdjacencyMatrix() {
-        return EjmlUtil.getAdjacencyMatrix(graph);
+        return EjmlUtil.getAdjacencyMatrix(graph, sortedIndices);
     }
 
 //    DatasetManager datasetManager;
