@@ -1,6 +1,7 @@
 package org.github.florentind.bench.bfs;
 
 import com.github.fabianmurariu.unsafe.GRBCORE;
+import com.github.fabianmurariu.unsafe.GRBOPSMAT;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.graphalgos.bfs.BfsNative;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -13,8 +14,11 @@ import java.nio.Buffer;
 
 public class BfsNativeBenchmark extends BfsBaseBenchmark {
 
-    @Param({"1", "8"})
+    @Param({"1"})
     private int concurrency;
+
+//    @Param({"true", "false"})
+//    private boolean isCSC;
 
     protected Buffer jniMatrix;
 
@@ -23,7 +27,9 @@ public class BfsNativeBenchmark extends BfsBaseBenchmark {
     public void setup() {
         super.setup();
         GRBCORE.initNonBlocking();
+        //jniMatrix = ToNativeMatrixConverter.convert(graph, isCSC);
         jniMatrix = ToNativeMatrixConverter.convert(graph);
+        GRBOPSMAT.transpose(jniMatrix, null, null, jniMatrix, null);
     }
 
 

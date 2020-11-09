@@ -27,12 +27,9 @@ public class EjmlGraphBaseBenchmark {
 
     protected EjmlGraph graph;
 
-    @Param({"true"})
-    private boolean sortedIndices;
-
     // untransposed version
     protected DMatrixSparseCSC getAdjacencyMatrix() {
-        return EjmlUtil.getAdjacencyMatrix(graph, sortedIndices);
+        return EjmlUtil.getAdjacencyMatrix(graph);
     }
 
 //    DatasetManager datasetManager;

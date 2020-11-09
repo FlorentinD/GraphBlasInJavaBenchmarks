@@ -27,10 +27,10 @@ import java.nio.Buffer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
-    private static final int NODE_COUNT = 30_000;
+    private static final int NODE_COUNT = 1000_000;
     private static final int MAX_ITERATIONS = 100;
     private static final int CONCURRENCY = 16;
-    private static final int START_NODE = 0;
+    private static final int START_NODE = NODE_COUNT / 2;
 
     @Override
     long nodeCount() {
@@ -51,6 +51,9 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
         super.setup();
         ejmlGraph = EjmlGraph.create(graph);
         goldStandard = getJniResult(ejmlGraph, START_NODE);
+
+        System.out.println("goldStandard.iterations() = " + goldStandard.iterations());
+        System.out.println("goldStandard.nodesVisited() = " + goldStandard.nodesVisited());
     }
 
     @Test
@@ -120,23 +123,21 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
     }
 
     private BfsResult getEjmlSparseResult(EjmlGraph ejmlGraph, int startNode) {
-        return new BfsEjml().computeSparse(EjmlUtil.getAdjacencyMatrix(ejmlGraph), BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
+        return new BfsEjml().computeSparse(ejmlGraph.matrix(), BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getEjmlDenseResult(EjmlGraph ejmlGraph, int startNode) {
-        return new BfsEjml().computeDense(EjmlUtil.getAdjacencyMatrix(ejmlGraph), BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
+        return new BfsEjml().computeDense(ejmlGraph.matrix(), BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getEjmlDenseSparseResult(EjmlGraph ejmlGraph, int startNode) {
-        return new BfsEjml().computeDenseSparse(EjmlUtil.getAdjacencyMatrix(ejmlGraph), BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
+        return new BfsEjml().computeDenseSparse(ejmlGraph.matrix(), BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getJniResult(EjmlGraph ejmlGraph, int startNode) {
         GRBCORE.initNonBlocking();
 
-        var unTransposedMatrix = CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null);
-
-        Buffer jniMatrix = ToNativeMatrixConverter.convert(unTransposedMatrix);
+        Buffer jniMatrix = ToNativeMatrixConverter.convert(ejmlGraph.matrix());
 
         var result = new BfsNative().computeLevel(jniMatrix, startNode, MAX_ITERATIONS, CONCURRENCY);
         NativeHelper.checkStatusCode(GRBCORE.freeMatrix(jniMatrix));

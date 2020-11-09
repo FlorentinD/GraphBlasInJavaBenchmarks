@@ -12,48 +12,43 @@ public class BfsEjmlBenchmark extends BfsBaseBenchmark {
     @Param({"1"})
     private int concurrency;
 
-    private DMatrixSparseCSC matrix;
-
-    // as vxm largely depends whether its sorted or not
-    @Param({"true", "false"})
-    private boolean sortedIndices;
+    private DMatrixSparseCSC transposedMatrix;
 
     @Override
     @Setup
     public void setup() {
         super.setup();
-
-        matrix = getAdjacencyMatrix();
+        transposedMatrix = graph.matrix();
     }
 
     @Benchmark
     public void ejmlSparseBfsLevel(Blackhole bh) {
-        bh.consume(new BfsEjml().computeSparse(matrix, BfsEjml.BfsVariation.LEVEL, startNode, maxIterations));
+        bh.consume(new BfsEjml().computeSparse(transposedMatrix, BfsEjml.BfsVariation.LEVEL, startNode, maxIterations));
     }
 
     @org.openjdk.jmh.annotations.Benchmark
     public void ejmlSparseBfsParent(Blackhole bh) {
-        bh.consume(new BfsEjml().computeSparse(matrix, BfsEjml.BfsVariation.PARENTS, startNode, maxIterations));
+        bh.consume(new BfsEjml().computeSparse(transposedMatrix, BfsEjml.BfsVariation.PARENTS, startNode, maxIterations));
     }
 
     @Benchmark
     public void ejmlDenseSparseBfsLevel(Blackhole bh) {
-        bh.consume(new BfsEjml().computeDenseSparse(matrix, BfsEjml.BfsVariation.LEVEL, startNode, maxIterations));
+        bh.consume(new BfsEjml().computeDenseSparse(transposedMatrix, BfsEjml.BfsVariation.LEVEL, startNode, maxIterations));
     }
 
     @org.openjdk.jmh.annotations.Benchmark
     public void ejmlDenseSparseBfsParent(Blackhole bh) {
-        bh.consume(new BfsEjml().computeDenseSparse(matrix, BfsEjml.BfsVariation.PARENTS, startNode, maxIterations));
+        bh.consume(new BfsEjml().computeDenseSparse(transposedMatrix, BfsEjml.BfsVariation.PARENTS, startNode, maxIterations));
     }
 
     @org.openjdk.jmh.annotations.Benchmark
     public void ejmlDenseBfsLevel(Blackhole bh) {
-        bh.consume(new BfsEjml().computeDense(matrix, BfsEjml.BfsVariation.LEVEL, startNode, maxIterations));
+        bh.consume(new BfsEjml().computeDense(transposedMatrix, BfsEjml.BfsVariation.LEVEL, startNode, maxIterations));
     }
 
     @org.openjdk.jmh.annotations.Benchmark
     public void ejmlDenseBfsParent(Blackhole bh) {
-        bh.consume(new BfsEjml().computeDense(matrix, BfsEjml.BfsVariation.PARENTS, startNode, maxIterations));
+        bh.consume(new BfsEjml().computeDense(transposedMatrix, BfsEjml.BfsVariation.PARENTS, startNode, maxIterations));
     }
 
     // TODO add MSBFS benchmark

@@ -1,5 +1,6 @@
 package org.github.florentind.graphalgos.bfs;
 
+import org.ejml.data.DGrowArray;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.data.DVectorSparse;
 import org.ejml.data.IGrowArray;
@@ -7,10 +8,10 @@ import org.ejml.masks.DMasks;
 import org.ejml.masks.Mask;
 import org.ejml.masks.PrimitiveDMask;
 import org.ejml.ops.*;
+import org.ejml.sparse.csc.CommonOpsWithSemiRing_DSCC;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.ejml.sparse.csc.CommonVectorOps_DSCC;
 import org.ejml.sparse.csc.MaskUtil_DSCC;
-import org.ejml.sparse.csc.mult.MatrixSparseVectorMultWithSemiRing_DSCC;
 import org.ejml.sparse.csc.mult.MatrixVectorMultWithSemiRing_DSCC;
 import org.github.florentind.core.ejml.EjmlUtil;
 
@@ -22,13 +23,13 @@ import static org.github.florentind.core.ejml.EjmlUtil.FIRST_PAIR;
 public class BfsEjml {
     // iteration-result needed, as mult cannot write into the same object in ejml
 
-      public BfsDenseDoubleResult computeDense(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int startNode, int maxIterations) {
-        int nodeCount = adjacencyMatrix.numCols;
+      public BfsDenseDoubleResult computeDense(DMatrixSparseCSC adjacencyMatrixTransposed, BfsVariation bfsVariation, int startNode, int maxIterations) {
+        int nodeCount = adjacencyMatrixTransposed.numCols;
         // if the inputVector entry is not zero -> return true (sparse adjacency matrix -> entry exists == true)
-        DBinaryOperator firstNotZeroOp = (a, b) -> (a != 0) ? 1 : 0;
+        DBinaryOperator secondNotZero = (a, b) -> (b != 0) ? 1 : 0;
         // as dense here: cannot use FIRST/ANY instead of OR
-        DSemiRing levelSemiRing = new DSemiRing(DMonoids.OR, firstNotZeroOp);
-        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : levelSemiRing;
+        DSemiRing levelSemiRing = new DSemiRing(DMonoids.OR, secondNotZero);
+        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_SECOND : levelSemiRing;
         double[] result = new double[nodeCount];
         Arrays.fill(result, semiRing.add.id);
 
@@ -41,6 +42,7 @@ public class BfsEjml {
         }
 
         double[] iterationResult = new double[nodeCount];
+        double tmp[];
 
         int visitedNodes = 0;
         int nodesInQueue = 1;
@@ -67,10 +69,11 @@ public class BfsEjml {
                 CommonOps_DArray.applyIdx(inputVector, inputVector, (idx, val) -> (val != semiRing.add.id) ? idx + 1 : val);
             }
 
-            iterationResult = MatrixVectorMultWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true);
+            // mxv
+            iterationResult = MatrixVectorMultWithSemiRing_DSCC.mult(adjacencyMatrixTransposed, inputVector, iterationResult, semiRing, mask, null, true);
 
             // switch pointers as iterationResult is the inputVector for next iteration
-            double[] tmp = iterationResult;
+            tmp = iterationResult;
             iterationResult = inputVector;
             inputVector = tmp;
 
@@ -81,8 +84,8 @@ public class BfsEjml {
         return new BfsDenseDoubleResult(result, iteration - 1, semiRing.add.id);
     }
 
-    public BfsSparseResult computeSparse(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int startNode, int maxIterations) {
-        int nodeCount = adjacencyMatrix.numCols;
+    public BfsSparseResult computeSparse(DMatrixSparseCSC adjacencyMatrixTransposed, BfsVariation bfsVariation, int startNode, int maxIterations) {
+        int nodeCount = adjacencyMatrixTransposed.numCols;
         DVectorSparse result = new DVectorSparse(nodeCount, nodeCount);
         DVectorSparse inputVector = result.createLike();
 
@@ -95,17 +98,18 @@ public class BfsEjml {
 
 
         // work space for saving iterationResult and combinedResult
-        DVectorSparse iterationResult = result.createLike();
+        DMatrixSparseCSC iterationResult = result.oneDimMatrix.createLike();
 
         // for reusing memory
         IGrowArray gw = new IGrowArray();
-        DVectorSparse tmp;
+        DGrowArray gx = new DGrowArray();
+        DMatrixSparseCSC tmp;
 
         int visitedNodes = 0;
         int nodesInQueue = 1;
 
         // first, as ANY is not existing in ejml
-        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : FIRST_PAIR;
+        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_SECOND : FIRST_PAIR;
 
         int iteration = 1;
 
@@ -129,11 +133,21 @@ public class BfsEjml {
             // negated -> dont compute values for visited nodes
             // replace -> iterationResult is basically the new inputVector
             Mask mask = DMasks.builder(result, true).withNegated(true).build();
-            iterationResult = MatrixSparseVectorMultWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true, gw);
+            iterationResult = CommonOpsWithSemiRing_DSCC.mult(
+                    adjacencyMatrixTransposed,
+                    inputVector.oneDimMatrix,
+                    iterationResult,
+                    semiRing,
+                    mask,
+                    null,
+                    true,
+                    gw,
+                    gx
+            );
 
             // set inputVector based on newly discovered nodes
-            tmp = inputVector;
-            inputVector = iterationResult;
+            tmp = inputVector.oneDimMatrix;
+            inputVector.oneDimMatrix = iterationResult;
             iterationResult = tmp;
 
             nodesInQueue = inputVector.nz_length();
@@ -145,8 +159,8 @@ public class BfsEjml {
 
 
     // dense result vector and sparse queue vector
-    public BfsDenseDoubleResult computeDenseSparse(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int startNode, int maxIterations) {
-        int nodeCount = adjacencyMatrix.numCols;
+    public BfsDenseDoubleResult computeDenseSparse(DMatrixSparseCSC adjacencyMatrixTransposed, BfsVariation bfsVariation, int startNode, int maxIterations) {
+        int nodeCount = adjacencyMatrixTransposed.numCols;
         double[] result = new double[nodeCount];
         DVectorSparse inputVector = new DVectorSparse(nodeCount, nodeCount);
 
@@ -159,12 +173,14 @@ public class BfsEjml {
 
         // for reusing memory
         IGrowArray gw = new IGrowArray();
-        DVectorSparse iterationResult = null;
+        DGrowArray gx = new DGrowArray();
+        DMatrixSparseCSC iterationResult = inputVector.oneDimMatrix.createLike();
+        DMatrixSparseCSC tmp;
 
         int nodesVisited = 0;
 
         // first, as ANY is not existing in ejml
-        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : FIRST_PAIR;
+        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_SECOND : FIRST_PAIR;
         Arrays.fill(result, semiRing.add.id);
 
         int iteration = 1;
@@ -194,11 +210,21 @@ public class BfsEjml {
                 break;
             }
 
-            iterationResult = MatrixSparseVectorMultWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true, gw);
+            iterationResult = CommonOpsWithSemiRing_DSCC.mult(
+                    adjacencyMatrixTransposed,
+                    inputVector.oneDimMatrix,
+                    iterationResult,
+                    semiRing,
+                    mask,
+                    null,
+                    true,
+                    gw,
+                    gx
+            );
 
             // switch references .. less costly then clone
-            DVectorSparse tmp = inputVector;
-            inputVector = iterationResult;
+            tmp = inputVector.oneDimMatrix;
+            inputVector.oneDimMatrix = iterationResult;
             iterationResult = tmp;
         }
 

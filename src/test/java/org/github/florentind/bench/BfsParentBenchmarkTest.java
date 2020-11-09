@@ -1,8 +1,8 @@
 package org.github.florentind.bench;
 
 import com.github.fabianmurariu.unsafe.GRBCORE;
+import com.github.fabianmurariu.unsafe.GRBOPSMAT;
 import org.github.florentind.core.ejml.EjmlGraph;
-import org.github.florentind.core.ejml.EjmlUtil;
 import org.github.florentind.core.grapblas_native.NativeHelper;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.graphalgos.bfs.BfsDenseDoubleResult;
@@ -52,6 +52,7 @@ public class BfsParentBenchmarkTest extends BaseBenchmarkTest {
         goldStandard = getJniResult(ejmlGraph, START_NODE);
 
         System.out.println("goldStandard.iterations() = " + goldStandard.iterations());
+        System.out.println("goldStandard.nodesVisited() = " + goldStandard.nodesVisited());
     }
 
     @Test
@@ -123,21 +124,22 @@ public class BfsParentBenchmarkTest extends BaseBenchmarkTest {
     }
 
     private BfsResult getEjmlSparseResult(EjmlGraph ejmlGraph, int startNode) {
-        return new BfsEjml().computeSparse(EjmlUtil.getAdjacencyMatrix(ejmlGraph), BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
+        return new BfsEjml().computeSparse(ejmlGraph.matrix(), BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getEjmlDenseResult(EjmlGraph ejmlGraph, int startNode) {
-        return new BfsEjml().computeDense(EjmlUtil.getAdjacencyMatrix(ejmlGraph), BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
+        return new BfsEjml().computeDense(ejmlGraph.matrix(), BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getEjmlDenseSparseResult(EjmlGraph ejmlGraph, int startNode) {
-        return new BfsEjml().computeDenseSparse(EjmlUtil.getAdjacencyMatrix(ejmlGraph), BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
+        return new BfsEjml().computeDenseSparse(ejmlGraph.matrix(), BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getJniResult(EjmlGraph ejmlGraph, int startNode) {
         GRBCORE.initNonBlocking();
 
         Buffer jniMatrix = ToNativeMatrixConverter.convert(ejmlGraph);
+        GRBOPSMAT.transpose(jniMatrix, null, null, jniMatrix, null);
 
         var result = new BfsNative().computeParent(jniMatrix, startNode, MAX_ITERATIONS, 1);
 

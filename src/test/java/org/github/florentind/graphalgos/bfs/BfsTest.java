@@ -4,15 +4,15 @@ package org.github.florentind.graphalgos.bfs;
 
 import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.ejml.data.DMatrixSparseCSC;
+import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.nio.Buffer;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class BfsTest {
     private static final int EXPECTED_ITERATIONS = 3;
     private static final int START_NODE = 0;
-    DMatrixSparseCSC inputMatrix;
+    static DMatrixSparseCSC inputMatrixTransposed;
 
     BfsEjml bfs = new BfsEjml();
     private static final int MAX_ITERATIONS = 20;
@@ -37,10 +37,10 @@ public class BfsTest {
         );
     }
 
-    @BeforeEach
-    public void setUp() {
+    @BeforeAll
+    public static void setUp() {
         // based on example in http://mit.bme.hu/~szarnyas/grb/graphblas-introduction.pdf
-        inputMatrix = new DMatrixSparseCSC(7, 7, 12);
+        DMatrixSparseCSC inputMatrix = new DMatrixSparseCSC(7, 7, 12);
         inputMatrix.set(0, 1, 1);
         inputMatrix.set(0, 3, 1);
         inputMatrix.set(1, 4, 1);
@@ -54,12 +54,13 @@ public class BfsTest {
         inputMatrix.set(6, 3, 1);
         inputMatrix.set(6, 4, 1);
         inputMatrix.sortIndices(null);
+        inputMatrixTransposed = CommonOps_DSCC.transpose(inputMatrix, null, null);
     }
 
     @ParameterizedTest
     @MethodSource("bfsVariantSource")
     public void testSparseEjmlVariations(BfsVariation variation, double[] expected) {
-        BfsSparseResult result = bfs.computeSparse(inputMatrix, variation, START_NODE, MAX_ITERATIONS);
+        BfsSparseResult result = bfs.computeSparse(inputMatrixTransposed, variation, START_NODE, MAX_ITERATIONS);
 
         assertBfsResult(expected, result);
         assertEquals(EXPECTED_ITERATIONS, result.iterations());
@@ -68,7 +69,7 @@ public class BfsTest {
     @ParameterizedTest
     @MethodSource("bfsVariantSource")
     public void testDenseEjmlVariations(BfsVariation variation, double[] expected) {
-        var result = bfs.computeDense(inputMatrix, variation, START_NODE, MAX_ITERATIONS);
+        var result = bfs.computeDense(inputMatrixTransposed, variation, START_NODE, MAX_ITERATIONS);
 
         assertBfsResult(expected, result);
         assertEquals(EXPECTED_ITERATIONS, result.iterations());
@@ -77,9 +78,8 @@ public class BfsTest {
     @ParameterizedTest
     @MethodSource("bfsVariantSource")
     public void testSparseDenseEjmlVariations(BfsVariation variation, double[] expected) {
-        var result = bfs.computeDenseSparse(inputMatrix, variation, START_NODE, MAX_ITERATIONS);
+        var result = bfs.computeDenseSparse(inputMatrixTransposed, variation, START_NODE, MAX_ITERATIONS);
 
-        System.out.println("result.result() = " + Arrays.toString(result.result()));
         assertBfsResult(expected, result);
         assertEquals(EXPECTED_ITERATIONS, result.iterations());
     }
@@ -101,7 +101,7 @@ public class BfsTest {
     public void testNativeBfs(BfsVariation variation, double[] expected) {
         GRBCORE.initNonBlocking();
 
-        Buffer nativeMatrix = ToNativeMatrixConverter.convert(inputMatrix);
+        Buffer nativeMatrix = ToNativeMatrixConverter.convert(inputMatrixTransposed);
 
         BfsResult result = null;
 

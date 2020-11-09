@@ -6,7 +6,7 @@ import static com.github.fabianmurariu.unsafe.GRAPHBLAS.*;
 import static com.github.fabianmurariu.unsafe.GRBCORE.*;
 import static com.github.fabianmurariu.unsafe.GRBMONOID.anyMonoidDouble;
 import static com.github.fabianmurariu.unsafe.GRBMONOID.minMonoidInt;
-import static com.github.fabianmurariu.unsafe.GRBOPSMAT.vxm;
+import static com.github.fabianmurariu.unsafe.GRBOPSMAT.mxv;
 import static com.github.fabianmurariu.unsafe.GRBOPSVEC.assign;
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 
@@ -19,15 +19,12 @@ public class BfsNative {
 
     /**
      *  BFS based on based on https://github.com/DrTimothyAldenDavis/SuiteSparse/blob/master/GraphBLAS/Demo/Source/bfs5m.c
-     *  @param adjacencyMatrix adjacency matrix in CSC format
+     *  @param adjacencyMatrixTransposed adjacency matrix in CSC format
      */
-    public BfsResult computeLevel(Buffer adjacencyMatrix, int startNode, int maxIterations, int concurrency) {
-        // assert adj-matrix to be in CSC
-        assert getFormat(adjacencyMatrix) == GxB_BY_COL;
-
+    public BfsResult computeLevel(Buffer adjacencyMatrixTransposed, int startNode, int maxIterations, int concurrency) {
         checkStatusCode(setGlobalInt(GxB_NTHREADS, concurrency));
 
-        long nodeCount = nrows(adjacencyMatrix);
+        long nodeCount = nrows(adjacencyMatrixTransposed);
 
         // result vector
         Buffer resultVector = createVector(intType(), nodeCount);
@@ -63,7 +60,6 @@ public class BfsNative {
         // BFS-traversal
         for (; ; level++) {
             // v<q> = level, using vector assign with q as the mask
-            // no option to use GrB_ALL -> but ni = nodeCount leads to it being used
             checkStatusCode(assignVectorInt(resultVector, queueVector, null, level, GrB_ALL, nodeCount, assignDesc));
 
             nodesVisited += nodesInQueue ;
@@ -71,7 +67,7 @@ public class BfsNative {
             if (nodesInQueue == 0 || nodesVisited == nodeCount || level > maxIterations) break ;
 
             // q<¬v> = q lor.land matrix
-            checkStatusCode(vxm(queueVector, resultVector, null, semiRing, queueVector, adjacencyMatrix, multDesc));
+            checkStatusCode(mxv(queueVector, resultVector, null, semiRing, adjacencyMatrixTransposed, queueVector, multDesc));
 
             nodesInQueue = nvalsVector(queueVector);
         }
@@ -99,15 +95,12 @@ public class BfsNative {
     /**
      * Result entries: 0 -> not found ; else  parent = entry - 1 (result ids indexed by 1)
      */
-    public BfsDenseIntegerResult computeParent(Buffer adjacencyMatrix, int startNode, int maxIterations, int concurrency) {
+    public BfsDenseIntegerResult computeParent(Buffer adjacencyMatrixTransposed, int startNode, int maxIterations, int concurrency) {
         // TODO use `GxB_ANY_SECONDI1_INT64` with SECONDI1 being a `positional binary operator` (GraphBLAS 4.0 feature)
-
-        // assert adj-matrix to be in CSC
-        assert getFormat(adjacencyMatrix) == GxB_BY_COL;
 
         checkStatusCode(setGlobalInt(GxB_NTHREADS, concurrency));
 
-        long nodeCount = nrows(adjacencyMatrix);
+        long nodeCount = nrows(adjacencyMatrixTransposed);
 
         // result vector
         Buffer resultVector = createVector(intType(), nodeCount);
@@ -128,7 +121,7 @@ public class BfsNative {
         // init node vector
         setVectorElementInt(queueVector, startNode, startNode + 1);
 
-        Buffer semiRing = createSemiring(minMonoidInt(), firstBinaryOpInt());
+        Buffer semiRing = createSemiring(minMonoidInt(), secondBinaryOpInt());
 
         Buffer multDesc = createDescriptor();
         // invert the mask
@@ -149,7 +142,6 @@ public class BfsNative {
         // BFS-traversal
         for (; ; iteration++) {
             // v<q> = q, using vector assign with q as the mask
-            // no option to use GrB_ALL -> but ni = nodeCount leads to it being used
             checkStatusCode(
                     assign(resultVector, queueVector, null, queueVector, GrB_ALL, nodeCount, assignDesc)
             );
@@ -161,7 +153,7 @@ public class BfsNative {
             assign(queueVector, queueVector, null, idVector, GrB_ALL, nodeCount, assignDesc);
 
             // q<¬v> = q min.first matrix
-            checkStatusCode(vxm(queueVector, resultVector, null, semiRing, queueVector, adjacencyMatrix, multDesc));
+            checkStatusCode(mxv(queueVector, resultVector, null, semiRing, adjacencyMatrixTransposed, queueVector, multDesc));
 
             nodesInQueue = nvalsVector(queueVector);
         }

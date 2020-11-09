@@ -6,7 +6,11 @@ import org.ejml.data.DMatrixSparseCSC;
 import org.github.florentind.core.ejml.EjmlRelationships;
 import org.github.florentind.core.grapblas_native.NativeMatrixToString;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.neo4j.graphalgo.beta.generator.PropertyProducer;
 import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
@@ -14,16 +18,31 @@ import org.neo4j.graphalgo.beta.generator.RelationshipDistribution;
 import org.neo4j.graphalgo.core.Aggregation;
 
 import java.nio.Buffer;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ToNativMatrixConverterTest {
 
+    @BeforeAll
+    static void setup() {
+        GRBCORE.initNonBlocking();
+    }
+
+    private static Stream<Arguments> matrixFormatAndWeighted() {
+        Stream.Builder<Arguments> builder = Stream.builder();
+        boolean[] values = {true, false};
+        for (int isCsc = 0; isCsc < 2; isCsc++) {
+            for (int weighted = 0; weighted < 2; weighted++) {
+                builder.accept(Arguments.of(values[isCsc], values[weighted]));
+            }
+        }
+        return builder.build();
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void convertFromMatrix(boolean by_col) {
-        GRBCORE.initNonBlocking();
-
         int nodeCount = 3;
         var ejmlMatrix = new DMatrixSparseCSC(nodeCount, nodeCount);
         ejmlMatrix.set(0, 0, 42);
@@ -41,10 +60,8 @@ public class ToNativMatrixConverterTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"false", "true"})
-    void convertFromGraph(boolean weighted) {
-        GRBCORE.initNonBlocking();
-
+    @MethodSource("matrixFormatAndWeighted")
+    void convertFromGraph(boolean by_col, boolean weighted) {
         var graphBuilder = RandomGraphGenerator.builder()
                 .nodeCount(10)
                 .averageDegree(3)
@@ -59,7 +76,7 @@ public class ToNativMatrixConverterTest {
                 .build()
                 .generate();
 
-        Buffer nativeMatrix = ToNativeMatrixConverter.convert(graph);
+        Buffer nativeMatrix = ToNativeMatrixConverter.convert(graph, by_col);
 
         assertEquals(graph.relationshipCount(), GRBCORE.nvalsMatrix(nativeMatrix));
 
@@ -70,5 +87,10 @@ public class ToNativMatrixConverterTest {
             });
             return true;
         });
+    }
+
+    @AfterAll
+    static void teardown() {
+        GRBCORE.grbFinalize();
     }
 }
