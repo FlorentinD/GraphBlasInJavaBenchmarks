@@ -8,7 +8,9 @@ import org.github.florentind.core.ejml.EjmlGraph;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.core.jgrapht.JGraphTConverter;
 import org.github.florentind.graphalgos.pageRank.PageRankEjml;
+import org.github.florentind.graphalgos.pageRank.PageRankGraphalyticsEjml;
 import org.github.florentind.graphalgos.pageRank.PageRankNative;
+import org.github.florentind.graphalgos.pageRank.ResultUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
@@ -23,8 +25,8 @@ import org.neo4j.graphalgo.pagerank.PageRankStreamConfig;
 import org.neo4j.logging.NullLog;
 
 import java.nio.Buffer;
-import java.util.Arrays;
 
+import static org.github.florentind.graphalgos.pageRank.ResultUtil.normalize;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -100,7 +102,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
 
         var result = new PageRankEjml().compute(adjacencyMatrix, DAMPING_FACTOR, TOLERANCE, MAX_ITERATIONS);
 
-        return new ImmutableTriple<>("ejml", result.iterations(), result.result());
+        return new ImmutableTriple<>("ejml", result.iterations(), normalize(result.result()));
     }
 
     Triple<String, Integer, double[]> getGdsResult() {
@@ -120,7 +122,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
 
         pageRank.compute();
 
-        double[] normalizedResult = normalizeResult(pageRank.result().array().toArray());
+        double[] normalizedResult = normalize(pageRank.result().array().toArray());
         return new ImmutableTriple<>("gdsUnweighted", pageRank.iterations(), normalizedResult);
     }
 
@@ -142,13 +144,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
 
         var result = pageRankJob.run();
         String propertyName = "pagerank";
-        double[] normalizedResult = normalizeResult(result.nodeValues().doubleProperties(propertyName).toArray());
+        double[] normalizedResult = normalize(result.nodeValues().doubleProperties(propertyName).toArray());
         return new ImmutableTriple<>("pregel", result.ranIterations(), normalizedResult);
     }
-
-    static double[] normalizeResult(double[] result) {
-        var sum = Arrays.stream(result).sum();
-        return Arrays.stream(result).map(x -> x / sum).toArray();
-    }
-
 }

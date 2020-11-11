@@ -45,7 +45,7 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
 
     @Override
     long nodeCount() {
-        return 10_000;
+        return 30_000;
     }
 
     @Override

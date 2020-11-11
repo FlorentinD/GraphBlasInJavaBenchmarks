@@ -11,16 +11,15 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.nio.Buffer;
 import java.util.stream.Stream;
 
+import static org.github.florentind.graphalgos.pageRank.ResultUtil.normalize;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings({"UnusedMethod"})
 public class WeightedPageRankTest {
-    private static final double DAMPING_FACTOR = PageRankEjml.DEFAULT_DAMPING_FACTOR;
-    private static final float TOLERANCE = PageRankEjml.DEFAULT_TOLERANCE;
-    private static final int MAX_ITERATIONS = PageRankEjml.DEFAULT_MAX_ITERATIONS;
-
-    PageRankEjml pageRank = new PageRankEjml();
+    private static final double DAMPING_FACTOR = PageRankGraphalyticsEjml.DEFAULT_DAMPING_FACTOR;
+    private static final float TOLERANCE = PageRankGraphalyticsEjml.DEFAULT_TOLERANCE;
+    private static final int MAX_ITERATIONS = PageRankGraphalyticsEjml.DEFAULT_MAX_ITERATIONS;
 
     private static Stream<Arguments> weightedGraphs() {
         DMatrixSparseCSC equallyWeighted = new DMatrixSparseCSC(10, 10, 9);
@@ -81,8 +80,8 @@ public class WeightedPageRankTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("weightedGraphs")
-    public void pageRankEjml(String desc, DMatrixSparseCSC adjMatrix, double[] expectedScores) {
-        PageRankResult result = pageRank.computeWeighted(
+    public void pageRankGraphAlyticsEjml(String desc, DMatrixSparseCSC adjMatrix, double[] expectedScores) {
+        PageRankResult result = new PageRankGraphalyticsEjml().computeWeighted(
                 adjMatrix,
                 DAMPING_FACTOR,
                 TOLERANCE,
@@ -95,7 +94,23 @@ public class WeightedPageRankTest {
         assertArrayEquals(expectedScores, result.result(), 1e-2f);
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("weightedGraphs")
+    public void pageRankEjml(String desc, DMatrixSparseCSC adjMatrix, double[] expectedScores) {
+        PageRankResult result = new PageRankEjml().computeWeighted(
+                adjMatrix,
+                DAMPING_FACTOR,
+                TOLERANCE,
+                MAX_ITERATIONS
+        );
+
+
+        assertEquals(20, result.iterations());
+        // other tolerance as maxIterations reached and not tolerance
+        assertArrayEquals(expectedScores, normalize(result.result()), 1e-2f);
+    }
+
+    @ParameterizedTest(name = "{0}")
     @MethodSource("weightedGraphs")
     public void pageRankNative(String desc, DMatrixSparseCSC adjMatrix, double[] expectedScores) {
         GRBCORE.initNonBlocking();

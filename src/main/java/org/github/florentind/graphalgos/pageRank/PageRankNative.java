@@ -27,8 +27,7 @@ public class PageRankNative {
      * @return pr-scores (sum of all scores = 1)
      */
     public static PageRankResult compute(Buffer adjacencyMatrix, double dampingFactor, double tolerance, int maxIterations, int concurrency) {
-        // assert adj-matrix to be in CSC
-        assert getFormat(adjacencyMatrix) == GxB_BY_COL;
+
         setGlobalInt(GxB_NTHREADS, concurrency);
 
         long nodeCount = ncols(adjacencyMatrix);
@@ -142,8 +141,7 @@ public class PageRankNative {
     //  no trick for getting outdegree needed
     //  no division through outdegree but normalising weights
     public static PageRankResult computeWeighted(Buffer adjacencyMatrix, double dampingFactor, double tolerance, int maxIterations, int concurrency) {
-        // assert adj-matrix to be in CSC
-        assert getFormat(adjacencyMatrix) == GxB_BY_COL;
+
         setGlobalInt(GxB_NTHREADS, concurrency);
 
         long nodeCount = ncols(adjacencyMatrix);
