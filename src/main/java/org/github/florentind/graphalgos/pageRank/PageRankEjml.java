@@ -1,8 +1,6 @@
 package org.github.florentind.graphalgos.pageRank;
 
 import org.ejml.data.DMatrixSparseCSC;
-import org.ejml.masks.DMasks;
-import org.ejml.masks.PrimitiveDMask;
 import org.ejml.ops.CommonOps_DArray;
 import org.ejml.ops.DMonoids;
 import org.ejml.ops.DSemiRings;
@@ -57,14 +55,10 @@ public class PageRankEjml {
             //
 
             // Divide previous PageRank with number of outbound edges
-            // Difference to reference: need to use nonDanglingNodesMask here to avoid division by 0
             // Reason: outDegrees vector would be sparse in other GraphBLAS implementations (here always dense)
             // ! this should only be done if outDegree != 0?
             //  (otherwise division through 0, but result is ignored in next mult-op either way) (assume mask overhead is higher than gain)
             CommonOps_DArray.elementWiseMult(pr, outDegrees, pr, (a, b) -> a / b);
-
-            // Multiply importance by damping factor
-            CommonOps_DArray.apply(pr, i -> i * dampingFactor);
 
             // Calculate total PR of all inbound nodes
             //  --> importanceResultVec (instead of allocating a new result array per iteration)
@@ -86,9 +80,7 @@ public class PageRankEjml {
 
             //
             // PageRank summarization
-            // Add teleport and importanceVec
-            //
-            CommonOps_DArray.apply(pr, score -> score + teleport);
+            CommonOps_DArray.apply(pr, score -> score * dampingFactor + teleport);
 
             // calculate diff (for tolerance check)
             CommonOps_DArray.elementWiseMult(prevResult, pr, prevResult, (a,b) -> a - b);
@@ -152,9 +144,6 @@ public class PageRankEjml {
             // Importance calculation
             //
 
-            // Multiply prev pr by damping factor and save into importanceVec
-            CommonOps_DArray.apply(pr, i -> i * dampingFactor);
-
             // Calculate total PR of all inbound nodes
             // !! Difference to reference: input vector must be different to initial output vector (otherwise dirty reads) for `mult`
             //  --> importanceResultVec (instead of allocating a new result array per iteration)
@@ -176,8 +165,7 @@ public class PageRankEjml {
 
             //
             // PageRank summarization
-            // Add teleport
-            CommonOps_DArray.apply(pr, score -> score + teleport);
+            CommonOps_DArray.apply(pr, score -> score * dampingFactor + teleport);
 
 
             // !! Difference to reference: no tolerance contained
