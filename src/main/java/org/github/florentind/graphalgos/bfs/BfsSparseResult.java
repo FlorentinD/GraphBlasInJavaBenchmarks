@@ -25,6 +25,11 @@ public class BfsSparseResult implements BfsResult {
 
     @Override
     public double get(int nodeId) {
+        // to speed up test
+        if (!result.isIndicesSorted()) {
+            result.sortIndices();
+        }
+
         return result.get(nodeId, notFoundValue);
     }
 
