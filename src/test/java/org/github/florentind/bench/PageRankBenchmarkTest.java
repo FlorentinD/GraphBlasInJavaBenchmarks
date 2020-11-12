@@ -93,7 +93,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
         GRBCORE.grbFinalize();
 
         assertEquals(goldStandard.getMiddle(), nativeResult.iterations());
-        assertArrayEquals(goldStandard.getRight(), nativeResult.result(), 1e-2);
+        assertArrayEquals(goldStandard.getRight(), normalize(nativeResult.result()), 1e-2);
     }
 
     Triple<String, Integer, double[]> getEjmlResult() {

@@ -127,7 +127,7 @@ public class WeightedPageRankTest {
 
         assertEquals(20, result.iterations());
         // other tolerance as maxIterations reached and not tolerance
-        assertArrayEquals(expectedScores, result.result(), 1e-2f);
+        assertArrayEquals(expectedScores, normalize(result.result()), 1e-2f);
 
         GRBCORE.grbFinalize();
     }

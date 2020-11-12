@@ -113,7 +113,7 @@ public class PageRankTest {
 
         assertEquals(20, result.iterations());
         // other tolerance as maxIterations reached and not tolerance
-        assertArrayEquals(expected, result.result(), 1e-2f);
+        assertArrayEquals(expected, normalize(result.result()), 1e-2f);
 
         GRBCORE.grbFinalize();
     }

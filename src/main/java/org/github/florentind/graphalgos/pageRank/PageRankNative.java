@@ -8,7 +8,6 @@ import static com.github.fabianmurariu.unsafe.GRBCORE.*;
 import static com.github.fabianmurariu.unsafe.GRBMONOID.*;
 import static com.github.fabianmurariu.unsafe.GRBOPSMAT.*;
 import static com.github.fabianmurariu.unsafe.GRBOPSVEC.assign;
-import static com.github.fabianmurariu.unsafe.GRBOPSVEC.extract;
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 
 public class PageRankNative {
@@ -49,9 +48,6 @@ public class PageRankNative {
         Buffer plusSecondSemiring = createSemiring(plusMonoidLong(), secondBinaryOpLong());
        checkStatusCode(mxv(dOut, null, null, plusSecondSemiring, adjacencyMatrix, tmp_one_array, null));
 
-        Buffer importanceVec = createVector(doubleType(), nodeCount);
-        Buffer danglingVec = createVector(doubleType(), nodeCount);
-
         Buffer pr = createVector(doubleType(), nodeCount);
         Buffer prevResult = createVector(doubleType(), nodeCount);
         checkStatusCode(assignVectorDouble(pr, null, null, 1.0 / nodeCount, GrB_ALL, nodeCount, null));
@@ -74,43 +70,27 @@ public class PageRankNative {
             // Importance calculation
             //
 
-            // Divide previous PageRank with number of outbound edges
-            checkStatusCode(
-                    elemWiseMulIntersectBinOp(importanceVec, null, null, divBinaryOpDouble(), pr, dOut, null)
-            );
-
             // Multiply importance by damping factor
             checkStatusCode(
-                    assignVectorDouble(importanceVec, null, timesBinaryOpDouble(), dampingFactor, GrB_ALL, nodeCount, null)
+                    assignVectorDouble(pr, null, timesBinaryOpDouble(), dampingFactor, GrB_ALL, nodeCount, null)
             );
 
-
+            // Divide previous PageRank with number of outbound edges
+            checkStatusCode(
+                    elemWiseMulIntersectBinOp(pr, null, null, divBinaryOpDouble(), pr, dOut, null)
+            );
 
             // Calculate total PR of all inbound vertices
-            checkStatusCode(vxm(importanceVec, null, null, plusFirstSemiring, importanceVec, adjacencyMatrix, null));
-
-            //
-            // Dangling calculation
-            //
-
-            // Extract all the dangling PR entries from the previous result
-            checkStatusCode(extract(danglingVec, dOut, null, pr, GrB_ALL, nodeCount, invertedMask));
-
-            // Sum the previous PR values of dangling vertices together
-            double danglingSum = vectorReduceAllDouble(0.0, null, plusMonoidDouble(), danglingVec, null);
-
-            // Multiply by damping factor and 1 / |V|
-            danglingSum *= (dampingFactor / nodeCount);
+            checkStatusCode(vxm(pr, null, null, plusFirstSemiring, pr, adjacencyMatrix, null));
 
 
             //
             // PageRank summarization
-            // Add teleport, importanceVec, and danglingVec components together
-            //
-            checkStatusCode(assignVectorDouble(pr, null, null, (teleport + danglingSum), GrB_ALL, nodeCount, null));
-
+            //  importance + teleport
             checkStatusCode(
-                    elemWiseAddUnionMonoid(pr, null, null, plusMonoidDouble(), pr, importanceVec, null));
+                    assignVectorDouble(pr, null, plusBinaryOpDouble(), teleport, GrB_ALL, nodeCount, null)
+            );
+
 
             // Calculate result difference
             checkStatusCode(elemWiseAddUnionBinOp(prevResult, null, null, minusBinaryOpDouble(), prevResult, pr, null));
@@ -125,8 +105,6 @@ public class PageRankNative {
 
         freeVector(dOut);
         freeVector(tmp_one_array);
-        freeVector(importanceVec);
-        freeVector(danglingVec);
         freeVector(pr);
         freeVector(prevResult);
         freeDescriptor(invertedMask);
@@ -176,8 +154,6 @@ public class PageRankNative {
                 mxm(sumOutWeightsDia, null, null, anyDivSemiRing, sumOutWeightsDia, adjacencyMatrix, null));
         adjacencyMatrix = sumOutWeightsDia;
 
-        Buffer importanceVec = createVector(doubleType(), nodeCount);
-        Buffer danglingVec = createVector(doubleType(), nodeCount);
 
         Buffer pr = createVector(doubleType(), nodeCount);
         Buffer prevResult = createVector(doubleType(), nodeCount);
@@ -201,41 +177,22 @@ public class PageRankNative {
             // Importance calculation
             //
 
-
-            // unweighted would divide here by degree
-            checkStatusCode(assign(importanceVec, null, secondBinaryOpDouble(), pr, GrB_ALL, nodeCount, null));
-
             // Multiply importance by damping factor
-            checkStatusCode(assignVectorDouble(importanceVec, null, timesBinaryOpDouble(), dampingFactor, GrB_ALL, nodeCount, null));
+            checkStatusCode(
+                    assignVectorDouble(pr, null, timesBinaryOpDouble(), dampingFactor, GrB_ALL, nodeCount, null)
+            );
 
             // Calculate total PR of all inbound vertices
             // using plusFirst, as nz adj. matrix values are always 1
             checkStatusCode(
-                    vxm(importanceVec, null, null, plusTimesSemiring, importanceVec, adjacencyMatrix, null)
+                    vxm(pr, null, null, plusTimesSemiring, pr, adjacencyMatrix, null)
             );
-
-
-            //
-            // Dangling calculation
-            //
-
-            // Extract all the dangling PR entries from the previous result
-            checkStatusCode(extract(danglingVec, sumOutWeights, null, pr, GrB_ALL, nodeCount, invertedMask));
-
-            // Sum the previous PR values of dangling vertices together
-            double danglingSum = vectorReduceAllDouble(0.0, null, plusMonoidDouble(), danglingVec, null);
-
-            // Multiply by damping factor and 1 / |V|
-            danglingSum *= (dampingFactor / nodeCount);
-
 
             //
             // PageRank summarization
-            // Add teleport, importanceVec, and danglingVec components together
-            //
-            checkStatusCode(assignVectorDouble(pr, null, null, (teleport + danglingSum), GrB_ALL, nodeCount, null));
+            //  importance + teleport
+            checkStatusCode(assignVectorDouble(pr, null, plusBinaryOpDouble(), teleport, GrB_ALL, nodeCount, null));
 
-            checkStatusCode(elemWiseAddUnionMonoid(pr, null, null, plusMonoidDouble(), pr, importanceVec, null));
 
             // Calculate result difference
             checkStatusCode(elemWiseAddUnionBinOp(prevResult, null, null, minusBinaryOpDouble(), prevResult, pr, null));
@@ -250,8 +207,6 @@ public class PageRankNative {
         checkStatusCode(extractVectorTuplesDouble(pr, values, indices));
 
         freeVector(sumOutWeights);
-        freeVector(importanceVec);
-        freeVector(danglingVec);
         freeVector(pr);
         freeVector(prevResult);
         freeDescriptor(invertedMask);
