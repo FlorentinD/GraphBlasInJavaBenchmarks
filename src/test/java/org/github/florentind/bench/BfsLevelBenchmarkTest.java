@@ -1,9 +1,7 @@
 package org.github.florentind.bench;
 
 import com.github.fabianmurariu.unsafe.GRBCORE;
-import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
-import org.github.florentind.core.ejml.EjmlUtil;
 import org.github.florentind.core.grapblas_native.NativeHelper;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.graphalgos.bfs.BfsDenseDoubleResult;
@@ -36,6 +34,11 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
     long nodeCount() {
         return NODE_COUNT;
     }
+
+//    @Override
+//    Orientation orientation() {
+//        return Orientation.UNDIRECTED;
+//    }
 
     @Override
     long avgDegree() {

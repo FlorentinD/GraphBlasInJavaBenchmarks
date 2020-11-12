@@ -1,6 +1,7 @@
 package org.github.florentind.bench;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.neo4j.graphalgo.Orientation;
 import org.neo4j.graphalgo.api.CSRGraph;
 import org.neo4j.graphalgo.beta.generator.PropertyProducer;
 import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
@@ -17,6 +18,14 @@ public abstract class BaseBenchmarkTest {
 
     abstract long avgDegree();
 
+    Orientation orientation() {
+        return Orientation.NATURAL;
+    }
+
+    long seed = 42L;
+    Aggregation aggregation = Aggregation.MAX;
+    RandomGraphGeneratorConfig.AllowSelfLoops allowSelfLoops = RandomGraphGeneratorConfig.AllowSelfLoops.NO;
+    RelationshipDistribution relationshipDistribution = RelationshipDistribution.POWER_LAW;
     PropertyProducer relationshipPropertyProducer() {
         return null;
     }
@@ -29,11 +38,12 @@ public abstract class BaseBenchmarkTest {
         RandomGraphGeneratorBuilder builder = RandomGraphGenerator.builder()
                 .nodeCount(nodeCount())
                 .averageDegree(avgDegree())
-                .seed(42L)
-                .aggregation(Aggregation.MAX)
+                .seed(seed)
+                .aggregation(aggregation)
                 .allocationTracker(AllocationTracker.empty())
-                .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.NO)
-                .relationshipDistribution(RelationshipDistribution.POWER_LAW);
+                .orientation(orientation())
+                .allowSelfLoops(allowSelfLoops)
+                .relationshipDistribution(relationshipDistribution);
 
         if (relationshipPropertyProducer() != null) {
             builder.relationshipPropertyProducer(relationshipPropertyProducer());

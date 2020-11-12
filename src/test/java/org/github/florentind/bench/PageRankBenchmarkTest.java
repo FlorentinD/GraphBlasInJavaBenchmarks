@@ -49,6 +49,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
 
     Triple<String, Integer, double[]> goldStandard;
 
+    @Override
     @BeforeEach
     public void setup() {
         super.setup();

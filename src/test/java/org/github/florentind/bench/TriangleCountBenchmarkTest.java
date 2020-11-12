@@ -53,6 +53,11 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
         return 4;
     }
 
+    @Override
+    Orientation orientation() {
+        return Orientation.UNDIRECTED;
+    }
+
     EjmlGraph ejmlGraph;
 
     TriangleCountResult expected;
@@ -61,18 +66,7 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
     @Override
     @BeforeEach
     void setup() {
-        GdsEdition.instance().setToEnterpriseEdition();
-        graph = RandomGraphGenerator.builder()
-                .nodeCount(nodeCount())
-                .averageDegree(avgDegree())
-                .seed(42L)
-                .aggregation(Aggregation.MAX)
-                .allocationTracker(AllocationTracker.empty())
-                .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.NO)
-                .relationshipDistribution(RelationshipDistribution.POWER_LAW)
-                .orientation(Orientation.UNDIRECTED)
-                .build().generate();
-
+        super.setup();
 
         ejmlGraph = EjmlGraph.create(graph);
 
