@@ -89,6 +89,36 @@ public class ToNativMatrixConverterTest {
         });
     }
 
+    @ParameterizedTest
+    @MethodSource("matrixFormatAndWeighted")
+    void convertEdgeWiseFromGraph(boolean by_col, boolean weighted) {
+        var graphBuilder = RandomGraphGenerator.builder()
+                .nodeCount(10)
+                .averageDegree(3)
+                .aggregation(Aggregation.SINGLE)
+                .relationshipDistribution(RelationshipDistribution.POWER_LAW);
+
+        if (weighted) {
+            graphBuilder.relationshipPropertyProducer(PropertyProducer.fixed("weight", 42.42));
+        }
+
+        var graph = graphBuilder
+                .build()
+                .generate();
+
+        Buffer nativeMatrix = ToNativeMatrixConverter.convertEdgeWise(graph, by_col);
+
+        assertEquals(graph.relationshipCount(), GRBCORE.nvalsMatrix(nativeMatrix));
+
+        graph.forEachNode(node -> {
+            graph.forEachRelationship(node, EjmlRelationships.DEFAULT_RELATIONSHIP_PROPERTY, (src, trg, weight) -> {
+                assertEquals(weight, GRAPHBLAS.getMatrixElementDouble(nativeMatrix, src, trg)[0]);
+                return true;
+            });
+            return true;
+        });
+    }
+
     @AfterAll
     static void teardown() {
         GRBCORE.grbFinalize();

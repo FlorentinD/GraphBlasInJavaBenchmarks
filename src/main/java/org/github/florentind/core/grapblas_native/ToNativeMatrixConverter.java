@@ -68,6 +68,7 @@ public class ToNativeMatrixConverter {
     }
 
     /**
+     * Using batch-insert via arrays
      * @param graph  Input graph
      * @param by_col true -> CSC matrix, else CSR matrix
      * @return Pointer to the GraphBLAS matrix object
@@ -125,6 +126,48 @@ public class ToNativeMatrixConverter {
 
             long statusCode = GRAPHBLAS.buildMatrixFromTuplesBoolean(resultMatrix, rowIds, colIds, values, relCount, GRAPHBLAS.firstBinaryOpDouble());
             assert statusCode == GRBCORE.GrB_SUCCESS : "Status code was: " + statusCode + " Did you call GrB.init()?";
+        }
+
+        return resultMatrix;
+    }
+
+    /**
+     * Using setElement .. e.g. no intermediate arrays needed
+     * @param graph  Input graph
+     * @param by_col true -> CSC matrix, else CSR matrix
+     * @return Pointer to the GraphBLAS matrix object
+     */
+    public static Buffer convertEdgeWise(Graph graph, boolean by_col) {
+        if (by_col) {
+            GRBCORE.setGlobalInt(GRBCORE.GxB_FORMAT, GRBCORE.GxB_BY_COL);
+        } else {
+            GRBCORE.setGlobalInt(GRBCORE.GxB_FORMAT, GRBCORE.GxB_BY_ROW);
+        }
+
+        int nodeCount = Math.toIntExact(graph.nodeCount());
+        Buffer resultMatrix;
+
+        if (graph.hasRelationshipProperty()) {
+            resultMatrix = GRBCORE.createMatrix(GRAPHBLAS.doubleType(), nodeCount, nodeCount);
+
+            graph.forEachNode(node -> {
+                graph.forEachRelationship(node, EjmlRelationships.DEFAULT_RELATIONSHIP_PROPERTY, (src, trg, weight) -> {
+                    GRAPHBLAS.setMatrixElementDouble(resultMatrix, src, trg, weight);
+                    return true;
+                });
+                return true;
+            });
+        } else {
+            // unweighted case -> boolean matrix entries are sufficient
+            resultMatrix = GRBCORE.createMatrix(GRAPHBLAS.booleanType(), nodeCount, nodeCount);
+
+            graph.forEachNode(node -> {
+                graph.forEachRelationship(node, (src, trg) -> {
+                    GRAPHBLAS.setMatrixElementBoolean(resultMatrix, src, trg, true);
+                    return true;
+                });
+                return true;
+            });
         }
 
         return resultMatrix;
