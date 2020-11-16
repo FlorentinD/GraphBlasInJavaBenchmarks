@@ -19,7 +19,6 @@
  */
 package org.github.florentind.core.ejml;
 
-import com.carrotsearch.hppc.BitSet;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.data.DMatrixSparseTriplet;
 import org.ejml.ops.ConvertDMatrixStruct;
@@ -27,6 +26,7 @@ import org.neo4j.graphalgo.annotation.ValueClass;
 import org.neo4j.graphalgo.api.CSRGraph;
 import org.neo4j.graphalgo.api.Relationships;
 
+import java.util.BitSet;
 
 import static org.neo4j.graphalgo.utils.StringFormatting.formatWithLocale;
 
@@ -54,16 +54,18 @@ public interface EjmlRelationships {
             Math.toIntExact(relationships.elementCount())
         );
 
+        BitSet targetIds = new BitSet(nodeCount);
         graph.forEachNode((id) -> {
-            BitSet targetIds = new BitSet(nodeCount);
+            targetIds.clear();
 
             graph.forEachRelationship(id, DEFAULT_RELATIONSHIP_PROPERTY, (src, trg, weight) -> {
                 int srcIntId = Math.toIntExact(src);
                 int trgIntId = Math.toIntExact(trg);
 
-                if (!targetIds.getAndSet(trgIntId)) {
+                if (!targetIds.get(trgIntId)) {
                     // saving as reversed as accessing the CSC format is made for accessing column wise (normally incoming rels)
                     tripleStore.addItem(trgIntId, srcIntId, weight);
+                    targetIds.set(trgIntId);
                 } else {
                     throw new IllegalArgumentException(
                         formatWithLocale(

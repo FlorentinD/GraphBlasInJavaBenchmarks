@@ -26,7 +26,7 @@ import static com.github.fabianmurariu.unsafe.GRBCORE.*;
 @Fork(value = 1, warmups = 2)
 public class ToMatrixBenchmark {
 
-    @Param({"100000"})
+    @Param({"1000000"})
     int nodeCount;
 
     @Param({"2", "4", "8"})
