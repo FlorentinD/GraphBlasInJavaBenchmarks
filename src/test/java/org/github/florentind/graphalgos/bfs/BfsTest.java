@@ -69,7 +69,7 @@ public class BfsTest {
     @ParameterizedTest
     @MethodSource("bfsVariantSource")
     public void testDenseEjmlVariations(BfsVariation variation, double[] expected) {
-        var result = bfs.computeDense(inputMatrixTransposed, variation, START_NODE, MAX_ITERATIONS);
+        var result = bfs.computeDense(CommonOps_DSCC.transpose(inputMatrixTransposed, null, null), variation, START_NODE, MAX_ITERATIONS);
 
         assertBfsResult(expected, result);
         assertEquals(EXPECTED_ITERATIONS, result.iterations());

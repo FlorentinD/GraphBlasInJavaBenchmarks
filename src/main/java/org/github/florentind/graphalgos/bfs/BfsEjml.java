@@ -11,7 +11,6 @@ import org.ejml.ops.*;
 import org.ejml.sparse.csc.CommonOpsWithSemiRing_DSCC;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.ejml.sparse.csc.CommonVectorOps_DSCC;
-import org.ejml.sparse.csc.MaskUtil_DSCC;
 import org.ejml.sparse.csc.mult.MatrixVectorMultWithSemiRing_DSCC;
 import org.github.florentind.core.ejml.EjmlUtil;
 
@@ -23,13 +22,14 @@ import static org.github.florentind.core.ejml.EjmlUtil.FIRST_PAIR;
 public class BfsEjml {
     // iteration-result needed, as mult cannot write into the same object in ejml
 
-      public BfsDenseDoubleResult computeDense(DMatrixSparseCSC adjacencyMatrixTransposed, BfsVariation bfsVariation, int startNode, int maxIterations) {
-        int nodeCount = adjacencyMatrixTransposed.numCols;
+        // ! as dense -> always using vxm instead of mxv
+      public BfsDenseDoubleResult computeDense(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int startNode, int maxIterations) {
+        int nodeCount = adjacencyMatrix.numCols;
         // if the inputVector entry is not zero -> return true (sparse adjacency matrix -> entry exists == true)
-        DBinaryOperator secondNotZero = (a, b) -> (b != 0) ? 1 : 0;
+        DBinaryOperator firstNotZero = (a, b) -> (a != 0) ? 1 : 0;
         // as dense here: cannot use FIRST/ANY instead of OR
-        DSemiRing levelSemiRing = new DSemiRing(DMonoids.OR, secondNotZero);
-        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_SECOND : levelSemiRing;
+        DSemiRing levelSemiRing = new DSemiRing(DMonoids.OR, firstNotZero);
+        DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : levelSemiRing;
         double[] result = new double[nodeCount];
         Arrays.fill(result, semiRing.add.id);
 
@@ -58,8 +58,7 @@ public class BfsEjml {
                 CommonOps_DArray.assignScalar(result, iteration, resultMask);
             } else {
                 // parents version
-                // TODO also use an assign/add?
-                result = MaskUtil_DSCC.combineOutputs(result, inputVector, mask, null, true);
+                result = CommonOps_DArray.assign(result, inputVector, mask);
             }
 
             visitedNodes += nodesInQueue;
@@ -69,8 +68,8 @@ public class BfsEjml {
                 CommonOps_DArray.applyIdx(inputVector, inputVector, (idx, val) -> (val != semiRing.add.id) ? idx + 1 : val);
             }
 
-            // mxv
-            iterationResult = MatrixVectorMultWithSemiRing_DSCC.mult(adjacencyMatrixTransposed, inputVector, iterationResult, semiRing, mask, null, true);
+            // ! vxm
+            iterationResult = MatrixVectorMultWithSemiRing_DSCC.mult(inputVector, adjacencyMatrix, iterationResult, semiRing, mask, null, true);
 
             // switch pointers as iterationResult is the inputVector for next iteration
             tmp = iterationResult;

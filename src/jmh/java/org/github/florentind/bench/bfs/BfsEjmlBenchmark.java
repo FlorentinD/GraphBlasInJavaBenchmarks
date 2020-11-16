@@ -1,6 +1,7 @@
 package org.github.florentind.bench.bfs;
 
 import org.ejml.data.DMatrixSparseCSC;
+import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.graphalgos.bfs.BfsEjml;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
@@ -13,12 +14,14 @@ public class BfsEjmlBenchmark extends BfsBaseBenchmark {
     private int concurrency;
 
     private DMatrixSparseCSC transposedMatrix;
+    private DMatrixSparseCSC matrix;
 
     @Override
     @Setup
     public void setup() {
         super.setup();
         transposedMatrix = graph.matrix();
+        matrix = CommonOps_DSCC.transpose(transposedMatrix, null, null);
     }
 
     @Benchmark
@@ -43,12 +46,12 @@ public class BfsEjmlBenchmark extends BfsBaseBenchmark {
 
     @org.openjdk.jmh.annotations.Benchmark
     public void ejmlDenseBfsLevel(Blackhole bh) {
-        bh.consume(new BfsEjml().computeDense(transposedMatrix, BfsEjml.BfsVariation.LEVEL, startNode, maxIterations));
+        bh.consume(new BfsEjml().computeDense(matrix, BfsEjml.BfsVariation.LEVEL, startNode, maxIterations));
     }
 
     @org.openjdk.jmh.annotations.Benchmark
     public void ejmlDenseBfsParent(Blackhole bh) {
-        bh.consume(new BfsEjml().computeDense(transposedMatrix, BfsEjml.BfsVariation.PARENTS, startNode, maxIterations));
+        bh.consume(new BfsEjml().computeDense(matrix, BfsEjml.BfsVariation.PARENTS, startNode, maxIterations));
     }
 
     // TODO add MSBFS benchmark

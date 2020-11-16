@@ -2,6 +2,7 @@ package org.github.florentind.bench;
 
 import com.github.fabianmurariu.unsafe.GRBCORE;
 import com.github.fabianmurariu.unsafe.GRBOPSMAT;
+import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
 import org.github.florentind.core.grapblas_native.NativeHelper;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
@@ -128,7 +129,7 @@ public class BfsParentBenchmarkTest extends BaseBenchmarkTest {
     }
 
     private BfsResult getEjmlDenseResult(EjmlGraph ejmlGraph, int startNode) {
-        return new BfsEjml().computeDense(ejmlGraph.matrix(), BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
+        return new BfsEjml().computeDense(CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null), BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getEjmlDenseSparseResult(EjmlGraph ejmlGraph, int startNode) {

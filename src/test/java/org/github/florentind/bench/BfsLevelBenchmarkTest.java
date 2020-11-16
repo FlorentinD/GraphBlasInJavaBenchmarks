@@ -1,6 +1,7 @@
 package org.github.florentind.bench;
 
 import com.github.fabianmurariu.unsafe.GRBCORE;
+import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
 import org.github.florentind.core.grapblas_native.NativeHelper;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
@@ -10,6 +11,7 @@ import org.github.florentind.graphalgos.bfs.BfsNative;
 import org.github.florentind.graphalgos.bfs.BfsResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.neo4j.graphalgo.Orientation;
 import org.neo4j.graphalgo.api.Graph;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.PregelComputation;
@@ -35,10 +37,10 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
         return NODE_COUNT;
     }
 
-//    @Override
-//    Orientation orientation() {
-//        return Orientation.UNDIRECTED;
-//    }
+    @Override
+    Orientation orientation() {
+        return Orientation.UNDIRECTED;
+    }
 
     @Override
     long avgDegree() {
@@ -55,6 +57,9 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
         ejmlGraph = EjmlGraph.create(graph);
         goldStandard = getJniResult(ejmlGraph, START_NODE);
 
+//        System.out.println(GraphStatistics.degreeDistribution(ejmlGraph).toString());
+//        HugeLongArray components = new SccAlgorithm(ejmlGraph, AllocationTracker.empty()).compute();
+//        System.out.println("components.size() = " + LongStream.range(0, (int) nodeCount()).map(components::get).distinct().count());
         System.out.println("goldStandard.iterations() = " + goldStandard.iterations());
         System.out.println("goldStandard.nodesVisited() = " + goldStandard.nodesVisited());
     }
@@ -130,7 +135,7 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
     }
 
     private BfsResult getEjmlDenseResult(EjmlGraph ejmlGraph, int startNode) {
-        return new BfsEjml().computeDense(ejmlGraph.matrix(), BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
+        return new BfsEjml().computeDense(CommonOps_DSCC.transpose(ejmlGraph.matrix(), null, null), BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS);
     }
 
     private BfsResult getEjmlDenseSparseResult(EjmlGraph ejmlGraph, int startNode) {
