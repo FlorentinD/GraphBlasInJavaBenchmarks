@@ -133,6 +133,8 @@ public class ToNativeMatrixConverter {
 
     /**
      * Using setElement .. e.g. no intermediate arrays needed
+     * ! really slow !
+     *
      * @param graph  Input graph
      * @param by_col true -> CSC matrix, else CSR matrix
      * @return Pointer to the GraphBLAS matrix object
