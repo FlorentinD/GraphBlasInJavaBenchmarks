@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class MatrixOpsBaseBenchmark {
     protected DMatrixSparseCSC matrix;
 
-    @Param({"100000","1000000"})
+    @Param({"100000", "500000", "1000000"})
     private int dimension;
 
     // TODO also scale avgEntriesPerColumn?
@@ -28,12 +28,8 @@ public abstract class MatrixOpsBaseBenchmark {
     @Param({"UNIFORM"})
     private String degreeDistribution;
 
-    @Param({"true", "false"})
-    private boolean matrixIndicesSorted;
-
     @Setup
     public void setup() {
         matrix = RandomMatrices_DSCC.generateUniform(dimension, dimension, avgEntriesPerColumn, 1, 2, new Random(42));
-        matrix.indicesSorted = matrixIndicesSorted;
     }
 }

@@ -56,7 +56,7 @@ public class EjmlGraphBaseBenchmark {
 
         graph = EjmlGraph.create(hugeGraph);
 
-        // for usage of higher concurrencies in gds benchmarks
+        // for usage of higher concurrency in gds benchmarks
         GdsEdition.instance().setToEnterpriseEdition();
 
 

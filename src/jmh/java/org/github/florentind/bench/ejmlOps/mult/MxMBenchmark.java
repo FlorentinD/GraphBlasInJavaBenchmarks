@@ -20,12 +20,12 @@ public class MxMBenchmark extends MxMBaseBenchmark {
     protected static final String OR_TIMES = "Or, Times";
     protected static final String PLUS_FIRST = "Plus, First";
     protected static final String PLUS_BFIRST = "Plus, Boolean-First";
-    protected static final String PLUS_PAIR = "Plus, Pair";
+    protected static final String OR_PAIR = "Or, Pair";
     protected static final String MIN_MAX = "Min, Max";
     protected static final String NONE = "Plus, Times (inlined)";
 
 
-    HashMap<String, DSemiRing> semiRings = new HashMap<>() {{
+    protected static final HashMap<String, DSemiRing> semiRings = new HashMap<>() {{
         put(PLUS_TIMES, DSemiRings.PLUS_TIMES);
         put(OR_AND, DSemiRings.OR_AND);
         put(PLUS_AND, new DSemiRing(DMonoids.PLUS, DMonoids.AND));
@@ -33,18 +33,18 @@ public class MxMBenchmark extends MxMBaseBenchmark {
         put(PLUS_FIRST, DSemiRings.PLUS_FIRST);
         put(MIN_MAX, DSemiRings.MIN_MAX);
         put(PLUS_BFIRST, new DSemiRing(DMonoids.PLUS, (x,y) -> (x == 0) ? 0 : 1 ));
-        put(PLUS_PAIR, new DSemiRing(DMonoids.PLUS, (x, y) -> 1));
+        put(OR_PAIR, new DSemiRing(DMonoids.OR, (x, y) -> 1));
     }};
 
-    @Param({NONE, PLUS_TIMES, PLUS_AND, PLUS_FIRST, PLUS_BFIRST, PLUS_PAIR, OR_TIMES, OR_AND, MIN_MAX})
-    private String semiRing;
+    @Param({NONE, PLUS_TIMES, OR_PAIR, OR_AND, MIN_MAX})
+    protected String semiRingName;
 
     @Benchmark
     public void mxm(Blackhole bh) {
-        if (semiRing.equals(NONE)) {
+        if (semiRingName.equals(NONE)) {
             CommonOps_DSCC.mult(matrix, matrix, result);
         } else {
-            CommonOpsWithSemiRing_DSCC.mult(matrix, matrix, result, semiRings.get(semiRing), null, null, true);
+            CommonOpsWithSemiRing_DSCC.mult(matrix, matrix, result, semiRings.get(semiRingName), null, null, true);
         }
         bh.consume(result);
     }

@@ -11,10 +11,6 @@ import org.openjdk.jmh.infra.Blackhole;
 public class WeightedPageRankJGraphTBenchmark extends WeightedPageRankBaseBenchmark {
     Graph jGraph;
 
-    // JGraphT is too slow at 3 million nodes?
-    @Param({"300000"})
-    int nodeCount;
-
     @Setup
     public void setup() {
         super.setup();

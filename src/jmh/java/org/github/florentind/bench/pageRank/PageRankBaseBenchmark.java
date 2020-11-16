@@ -1,6 +1,7 @@
 package org.github.florentind.bench.pageRank;
 
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.github.florentind.bench.EjmlGraphBaseBenchmark;
 import org.neo4j.graphalgo.api.CSRGraph;
 import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
@@ -10,26 +11,41 @@ import org.neo4j.graphalgo.core.Aggregation;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.openjdk.jmh.annotations.Param;
 
+import java.util.HashMap;
+
 public class PageRankBaseBenchmark extends EjmlGraphBaseBenchmark {
-    @Param({"300000", "3000000"})
-    int nodeCount;
+    static HashMap<String, Pair<Integer, Integer>> nodeCountIterationsPairs = new HashMap<>() {{
+        put("0.1M,20", Pair.of(100_000, 20));
+        put("0.5M,20", Pair.of(500_000, 20));
+        put("1M,20", Pair.of(1_000_000, 20));
+        put("5M,20", Pair.of(5_000_000, 20));
+        put("1M,5", Pair.of(1_000_000, 5));
+        put("1M,10", Pair.of(1_000_000, 10));
+        put("1M,15", Pair.of(1_000_000, 15));
+    }};
+
+    @Param({"0.1M,20", "0.5M,20", "1M,20", "5M,20", "1M,5", "1M,10", "1M,15"})
+    protected String nodeCountIterationCombinations;
+
+    protected int nodeCount;
 
     @Param({"4"})
-    int avgDegree;
+    protected int avgDegree;
 
-
-    // TODO: scale maxIterations (! need to make sure none terminates earlier .. f.i. via a high tolerance)
-    @Param({"20"})
     protected int maxIterations;
 
     @Param({"0.85"})
     protected float dampingFactor;
 
-    @Param({"1e-7"})
+    @Param({"1e-32"})
     protected float tolerance;
 
     @Override
     protected CSRGraph getCSRGraph() {
+        Pair<Integer, Integer> nodeCountIterationsPair = nodeCountIterationsPairs.get(nodeCountIterationCombinations);
+        nodeCount = nodeCountIterationsPair.getLeft();
+        maxIterations = nodeCountIterationsPair.getRight();
+
         return RandomGraphGenerator.builder()
                 .nodeCount(nodeCount)
                 .averageDegree(avgDegree)

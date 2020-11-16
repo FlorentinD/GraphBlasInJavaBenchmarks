@@ -1,9 +1,5 @@
 package org.github.florentind.bench.triangleCount;
 
-import org.neo4j.graphalgo.beta.pregel.Pregel;
-import org.neo4j.graphalgo.beta.pregel.triangleCount.ImmutableTriangleCountPregelConfig;
-import org.neo4j.graphalgo.beta.pregel.triangleCount.TriangleCountPregel;
-import org.neo4j.graphalgo.core.concurrency.Pools;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.neo4j.graphalgo.triangle.ImmutableTriangleCountBaseConfig;
 import org.neo4j.graphalgo.triangle.IntersectingTriangleCountFactory;
@@ -27,20 +23,5 @@ public class TriangleCountGdsBenchmark extends TriangleCountBaseBenchmark {
         bh.consume(new IntersectingTriangleCountFactory<>()
                 .build(graph, config, AllocationTracker.empty(), NullLog.getInstance())
                 .compute());
-    }
-
-    @Benchmark
-    public void pregel(Blackhole bh) {
-        var triangleCountJob = Pregel.create(
-                graph,
-                ImmutableTriangleCountPregelConfig.builder()
-                        .concurrency(concurrency)
-                        .build(),
-                new TriangleCountPregel(),
-                Pools.DEFAULT,
-                AllocationTracker.empty()
-        );
-
-        bh.consume(triangleCountJob.run());
     }
 }

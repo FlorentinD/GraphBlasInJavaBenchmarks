@@ -10,9 +10,6 @@ import org.openjdk.jmh.infra.Blackhole;
 
 public class BfsEjmlBenchmark extends BfsBaseBenchmark {
 
-    @Param({"1"})
-    private int concurrency;
-
     private DMatrixSparseCSC transposedMatrix;
     private DMatrixSparseCSC matrix;
 
@@ -49,10 +46,8 @@ public class BfsEjmlBenchmark extends BfsBaseBenchmark {
         bh.consume(new BfsEjml().computeDense(matrix, BfsEjml.BfsVariation.LEVEL, startNode, maxIterations));
     }
 
-    @org.openjdk.jmh.annotations.Benchmark
-    public void ejmlDenseBfsParent(Blackhole bh) {
-        bh.consume(new BfsEjml().computeDense(matrix, BfsEjml.BfsVariation.PARENTS, startNode, maxIterations));
-    }
-
-    // TODO add MSBFS benchmark
+//    @org.openjdk.jmh.annotations.Benchmark
+//    public void ejmlDenseBfsParent(Blackhole bh) {
+//        bh.consume(new BfsEjml().computeDense(matrix, BfsEjml.BfsVariation.PARENTS, startNode, maxIterations));
+//    }
 }

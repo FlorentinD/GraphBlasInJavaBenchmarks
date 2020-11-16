@@ -2,6 +2,7 @@ package org.github.florentind.bench.bfs;
 
 
 import org.github.florentind.bench.EjmlGraphBaseBenchmark;
+import org.neo4j.graphalgo.Orientation;
 import org.neo4j.graphalgo.api.CSRGraph;
 import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
 import org.neo4j.graphalgo.beta.generator.RelationshipDistribution;
@@ -21,9 +22,12 @@ public class BfsBaseBenchmark extends EjmlGraphBaseBenchmark {
     // node in the middle (id-wise)
     int startNode;
 
-    // TODO: retrieve actually run iterations
+    // TODO: retrieve actually run iterations (for eval explanation)
     @Param({"100"})
     protected int maxIterations;
+
+    @Param({"POWER_LAW", "UNIFORM"})
+    protected String degreeDistribution;
 
     @Override
     @Setup
@@ -40,13 +44,12 @@ public class BfsBaseBenchmark extends EjmlGraphBaseBenchmark {
                 .averageDegree(avgDegree)
                 .seed(42L)
                 .aggregation(Aggregation.MAX)
+                .orientation(Orientation.UNDIRECTED)
+                .relationshipDistribution(RelationshipDistribution.valueOf(degreeDistribution))
                 .allocationTracker(AllocationTracker.empty())
                 .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.NO)
                 .relationshipDistribution(RelationshipDistribution.POWER_LAW)
                 .build().generate();
 
     }
-
-    // TODO add MSBFS benchmark
-
 }
