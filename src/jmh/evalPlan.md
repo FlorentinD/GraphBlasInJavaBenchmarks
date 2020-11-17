@@ -1,34 +1,37 @@
 # Evaluation
 
-## Extended operations
+## Extended matrix operations
 
 * focus on sparse operations
-* semirings 
-    * 2 operations:  
-        * reduceColumnWise (simple operation .. just `+` operator of semiring) **TODO**
-        * mxm (harder operation)
-    * matrices: 2 random matrices with uniform distribution and dimension (0.1M, 0.5M, 1M) 
-    * 4 semirings: arithmetic (+, *), boolean (or, and), (or, pair) expected to be fastest, (min, max)
-    * compare against: prev. ejml version (hard-coded arithmetic semiring) and native version (suite-sparse)
 
-**TODO**
-* mask:
-    * operations: 
-        * reduceColumnWise (low overhead in general), 
-        * mxm (high overhead if most entries are set)
-    * fixed matrix of size 10^5x10^5 with avg of 4 entries per column in mask + negation flag  
-    * scale: 
-        * number of set entries in the mask (5/50 per column in mask)
-        * negated/non-negated mask (-> f.i. numCol-2 are now set)
-        * structural/value mask 
-    * compare against: native version (suite-sparse)
+### Semirings 
+* 2 operations:  
+    * reduceColumnWise (simple operation .. just `+` operator of semiring) **TODO**
+    * mxm (harder operation)
+* matrices: 2 random matrices with uniform distribution and dimension (0.1M, 0.5M, 1M) 
+* 4 semirings: arithmetic (+, *), boolean (or, and), (or, pair) expected to be fastest, (min, max)
+* compare against: prev. ejml version (hard-coded arithmetic semiring) and native version (suite-sparse)
 
-** TODO  e.g. clean-up ** 
-* ? sparse vxm vs dense mxv (would be only to show BFS explanation is coherent?!)
-    * fixed semiring, no mask
-    * expect for sparse vector mxv to be faster
-    * for dense vectors vxm should be faster
-   
+### Masks
+* operations: 
+   * reduceColumnWise (low overhead in general),  **TODO**
+   * mxm (high overhead if most entries are set)
+* fixed matrix of size 0.1Mx0.1M with avg of 4 entries per column in mask + negation flag  
+* scale: 
+   * number of set entries in the mask (5/50 per column in mask)
+   * negated/non-negated mask (-> f.i. numCol-2 are now set)
+   * structural/value mask 
+   * compare against: native version (suite-sparse)
+
+
+### vxm vs mxv ?
+<!-- ** TODO  e.g. clean-up ** -->
+* fixed semiring of plus-times, no mask
+* expect for sparse vector mxv to be faster
+* for dense vectors vxm should be faster
+
+
+### Loading graphs into matrices   
 * Graph/Matrix creation based on existing graph: Graph from GDS to matrix (native vs ejml)
     * weighted graph
     * scale edges .. fixed vertexCount of 1M and avgDegree of 2/4/8 

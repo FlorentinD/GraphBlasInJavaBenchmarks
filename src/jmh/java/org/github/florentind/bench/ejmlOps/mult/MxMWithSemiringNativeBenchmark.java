@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 
-public class MxMNativeBenchmark extends MxMBenchmark {
+public class MxMWithSemiringNativeBenchmark extends MatrixOpsWithSemiringBaseBenchmark {
     protected static final HashMap<String, Buffer> semiRings = new HashMap<>() {{
         put(PLUS_TIMES, GRBCORE.createSemiring(GRBMONOID.plusMonoidDouble(), GRAPHBLAS.timesBinaryOpDouble()));
         put(OR_AND, GRBCORE.createSemiring(GRBMONOID.lorMonoid(), GRAPHBLAS.landBinaryOp()));

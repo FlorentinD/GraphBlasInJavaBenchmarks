@@ -7,24 +7,12 @@ import org.ejml.ops.DSemiRings;
 import org.ejml.sparse.csc.CommonOpsWithSemiRing_DSCC;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.infra.Blackhole;
 
 import java.util.HashMap;
 
 
-public class MxMBenchmark extends MxMBaseBenchmark {
-    protected static final String PLUS_TIMES = "Plus, Times";
-    protected static final String OR_AND = "Or, And";
-    protected static final String PLUS_AND = "Plus, And";
-    protected static final String OR_TIMES = "Or, Times";
-    protected static final String PLUS_FIRST = "Plus, First";
-    protected static final String PLUS_BFIRST = "Plus, Boolean-First";
-    protected static final String OR_PAIR = "Or, Pair";
-    protected static final String MIN_MAX = "Min, Max";
-    protected static final String NONE = "Plus, Times (inlined)";
-
-
+public class MxMWithSemiringsBenchmark extends MatrixOpsWithSemiringBaseBenchmark {
     protected static final HashMap<String, DSemiRing> semiRings = new HashMap<>() {{
         put(PLUS_TIMES, DSemiRings.PLUS_TIMES);
         put(OR_AND, DSemiRings.OR_AND);
@@ -36,16 +24,12 @@ public class MxMBenchmark extends MxMBaseBenchmark {
         put(OR_PAIR, new DSemiRing(DMonoids.OR, (x, y) -> 1));
     }};
 
-    @Param({NONE, PLUS_TIMES, OR_PAIR, OR_AND, MIN_MAX})
-    protected String semiRingName;
-
     @Benchmark
     public void mxm(Blackhole bh) {
         if (semiRingName.equals(NONE)) {
-            CommonOps_DSCC.mult(matrix, matrix, result);
+            bh.consume(CommonOps_DSCC.mult(matrix, matrix, null));
         } else {
-            CommonOpsWithSemiRing_DSCC.mult(matrix, matrix, result, semiRings.get(semiRingName), null, null, true);
+            bh.consume(CommonOpsWithSemiRing_DSCC.mult(matrix, matrix, null, semiRings.get(semiRingName), null, null, true));
         }
-        bh.consume(result);
     }
 }

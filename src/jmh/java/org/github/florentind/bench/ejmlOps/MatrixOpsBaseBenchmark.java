@@ -19,14 +19,14 @@ public abstract class MatrixOpsBaseBenchmark {
     protected DMatrixSparseCSC matrix;
 
     @Param({"100000", "500000", "1000000"})
-    private int dimension;
+    protected int dimension;
 
     // TODO also scale avgEntriesPerColumn?
     @Param({"4"})
-    private int avgEntriesPerColumn;
+    protected int avgEntriesPerColumn;
 
     @Param({"UNIFORM"})
-    private String degreeDistribution;
+    protected String degreeDistribution;
 
     @Setup
     public void setup() {
