@@ -13,10 +13,15 @@
 
 **TODO**
 * mask:
-    * operations: reduceColumnWise (low overhead in general), mxm (high overhead if most entries are set)
-    * fixed matrix of 10^6x10^6 with avg of 4 entries per column?  
-    * scale: number of set entries in the mask
-    * compare against: native version (suite-sparse) as prev. ejml had no masks
+    * operations: 
+        * reduceColumnWise (low overhead in general), 
+        * mxm (high overhead if most entries are set)
+    * fixed matrix of size 10^5x10^5 with avg of 4 entries per column in mask + negation flag  
+    * scale: 
+        * number of set entries in the mask (5/50 per column in mask)
+        * negated/non-negated mask (-> f.i. numCol-2 are now set)
+        * structural/value mask 
+    * compare against: native version (suite-sparse)
 
 ** TODO  e.g. clean-up ** 
 * ? sparse vxm vs dense mxv (would be only to show BFS explanation is coherent?!)

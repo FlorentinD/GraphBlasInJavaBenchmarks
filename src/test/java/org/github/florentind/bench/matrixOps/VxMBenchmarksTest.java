@@ -1,4 +1,4 @@
-package org.github.florentind.bench;
+package org.github.florentind.bench.matrixOps;
 
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.data.DVectorSparse;
@@ -15,7 +15,7 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MatrixOpsBenchmarksTest {
+public class VxMBenchmarksTest {
     protected DMatrixSparseCSC matrix;
 
     private int dimension = 100_000;
