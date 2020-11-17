@@ -24,8 +24,9 @@
 * compare against: native version (suite-sparse)
 
 
-### vxm vs mxv ?
+### ? vxm vs mxv ?
 <!-- ** TODO  e.g. clean-up benchmarks ** -->
+* would be just to underline assumption taken from push/pull paper
 * fixed semiring of plus-times, no mask
 * expect for sparse vector mxv to be faster
 * for dense vectors vxm should be faster

@@ -16,7 +16,6 @@ public class ReduceColumnWiseBenchmark extends MatrixOpsWithMonoidBaseBenchmark 
         put(PLUS, DMonoids.PLUS);
         put(OR, DMonoids.OR);
         put(MIN, DMonoids.MIN);
-        put(FIRST, EjmlUtil.FIRST_MONOID);
     }};
 
     @Benchmark

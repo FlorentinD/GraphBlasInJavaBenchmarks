@@ -7,8 +7,6 @@ import org.ejml.masks.DMasks;
 import org.ejml.masks.Mask;
 import org.ejml.ops.DMonoid;
 import org.ejml.ops.DMonoids;
-import org.ejml.ops.DSemiRings;
-import org.ejml.sparse.csc.CommonOpsWithSemiRing_DSCC;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.ejml.sparse.csc.RandomMatrices_DSCC;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
@@ -37,7 +35,7 @@ public class ReduceColumnWiseWithMaskBenchmarksTest {
     private static int[] NON_ZERO_MASK_VALUES = {5, 50};
     private static boolean[] BOOL_VALUES = {true, false};
 
-    private static Stream<Arguments> mxmWithMaskVariants() {
+    private static Stream<Arguments> reduceColumnWiseWithMaskVariants() {
         Stream.Builder<Arguments> builder = Stream.builder();
 
         Arrays.stream(NON_ZERO_MASK_VALUES).forEach(v -> {
@@ -60,7 +58,7 @@ public class ReduceColumnWiseWithMaskBenchmarksTest {
     }
 
     @ParameterizedTest(name = "avgDegreeInMask: {0}, negateMask: {1}, structural: {2}, dense: {3}")
-    @MethodSource("mxmWithMaskVariants")
+    @MethodSource("reduceColumnWiseWithMaskVariants")
     public void testReduceColumnWiseWithMask(int nzMaskValues, boolean negatedMask, boolean structuralMask, boolean denseMask) {
         var sparseVector = new DVectorSparse(RandomMatrices_DSCC.generateUniform(dimension, 1, nzMaskValues, 1, 1, new Random(42)));
 
@@ -87,7 +85,7 @@ public class ReduceColumnWiseWithMaskBenchmarksTest {
         var nativeMask = ToNativeVectorConverter.convert(sparseVector);
         var nativeResult = createVector(GRAPHBLAS.doubleType(), matrix.numCols);
 
-        var nativeMonoid = GRBMONOID.timesMonoidByte();
+        var nativeMonoid = GRBMONOID.timesMonoidDouble();
         var descriptor = createDescriptor();
         setDescriptorValue(descriptor, GrB_INP0, GrB_TRAN);
         if (negatedMask) setDescriptorValue(descriptor, GrB_MASK, GrB_COMP);
@@ -102,7 +100,7 @@ public class ReduceColumnWiseWithMaskBenchmarksTest {
             if (ejmlValue != monoid.id) {
                 assertEquals(ejmlValue, nativeEntry[0], 1e-5);
             } else {
-                assertTrue(nativeEntry.length == 0);
+                assertEquals(nativeEntry.length, 0);
             }
         }
 

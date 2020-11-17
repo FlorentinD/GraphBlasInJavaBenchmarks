@@ -20,8 +20,6 @@ public class ReduceColumnWiseNativeBenchmark extends MatrixOpsWithMonoidBaseBenc
         put(PLUS, GRBMONOID.plusMonoidDouble());
         put(OR, GRBMONOID.lorMonoid());
         put(MIN, GRBMONOID.minMonoidDouble());
-        // single-threaded there should be no difference
-        put(FIRST, GRBMONOID.anyMonoidFloat());
     }};
 
     Buffer nativeMatrix;
