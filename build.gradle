@@ -35,7 +35,7 @@ dependencies {
 
 
     compileOnly         group: 'org.ejml',                 name: 'ejml-all',        version: ver.ejml
-    // TODO: this is also locally installed !
+    // TODO: this is locally installed !
     implementation      group: 'com.github.fabianmurariu',  name: 'graphblas-java-native',   version: ver.'graphblas-java-native'
     implementation      group: 'org.jgrapht',            name: 'jgrapht-core',      version: ver.jgrapht
     implementation      group: 'org.jgrapht',            name: 'jgrapht-opt',      version: ver.jgrapht
@@ -75,6 +75,7 @@ dependencies {
     testCompileOnly group: 'org.immutables',    name: 'builder',            version: ver.'immutables'
     testCompileOnly group: 'org.jetbrains',     name: 'annotations',        version: ver.'jetbrains-annotations'
     testCompileOnly  group: 'org.neo4j.gds',    name: 'test-utils',          version: ver.gds
+    testCompileOnly  group: 'org.neo4j.gds',    name: 'alpha-algo',          version: ver.gds
 
     // pregel/jmh tests (should be moved to a seperate jmhTest folder?!)
     testCompile         group: 'org.neo4j.gds',                   name: 'pregel-example',      version: ver.gds

@@ -1,8 +1,8 @@
 = GraphBLAS in Java Benchmarks
 
-Master Thesis project comparing different graph-algorithms written in gds-pregel, gds and ejml.
+Master Thesis project comparing different graph-algorithms written in gds-pregel and ejml against existing once in  JGraphT and GDS.
 
-*Relies on local build ejml and gds*
+*Relies on locally build ejml, gds and graphblas-java-native*
 
 
 == Setting up the project
