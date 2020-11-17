@@ -26,7 +26,7 @@ import static com.github.fabianmurariu.unsafe.GRBCORE.*;
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MxMBenchmarksTest {
+public class MxMWithSemiringBenchmarksTest {
     protected static final String PLUS_TIMES = "Plus, Times";
     protected static final String OR_AND = "Or, And";
     protected static final String OR_PAIR = "Or, Pair";

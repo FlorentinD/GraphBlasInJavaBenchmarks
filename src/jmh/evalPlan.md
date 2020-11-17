@@ -6,26 +6,26 @@
 
 ### Semirings 
 * 2 operations:  
-    * reduceColumnWise (simple operation .. just `+` operator of semiring) **TODO**
-    * mxm (harder operation)
-* matrices: 2 random matrices with uniform distribution and dimension (0.1M, 0.5M, 1M) 
+    * reduceColumnWise
+    * mxm (same matrix)
+* matrix: random matrices with uniform distribution and dimension (0.1M, 0.5M, 1M) 
 * 4 semirings: arithmetic (+, *), boolean (or, and), (or, pair) expected to be fastest, (min, max)
 * compare against: prev. ejml version (hard-coded arithmetic semiring) and native version (suite-sparse)
 
 ### Masks
 * operations: 
-   * reduceColumnWise (low overhead in general),  **TODO**
-   * mxm (high overhead if most entries are set)
-* fixed matrix of size 0.1Mx0.1M with avg of 4 entries per column in mask + negation flag  
+   * reduceColumnWise
+   * mxm 
+* fixed matrix size of 0.1Mx0.1M for mxm , 0.5Mx0.5M for reduceColumnWise
 * scale: 
    * number of set entries in the mask (5/50 per column in mask)
    * negated/non-negated mask (-> f.i. numCol-2 are now set)
    * structural/value mask 
-   * compare against: native version (suite-sparse)
+* compare against: native version (suite-sparse)
 
 
 ### vxm vs mxv ?
-<!-- ** TODO  e.g. clean-up ** -->
+<!-- ** TODO  e.g. clean-up benchmarks ** -->
 * fixed semiring of plus-times, no mask
 * expect for sparse vector mxv to be faster
 * for dense vectors vxm should be faster

@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 import static com.github.fabianmurariu.unsafe.GRBCORE.*;
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReduceColumnWiseWithMaskBenchmarksTest {
     private static final Random RAND = new Random(42);
@@ -60,7 +61,7 @@ public class ReduceColumnWiseWithMaskBenchmarksTest {
 
     @ParameterizedTest(name = "avgDegreeInMask: {0}, negateMask: {1}, structural: {2}, dense: {3}")
     @MethodSource("mxmWithMaskVariants")
-    public void testMxMWithMask(int nzMaskValues, boolean negatedMask, boolean structuralMask, boolean denseMask) {
+    public void testReduceColumnWiseWithMask(int nzMaskValues, boolean negatedMask, boolean structuralMask, boolean denseMask) {
         var sparseVector = new DVectorSparse(RandomMatrices_DSCC.generateUniform(dimension, 1, nzMaskValues, 1, 1, new Random(42)));
 
         Mask mask;
@@ -72,7 +73,8 @@ public class ReduceColumnWiseWithMaskBenchmarksTest {
             mask = DMasks.builder(sparseVector, structuralMask).withNegated(negatedMask).build();
         }
 
-        var ejmlResult = CommonOps_DSCC.reduceColumnWise(matrix, 0, DMonoids.PLUS.func, null, mask, null, true);
+        DMonoid monoid = DMonoids.TIMES;
+        var ejmlResult = CommonOps_DSCC.reduceColumnWise(matrix, monoid.id, monoid.func, null, mask, null, true);
 
         if(denseMask) {
             // only sparse matrices in Native
@@ -84,24 +86,31 @@ public class ReduceColumnWiseWithMaskBenchmarksTest {
         var nativeMatrix = ToNativeMatrixConverter.convert(matrix);
         var nativeMask = ToNativeVectorConverter.convert(sparseVector);
         var nativeResult = createVector(GRAPHBLAS.doubleType(), matrix.numCols);
-        var semiring = createSemiring(GRBMONOID.plusMonoidDouble(), GRAPHBLAS.timesBinaryOpDouble());
-        var descriptor = createDescriptor();
 
+        var nativeMonoid = GRBMONOID.timesMonoidByte();
+        var descriptor = createDescriptor();
+        setDescriptorValue(descriptor, GrB_INP0, GrB_TRAN);
         if (negatedMask) setDescriptorValue(descriptor, GrB_MASK, GrB_COMP);
         if (structuralMask) setDescriptorValue(descriptor, GrB_MASK, GrB_STRUCTURE);
 
-        // TODO: map Vecotr reduce in GRBOPSVEC
-//        checkStatusCode(GRBOPSVEC.(nativeResult, nativeMask, null, semiring, nativeMatrix, nativeMatrix, descriptor));
-//        matrixWait(nativeResult);
+        checkStatusCode(GRBOPSMAT.matrixReduceMonoid(nativeResult, nativeMask, null, nativeMonoid, nativeMatrix, descriptor));
+        vectorWait(nativeResult);
 
-        //System.out.println("ejmlResult.nz_length = " + ejmlResult.nz_length);
-        //assertEquals(ejmlResult.nz_length, GRBCORE.nvalsMatrix(nativeResult));
+        for (int idx = 0; idx < ejmlResult.data.length; idx++) {
+            double ejmlValue = ejmlResult.get(idx);
+            double[] nativeEntry = GRAPHBLAS.getVectorElementDouble(nativeResult, idx);
+            if (ejmlValue != monoid.id) {
+                assertEquals(ejmlValue, nativeEntry[0], 1e-5);
+            } else {
+                assertTrue(nativeEntry.length == 0);
+            }
+        }
 
         freeMatrix(nativeResult);
         freeMatrix(nativeMatrix);
         freeMatrix(nativeMask);
         freeDescriptor(descriptor);
-        freeSemiring(semiring);
+        freeSemiring(nativeMonoid);
         checkStatusCode(grbFinalize());
     }
 }
