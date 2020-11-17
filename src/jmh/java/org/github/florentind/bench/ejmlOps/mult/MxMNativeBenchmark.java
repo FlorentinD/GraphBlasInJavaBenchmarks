@@ -21,7 +21,7 @@ public class MxMNativeBenchmark extends MxMBenchmark {
         put(OR_AND, GRBCORE.createSemiring(GRBMONOID.lorMonoid(), GRAPHBLAS.landBinaryOp()));
         put(MIN_MAX, GRBCORE.createSemiring(GRBMONOID.minMonoidDouble(), GRAPHBLAS.maxBinaryOpDouble()));
         put(OR_TIMES, GRBCORE.createSemiring(GRBMONOID.minMonoidDouble(), GRAPHBLAS.maxBinaryOpDouble()));
-        put(OR_PAIR, GRBCORE.createSemiring(GRBMONOID.lorMonoid(), GRAPHBLAS.pairBinaryOpDouble()));
+        put(OR_PAIR, GRBCORE.createSemiring(GRBMONOID.lorMonoid(), GRAPHBLAS.pairBinaryOpBoolean()));
     }};
 
     protected Buffer nativeMatrix;

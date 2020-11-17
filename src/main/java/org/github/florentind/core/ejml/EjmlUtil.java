@@ -3,6 +3,7 @@ package org.github.florentind.core.ejml;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.ops.DBinaryOperator;
 import org.ejml.ops.DMonoid;
+import org.ejml.ops.DMonoids;
 import org.ejml.ops.DSemiRing;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 
@@ -11,6 +12,7 @@ public class EjmlUtil {
     public static final DBinaryOperator SECOND_OP = (x, y) -> y;
     public static final DMonoid FIRST_MONOID = new DMonoid(0, (a, b) -> a);
     public static final DSemiRing FIRST_PAIR = new DSemiRing(FIRST_MONOID, PAIR_OP);
+    public static final DSemiRing OR_PAIR = new DSemiRing(DMonoids.OR, PAIR_OP);
 
     /**
      * sum of outgoing edge weights equals 1 (or 0 if no edges at all)
