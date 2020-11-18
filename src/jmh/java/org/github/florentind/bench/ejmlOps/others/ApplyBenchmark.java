@@ -1,7 +1,8 @@
 
-package org.github.florentind.bench.ejmlOps;
+package org.github.florentind.bench.ejmlOps.others;
 
 import org.ejml.sparse.csc.CommonOps_DSCC;
+import org.github.florentind.bench.ejmlOps.MatrixOpsBaseBenchmark;
 import org.openjdk.jmh.annotations.*;
 
 /**

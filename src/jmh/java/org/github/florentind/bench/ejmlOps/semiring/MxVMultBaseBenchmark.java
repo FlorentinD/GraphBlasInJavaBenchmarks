@@ -1,11 +1,10 @@
 
-package org.github.florentind.bench.ejmlOps.mult;
+package org.github.florentind.bench.ejmlOps.semiring;
 
 import org.github.florentind.bench.ejmlOps.MatrixOpsBaseBenchmark;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 
-import java.util.Arrays;
 import java.util.Random;
 
 
@@ -19,7 +18,7 @@ public class MxVMultBaseBenchmark extends MatrixOpsBaseBenchmark {
 
     @Override
     @Setup
-    public void setup() {
+    public void setup() throws Throwable {
         super.setup();
         denseInputVector = new double[matrix.numRows];
         output = new double[matrix.numRows];

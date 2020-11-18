@@ -1,5 +1,5 @@
 
-package org.github.florentind.bench.ejmlOps.mult;
+package org.github.florentind.bench.ejmlOps.semiring;
 
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.data.DVectorSparse;
@@ -18,7 +18,7 @@ public class MxVMultBenchmark extends MxVMultBaseBenchmark {
 
     @Override
     @Setup
-    public void setup() {
+    public void setup() throws Throwable {
         super.setup();
         sparseInputVector = new DVectorSparse(denseInputVector, 0);
         sparse1DimMatrix = CommonOps_DSCC.transpose(sparseInputVector.oneDimMatrix, null, null);

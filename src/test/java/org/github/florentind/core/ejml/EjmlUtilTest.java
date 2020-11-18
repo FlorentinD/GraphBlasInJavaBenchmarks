@@ -58,4 +58,10 @@ public class EjmlUtilTest {
             assertTrue((Math.round(total * 100) - 100 == 0) || total == 0, "value was " + total);
         }
     }
+
+    @Test
+    void createOrLoadMatrix() throws Throwable {
+        EjmlUtil.createOrLoadRandomMatrix(100, 100, 4, 1.0, -1.0, 42);
+        EjmlUtil.createOrLoadRandomMatrix(100, 100, 4, 1.0, -1.0, 42);
+    }
 }

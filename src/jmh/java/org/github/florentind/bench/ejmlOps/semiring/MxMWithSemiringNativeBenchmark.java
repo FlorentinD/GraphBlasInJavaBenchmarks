@@ -1,4 +1,4 @@
-package org.github.florentind.bench.ejmlOps.mult;
+package org.github.florentind.bench.ejmlOps.semiring;
 
 import com.github.fabianmurariu.unsafe.GRAPHBLAS;
 import com.github.fabianmurariu.unsafe.GRBCORE;
@@ -30,7 +30,7 @@ public class MxMWithSemiringNativeBenchmark extends MatrixOpsWithSemiringBaseBen
 
     @Override
     @Setup
-    public void setup() {
+    public void setup() throws Throwable {
         super.setup();
 
         GRBCORE.initNonBlocking();

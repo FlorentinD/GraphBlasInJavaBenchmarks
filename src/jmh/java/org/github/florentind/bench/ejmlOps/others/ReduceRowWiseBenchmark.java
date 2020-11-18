@@ -1,10 +1,10 @@
 
-package org.github.florentind.bench.ejmlOps;
+package org.github.florentind.bench.ejmlOps.others;
 
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.sparse.csc.CommonOps_DSCC;
+import org.github.florentind.bench.ejmlOps.MatrixOpsBaseBenchmark;
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.infra.Blackhole;
 
@@ -17,7 +17,7 @@ public class ReduceRowWiseBenchmark extends MatrixOpsBaseBenchmark {
 
     @Override
     @Setup
-    public void setup() {
+    public void setup() throws Throwable {
         super.setup();
         output = new DMatrixRMaj(matrix.numRows, 1);
     }

@@ -1,10 +1,9 @@
 
-package org.github.florentind.bench.ejmlOps.mult;
+package org.github.florentind.bench.ejmlOps.semiring;
 
 import org.ejml.ops.DMonoid;
 import org.ejml.ops.DMonoids;
 import org.ejml.sparse.csc.CommonOps_DSCC;
-import org.github.florentind.core.ejml.EjmlUtil;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.infra.Blackhole;
 

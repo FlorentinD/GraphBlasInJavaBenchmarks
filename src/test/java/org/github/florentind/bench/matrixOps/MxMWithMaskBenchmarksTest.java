@@ -8,8 +8,7 @@ import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.masks.DMasks;
 import org.ejml.ops.DSemiRings;
 import org.ejml.sparse.csc.CommonOpsWithSemiRing_DSCC;
-import org.ejml.sparse.csc.CommonOps_DSCC;
-import org.ejml.sparse.csc.RandomMatrices_DSCC;
+import org.github.florentind.core.ejml.EjmlUtil;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,7 +16,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
-import java.util.Random;
 import java.util.stream.Stream;
 
 import static com.github.fabianmurariu.unsafe.GRBCORE.*;
@@ -25,7 +23,7 @@ import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatu
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MxMWithMaskBenchmarksTest {
-    private static final Random RAND = new Random(42);
+    private static final int RAND_SEED = 42;
     protected DMatrixSparseCSC matrix;
 
     private int dimension = 100_000;
@@ -50,14 +48,14 @@ public class MxMWithMaskBenchmarksTest {
     }
 
     @BeforeEach
-    public void setup() {
-        matrix = RandomMatrices_DSCC.generateUniform(dimension, dimension, avgDegree, 1, 2, RAND);
+    public void setup() throws Throwable {
+        matrix = EjmlUtil.createOrLoadRandomMatrix(dimension, dimension, avgDegree, 1, 2, RAND_SEED);
     }
 
     @ParameterizedTest(name = "avgDegreeInMask: {0}, negateMask: {1}, structural: {2}")
     @MethodSource("mxmWithMaskVariants")
-    public void testMxMWithMask(int avgDegreeInMask, boolean negatedMask, boolean structuralMask) {
-        var maskMatrix = RandomMatrices_DSCC.generateUniform(dimension, dimension, avgDegreeInMask, 1, 1, RAND);
+    public void testMxMWithMask(int avgDegreeInMask, boolean negatedMask, boolean structuralMask) throws Throwable {
+        var maskMatrix = EjmlUtil.createOrLoadRandomMatrix(dimension, dimension, avgDegreeInMask, 1, 1, RAND_SEED);
 
         var ejmlResult = CommonOpsWithSemiRing_DSCC
                 .mult(matrix, matrix, null, DSemiRings.PLUS_TIMES, DMasks.builder(maskMatrix, structuralMask).withNegated(negatedMask).build(), null, true);

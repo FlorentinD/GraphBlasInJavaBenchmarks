@@ -1,11 +1,9 @@
 package org.github.florentind.bench.ejmlOps.mask;
 
 import org.ejml.data.DMatrixSparseCSC;
-import org.ejml.sparse.csc.RandomMatrices_DSCC;
+import org.github.florentind.core.ejml.EjmlUtil;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
-
-import java.util.Random;
 
 public class MxMWithMaskBaseBenchmark extends MatrixOpsWithMaskBaseBenchmark {
     // overriding
@@ -15,8 +13,8 @@ public class MxMWithMaskBaseBenchmark extends MatrixOpsWithMaskBaseBenchmark {
     DMatrixSparseCSC maskMatrix;
 
     @Setup
-    public void setup() {
+    public void setup() throws Throwable {
         super.setup();
-        maskMatrix = RandomMatrices_DSCC.generateUniform(dimension, dimension, avgEntriesPerColumnInMask, 1, 1, new Random(42));
+        maskMatrix = EjmlUtil.createOrLoadRandomMatrix(dimension, dimension, avgEntriesPerColumnInMask, 1, 1, 42);
     }
 }

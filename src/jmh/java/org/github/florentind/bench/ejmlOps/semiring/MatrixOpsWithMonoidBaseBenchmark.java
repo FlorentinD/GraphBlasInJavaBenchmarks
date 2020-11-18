@@ -1,5 +1,5 @@
 
-package org.github.florentind.bench.ejmlOps.mult;
+package org.github.florentind.bench.ejmlOps.semiring;
 
 import org.github.florentind.bench.ejmlOps.MatrixOpsBaseBenchmark;
 import org.openjdk.jmh.annotations.Param;

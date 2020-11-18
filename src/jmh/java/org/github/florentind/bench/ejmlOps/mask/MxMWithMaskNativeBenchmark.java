@@ -27,7 +27,7 @@ public class MxMWithMaskNativeBenchmark extends MxMWithMaskBaseBenchmark {
 
     @Override
     @Setup
-    public void setup() {
+    public void setup() throws Throwable {
         super.setup();
 
         initNonBlocking();

@@ -3,11 +3,9 @@ package org.github.florentind.bench.ejmlOps.mask;
 import org.ejml.data.DVectorSparse;
 import org.ejml.masks.DMasks;
 import org.ejml.masks.Mask;
-import org.ejml.sparse.csc.RandomMatrices_DSCC;
+import org.github.florentind.core.ejml.EjmlUtil;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
-
-import java.util.Random;
 
 public class ReduceColumnWiseWithMaskBaseBenchmark extends MatrixOpsWithMaskBaseBenchmark {
     Mask mask;
@@ -22,10 +20,10 @@ public class ReduceColumnWiseWithMaskBaseBenchmark extends MatrixOpsWithMaskBase
 
     @Override
     @Setup
-    public void setup() {
+    public void setup() throws Throwable {
         super.setup();
 
-        maskVector = new DVectorSparse(RandomMatrices_DSCC.generateUniform(dimension, 1, avgEntriesPerColumnInMask, 1, 1, new Random(42)));
+        maskVector = new DVectorSparse(EjmlUtil.createOrLoadRandomMatrix(dimension, 1, avgEntriesPerColumnInMask, 1, 1, 42), false);
 
         if (denseMask) {
             double[] denseVector = new double[dimension];

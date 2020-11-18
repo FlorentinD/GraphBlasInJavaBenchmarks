@@ -2,10 +2,9 @@
 package org.github.florentind.bench.ejmlOps;
 
 import org.ejml.data.DMatrixSparseCSC;
-import org.ejml.sparse.csc.RandomMatrices_DSCC;
+import org.github.florentind.core.ejml.EjmlUtil;
 import org.openjdk.jmh.annotations.*;
 
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 
@@ -29,7 +28,7 @@ public abstract class MatrixOpsBaseBenchmark {
     protected String degreeDistribution;
 
     @Setup
-    public void setup() {
-        matrix = RandomMatrices_DSCC.generateUniform(dimension, dimension, avgEntriesPerColumn, 1, 2, new Random(42));
+    public void setup() throws Throwable {
+        matrix = EjmlUtil.createOrLoadRandomMatrix(dimension, dimension, avgEntriesPerColumn, 1, 2, 42);
     }
 }

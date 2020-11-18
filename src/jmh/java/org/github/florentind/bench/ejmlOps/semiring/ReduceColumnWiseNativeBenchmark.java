@@ -1,4 +1,4 @@
-package org.github.florentind.bench.ejmlOps.mult;
+package org.github.florentind.bench.ejmlOps.semiring;
 
 import com.github.fabianmurariu.unsafe.GRBMONOID;
 import com.github.fabianmurariu.unsafe.GRBOPSMAT;
@@ -28,7 +28,7 @@ public class ReduceColumnWiseNativeBenchmark extends MatrixOpsWithMonoidBaseBenc
 
     @Override
     @Setup
-    public void setup() {
+    public void setup() throws Throwable {
         super.setup();
 
         initNonBlocking();

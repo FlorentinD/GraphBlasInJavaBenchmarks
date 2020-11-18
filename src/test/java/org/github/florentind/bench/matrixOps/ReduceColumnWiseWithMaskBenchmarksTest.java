@@ -60,7 +60,7 @@ public class ReduceColumnWiseWithMaskBenchmarksTest {
     @ParameterizedTest(name = "avgDegreeInMask: {0}, negateMask: {1}, structural: {2}, dense: {3}")
     @MethodSource("reduceColumnWiseWithMaskVariants")
     public void testReduceColumnWiseWithMask(int nzMaskValues, boolean negatedMask, boolean structuralMask, boolean denseMask) {
-        var sparseVector = new DVectorSparse(RandomMatrices_DSCC.generateUniform(dimension, 1, nzMaskValues, 1, 1, new Random(42)));
+        var sparseVector = new DVectorSparse(RandomMatrices_DSCC.generateUniform(dimension, 1, nzMaskValues, 1, 1, new Random(42)), false);
 
         Mask mask;
         if (denseMask) {
