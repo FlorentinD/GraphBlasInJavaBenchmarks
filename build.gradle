@@ -92,9 +92,10 @@ jmh {
     forceGC = true
     // regExp which benchmarks to run
     // ejmlSparseBfsLevel
-    include = ['.*TriangleCountGdsBenchmark.pregel*']
+    include = ['.*MxMWithSemiringsBenchmark*']
     exclude = ['.*GraphImpl.*']
-    duplicateClassesStrategy = 'warn'
+    // TODO actually avoid duplicate dependencies
+    duplicateClassesStrategy = 'exclude'
 
     // ! increase -Xmx and set -Xms to equal value on server if needed .. f.i. "-Xmx32g"
     jvmArgs = ["-Xms12g", "-Xmx12g", "-XX:+UseSuperWord"]
