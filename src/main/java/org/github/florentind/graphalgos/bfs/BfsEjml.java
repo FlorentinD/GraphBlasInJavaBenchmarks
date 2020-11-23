@@ -42,7 +42,7 @@ public class BfsEjml {
         }
 
         double[] iterationResult = new double[nodeCount];
-        double tmp[];
+        double[] tmp;
 
         int visitedNodes = 0;
         int nodesInQueue = 1;
@@ -50,15 +50,15 @@ public class BfsEjml {
 
         // negated -> dont compute values for visited nodes
         // replace -> iterationResult is basically the new inputVector
-        PrimitiveDMask mask = DMasks.builder(result).withZeroElement(semiRing.add.id).withNegated(true).build();
+        Mask mask = DMasks.builder(result).withZeroElement(semiRing.add.id).withNegated(true).build();
 
         for (; ; iteration++) {
             if (bfsVariation == BfsVariation.LEVEL) {
-                PrimitiveDMask resultMask = DMasks.builder(inputVector).withZeroElement(semiRing.add.id).build();
+                Mask resultMask = DMasks.builder(inputVector).withZeroElement(semiRing.add.id).build();
                 CommonOps_DArray.assignScalar(result, iteration, resultMask);
             } else {
                 // parents version
-                result = CommonOps_DArray.assign(result, inputVector, mask);
+                CommonOps_DArray.assign(result, inputVector, mask);
             }
 
             visitedNodes += nodesInQueue;

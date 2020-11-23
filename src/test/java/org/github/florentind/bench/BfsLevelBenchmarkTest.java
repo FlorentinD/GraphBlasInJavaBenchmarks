@@ -5,10 +5,12 @@ import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
 import org.github.florentind.core.grapblas_native.NativeHelper;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
+import org.github.florentind.core.jgrapht.JGraphTConverter;
 import org.github.florentind.graphalgos.bfs.BfsDenseDoubleResult;
 import org.github.florentind.graphalgos.bfs.BfsEjml;
 import org.github.florentind.graphalgos.bfs.BfsNative;
 import org.github.florentind.graphalgos.bfs.BfsResult;
+import org.jgrapht.alg.shortestpath.BFSShortestPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphalgo.Orientation;
@@ -82,6 +84,21 @@ public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
     @Test
     void ejmlDenseSparseEqualsJni() {
         assertResultEquals(getEjmlDenseSparseResult(ejmlGraph, START_NODE));
+    }
+
+    @Test
+    void jGraphT() {
+        var graph = JGraphTConverter.convert(ejmlGraph);
+        var actual = new BFSShortestPath<>(graph).getPaths(START_NODE);
+
+        for (int i = 0; i < NODE_COUNT; i++) {
+            if (goldStandard.visited(i)) {
+                // +1 as for level: graphblas versions starts at 1 instead of 0
+                assertEquals(goldStandard.get(i), actual.getWeight(i) + 1, "Different for node " + i);
+            } else {
+                assertEquals(Double.POSITIVE_INFINITY, actual.getWeight(i));
+            }
+        }
     }
 
 
