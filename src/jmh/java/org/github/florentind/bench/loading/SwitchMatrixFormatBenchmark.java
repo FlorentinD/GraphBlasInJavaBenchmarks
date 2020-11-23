@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value = 1, warmups = 2)
+@Fork(value = 2, warmups = 1)
 public class SwitchMatrixFormatBenchmark {
 
     protected HugeGraph graph;
