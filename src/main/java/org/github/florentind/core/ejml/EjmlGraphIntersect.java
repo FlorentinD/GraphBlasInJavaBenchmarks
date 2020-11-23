@@ -38,31 +38,6 @@ public class EjmlGraphIntersect extends GraphIntersect<EjmlAdjacencyCursor> {
     }
 
     @Override
-    protected long skipUntil(EjmlAdjacencyCursor cursor, long nodeId) {
-        return cursor.skipUntil(nodeId);
-    }
-
-    @Override
-    protected long advance(EjmlAdjacencyCursor cursor, long nodeId) {
-        return cursor.advance(nodeId);
-    }
-
-    @Override
-    protected void copyFrom(
-            EjmlAdjacencyCursor sourceCursor, EjmlAdjacencyCursor targetCursor
-    ) {
-        targetCursor.copyFrom(sourceCursor);
-    }
-
-    @Override
-    protected EjmlAdjacencyCursor cursor(
-        long node,
-        EjmlAdjacencyCursor reuse
-    ) {
-        return EjmlAdjacencyCursor.cursor(reuse, node);
-    }
-
-    @Override
     protected int degree(long node) {
         return adjacencyMatrix.col_idx[(int) node + 1] - adjacencyMatrix.col_idx[(int) node];
     }

@@ -147,12 +147,14 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
         assertEquals(expected.totalCount(), GraphMetrics.getNumberOfTriangles(jGraph));
     }
 
-    @Test
-    public void testPregel() {
+    @ParameterizedTest
+    @ValueSource(strings = {"false", "true"})
+    public void testPregel(boolean useIndices) {
         var triangleCountJob = Pregel.create(
                 graph,
                 ImmutableTriangleCountPregelConfig.builder()
                         .concurrency(CONCURRENCY)
+                        .indexNeighbours(useIndices)
                         .build(),
                 new TriangleCountPregel(),
                 Pools.DEFAULT,

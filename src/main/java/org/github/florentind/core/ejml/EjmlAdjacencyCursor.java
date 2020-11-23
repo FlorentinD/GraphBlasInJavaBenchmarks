@@ -33,17 +33,12 @@ public class EjmlAdjacencyCursor implements AdjacencyCursor {
         this.adjacencyMatrix = adjacencyMatrix;
     }
 
-    static EjmlAdjacencyCursor cursor(EjmlAdjacencyCursor reuse, long node) {
-        return reuse.init(node);
-    }
-
-    public EjmlAdjacencyCursor init(long node) {
+    public void init(long node) {
         int nodeId = (int) node;
         sourceNodeId = nodeId;
         currentOffset = adjacencyMatrix.col_idx[nodeId];
         // as exclusive range
         maxOffset = adjacencyMatrix.col_idx[nodeId + 1] - 1;
-        return this;
     }
 
 
@@ -84,7 +79,8 @@ public class EjmlAdjacencyCursor implements AdjacencyCursor {
      * {@code skipUntil(target) <= target} can be used to distinguish the no-more-ids case and afterwards {@link #hasNextVLong()}
      * will return {@code false}
      */
-    long skipUntil(long nodeId) {
+    @Override
+    public long skipUntil(long nodeId) {
         int targetId = -1;
         for (; currentOffset <= maxOffset; currentOffset++) {
             targetId = adjacencyMatrix.nz_rows[currentOffset];
@@ -99,13 +95,17 @@ public class EjmlAdjacencyCursor implements AdjacencyCursor {
     /**
      * Copy iteration state from another cursor without changing {@code other}.
      */
-    void copyFrom(EjmlAdjacencyCursor sourceCursor) {
+    @Override
+    public void copyFrom(AdjacencyCursor other) {
+        assert(other instanceof EjmlAdjacencyCursor);
+        EjmlAdjacencyCursor sourceCursor = (EjmlAdjacencyCursor) other;
         sourceNodeId = sourceCursor.sourceNodeId;
         currentOffset = sourceCursor.currentOffset;
         maxOffset = sourceCursor.maxOffset;
     }
 
-    long advance(long nodeId) {
+    @Override
+    public long advance(long nodeId) {
         int targetId = -1;
         for (; currentOffset <= maxOffset; currentOffset++) {
             targetId = adjacencyMatrix.nz_rows[currentOffset];
