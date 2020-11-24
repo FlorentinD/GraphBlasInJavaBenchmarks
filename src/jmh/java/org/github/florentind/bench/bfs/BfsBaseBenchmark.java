@@ -22,12 +22,14 @@ public class BfsBaseBenchmark extends EjmlGraphBaseBenchmark {
     // node in the middle (id-wise)
     int startNode;
 
-    // TODO: retrieve actually run iterations (for eval explanation)
-    @Param({"100"})
-    protected int maxIterations;
+    // as JGraphT supports no max-iterations parameter
+    final static int MAX_ITERATIONS = Integer.MAX_VALUE;
 
-    @Param({"POWER_LAW", "UNIFORM"})
+    @Param({"POWER_LAW"})
     protected String degreeDistribution;
+
+    @Param({"UNDIRECTED"})
+    protected String orientation;
 
     @Override
     @Setup
@@ -44,7 +46,7 @@ public class BfsBaseBenchmark extends EjmlGraphBaseBenchmark {
                 .averageDegree(avgDegree)
                 .seed(42L)
                 .aggregation(Aggregation.MAX)
-                .orientation(Orientation.UNDIRECTED)
+                .orientation(Orientation.valueOf(orientation))
                 .relationshipDistribution(RelationshipDistribution.valueOf(degreeDistribution))
                 .allocationTracker(AllocationTracker.empty())
                 .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.NO)

@@ -25,7 +25,11 @@ public abstract class BaseBenchmarkTest {
     long seed = 42L;
     Aggregation aggregation = Aggregation.MAX;
     RandomGraphGeneratorConfig.AllowSelfLoops allowSelfLoops = RandomGraphGeneratorConfig.AllowSelfLoops.NO;
-    RelationshipDistribution relationshipDistribution = RelationshipDistribution.POWER_LAW;
+
+    RelationshipDistribution relationshipDistribution() {
+        return RelationshipDistribution.POWER_LAW;
+    }
+
     PropertyProducer relationshipPropertyProducer() {
         return null;
     }
@@ -43,7 +47,7 @@ public abstract class BaseBenchmarkTest {
                 .allocationTracker(AllocationTracker.empty())
                 .orientation(orientation())
                 .allowSelfLoops(allowSelfLoops)
-                .relationshipDistribution(relationshipDistribution);
+                .relationshipDistribution(relationshipDistribution());
 
         if (relationshipPropertyProducer() != null) {
             builder.relationshipPropertyProducer(relationshipPropertyProducer());

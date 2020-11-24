@@ -29,7 +29,7 @@ public class BfsPregelBenchmark extends BfsBaseBenchmark {
         super.setup();
 
         config = ImmutableBFSPregelConfig.builder()
-                .maxIterations(maxIterations)
+                .maxIterations(MAX_ITERATIONS)
                 .startNode(0)
                 .concurrency(concurrency)
                 .build();

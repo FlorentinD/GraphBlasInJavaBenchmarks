@@ -23,31 +23,31 @@ public class BfsEjmlBenchmark extends BfsBaseBenchmark {
 
     @Benchmark
     public void ejmlSparseBfsLevel(Blackhole bh) {
-        bh.consume(new BfsEjml().computeSparse(transposedMatrix, BfsEjml.BfsVariation.LEVEL, startNode, maxIterations));
+        bh.consume(new BfsEjml().computeSparse(transposedMatrix, BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS));
     }
 
     @org.openjdk.jmh.annotations.Benchmark
     public void ejmlSparseBfsParent(Blackhole bh) {
-        bh.consume(new BfsEjml().computeSparse(transposedMatrix, BfsEjml.BfsVariation.PARENTS, startNode, maxIterations));
+        bh.consume(new BfsEjml().computeSparse(transposedMatrix, BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS));
     }
 
     @Benchmark
     public void ejmlDenseSparseBfsLevel(Blackhole bh) {
-        bh.consume(new BfsEjml().computeDenseSparse(transposedMatrix, BfsEjml.BfsVariation.LEVEL, startNode, maxIterations));
+        bh.consume(new BfsEjml().computeDenseSparse(transposedMatrix, BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS));
     }
 
     @org.openjdk.jmh.annotations.Benchmark
     public void ejmlDenseSparseBfsParent(Blackhole bh) {
-        bh.consume(new BfsEjml().computeDenseSparse(transposedMatrix, BfsEjml.BfsVariation.PARENTS, startNode, maxIterations));
+        bh.consume(new BfsEjml().computeDenseSparse(transposedMatrix, BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS));
     }
 
     @org.openjdk.jmh.annotations.Benchmark
     public void ejmlDenseBfsLevel(Blackhole bh) {
-        bh.consume(new BfsEjml().computeDense(matrix, BfsEjml.BfsVariation.LEVEL, startNode, maxIterations));
+        bh.consume(new BfsEjml().computeDense(matrix, BfsEjml.BfsVariation.LEVEL, startNode, MAX_ITERATIONS));
     }
 
 //    @org.openjdk.jmh.annotations.Benchmark
 //    public void ejmlDenseBfsParent(Blackhole bh) {
-//        bh.consume(new BfsEjml().computeDense(matrix, BfsEjml.BfsVariation.PARENTS, startNode, maxIterations));
+//        bh.consume(new BfsEjml().computeDense(matrix, BfsEjml.BfsVariation.PARENTS, startNode, MAX_ITERATIONS));
 //    }
 }

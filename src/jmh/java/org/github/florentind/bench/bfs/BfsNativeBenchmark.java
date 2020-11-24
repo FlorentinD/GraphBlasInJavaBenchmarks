@@ -35,12 +35,12 @@ public class BfsNativeBenchmark extends BfsBaseBenchmark {
 
     @Benchmark
     public void jniBfsLevel(Blackhole bh) {
-        bh.consume(new BfsNative().computeLevel(jniMatrix, startNode, maxIterations, concurrency));
+        bh.consume(new BfsNative().computeLevel(jniMatrix, startNode, MAX_ITERATIONS, concurrency));
     }
 
     @Benchmark
     public void jniBfsParent(Blackhole bh) {
-        bh.consume(new BfsNative().computeParent(jniMatrix, startNode, maxIterations, concurrency));
+        bh.consume(new BfsNative().computeParent(jniMatrix, startNode, MAX_ITERATIONS, concurrency));
     }
 
     @Override

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphalgo.Orientation;
 import org.neo4j.graphalgo.api.Graph;
+import org.neo4j.graphalgo.beta.generator.RelationshipDistribution;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.PregelComputation;
 import org.neo4j.graphalgo.beta.pregel.bfs.BFSLevelPregel;
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BfsLevelBenchmarkTest extends BaseBenchmarkTest {
     private static final int NODE_COUNT = 1000_000;
-    private static final int MAX_ITERATIONS = 100;
+    private static final int MAX_ITERATIONS = Integer.MAX_VALUE;
     private static final int CONCURRENCY = 16;
     private static final int START_NODE = NODE_COUNT / 2;
 
