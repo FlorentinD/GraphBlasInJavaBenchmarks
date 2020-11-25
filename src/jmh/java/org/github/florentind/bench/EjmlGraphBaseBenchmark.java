@@ -16,13 +16,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Benchmarks only based on EJML-Graphs
  */
-@BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 2)
-@Measurement(iterations = 5)
-@State(Scope.Benchmark)
-@Fork(value = 2, warmups = 1)
-public class EjmlGraphBaseBenchmark {
+public class EjmlGraphBaseBenchmark extends BaseBenchmark {
     GdsGraphDatabaseAPI db;
 
     protected EjmlGraph graph;
