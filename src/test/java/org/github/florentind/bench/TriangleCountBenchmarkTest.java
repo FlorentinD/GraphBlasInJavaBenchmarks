@@ -147,24 +147,22 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
         assertEquals(expected.totalCount(), GraphMetrics.getNumberOfTriangles(jGraph));
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"false", "true"})
-    public void testPregel(boolean useIndices) {
+    @Test
+    public void testPregel() {
         var triangleCountJob = Pregel.create(
                 graph,
                 ImmutableTriangleCountPregelConfig.builder()
                         .concurrency(CONCURRENCY)
-                        .indexNeighbours(useIndices)
                         .build(),
                 new TriangleCountPregel(),
                 Pools.DEFAULT,
                 AllocationTracker.empty()
         );
 
-        NativeNodeWiseTriangleCountResult result = new NativeNodeWiseTriangleCountResult(
+        var result = new NativeNodeWiseTriangleCountResult(
                 triangleCountJob.run().nodeValues().longProperties(TriangleCountPregel.TRIANGLE_COUNT).toArray()
         );
-        assertEquals(expected.totalCount(), result.totalCount());
+        assertNodeWiseCount(expected, result);
     }
 
     void assertNodeWiseCount(TriangleCountResult expected, TriangleCountResult actual) {

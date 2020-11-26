@@ -22,7 +22,6 @@ public class TriangleCountPregelBenchmark extends TriangleCountBaseBenchmark {
                 graph,
                 ImmutableTriangleCountPregelConfig.builder()
                         .concurrency(concurrency)
-                        .indexNeighbours(useIndices)
                         .build(),
                 new TriangleCountPregel(),
                 Pools.DEFAULT,
