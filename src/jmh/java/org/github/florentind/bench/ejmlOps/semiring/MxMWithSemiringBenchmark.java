@@ -12,7 +12,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import java.util.HashMap;
 
 
-public class MxMWithSemiringsBenchmark extends MatrixOpsWithSemiringBaseBenchmark {
+public class MxMWithSemiringBenchmark extends MatrixOpsWithSemiringBaseBenchmark {
     protected static final HashMap<String, DSemiRing> semiRings = new HashMap<>() {{
         put(PLUS_TIMES, DSemiRings.PLUS_TIMES);
         put(OR_AND, DSemiRings.OR_AND);

@@ -15,8 +15,8 @@
 
 ### Semirings 
 * 2 operations:  
-    * reduceColumnWise (nearly zero structural overhead)
-    * mxm (same matrix)
+    * reduceColumnWise (nearly zero structural overhead) -- include: ".*MxMWithSemiring.*"
+    * mxm (same matrix) -- include: ".*ReduceColumnWiseWithSemiring.*"
 * matrix: random matrices in CSC with uniform distribution and dimension (0.1M, 0.5M, 1M) 
 * 4 semirings: arithmetic (+, *), boolean (or, and), (or, pair) expected to be fastest, (min, max)
 * compare against: prev. ejml version (hard-coded arithmetic semiring) and native version (suite-sparse)

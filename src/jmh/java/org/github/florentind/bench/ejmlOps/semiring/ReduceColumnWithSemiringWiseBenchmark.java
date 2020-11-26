@@ -10,7 +10,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import java.util.HashMap;
 
 
-public class ReduceColumnWiseBenchmark extends MatrixOpsWithMonoidBaseBenchmark {
+public class ReduceColumnWithSemiringWiseBenchmark extends MatrixOpsWithMonoidBaseBenchmark {
     protected static final HashMap<String, DMonoid> monoids = new HashMap<>() {{
         put(PLUS, DMonoids.PLUS);
         put(OR, DMonoids.OR);

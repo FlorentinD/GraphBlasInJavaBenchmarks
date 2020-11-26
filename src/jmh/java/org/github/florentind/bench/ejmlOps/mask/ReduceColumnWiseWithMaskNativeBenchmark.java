@@ -46,7 +46,7 @@ public class ReduceColumnWiseWithMaskNativeBenchmark extends ReduceColumnWiseWit
     }
 
     @Benchmark
-    public void reduceColWiseNativeWithMask(Blackhole bh) {
+    public void reduceColWiseWithMaskNative(Blackhole bh) {
         checkStatusCode(GRBOPSMAT.matrixReduceMonoid(nativeResult, nativeMask, null, nativeMonoid, nativeMatrix, descriptor));
         bh.consume(vectorWait(nativeResult));
     }

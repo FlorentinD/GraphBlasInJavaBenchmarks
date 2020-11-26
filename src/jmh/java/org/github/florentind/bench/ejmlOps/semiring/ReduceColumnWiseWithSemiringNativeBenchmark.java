@@ -15,7 +15,7 @@ import static com.github.fabianmurariu.unsafe.GRAPHBLAS.doubleType;
 import static com.github.fabianmurariu.unsafe.GRBCORE.*;
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 
-public class ReduceColumnWiseNativeBenchmark extends MatrixOpsWithMonoidBaseBenchmark {
+public class ReduceColumnWiseWithSemiringNativeBenchmark extends MatrixOpsWithMonoidBaseBenchmark {
     protected static final HashMap<String, Buffer> monoids = new HashMap<>() {{
         put(PLUS, GRBMONOID.plusMonoidDouble());
         put(OR, GRBMONOID.lorMonoid());
@@ -40,7 +40,7 @@ public class ReduceColumnWiseNativeBenchmark extends MatrixOpsWithMonoidBaseBenc
     }
 
     @Benchmark
-    public void reduceColWiseNativeWithMask(Blackhole bh) {
+    public void reduceColWiseNative(Blackhole bh) {
         checkStatusCode(GRBOPSMAT.matrixReduceMonoid(nativeResult, null, null, monoids.get(monoidName), nativeMatrix, descriptor));
         bh.consume(vectorWait(nativeResult));
     }
