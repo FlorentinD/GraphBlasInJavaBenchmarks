@@ -25,6 +25,7 @@ public class ReduceColumnWiseWithSemiringNativeBenchmark extends MatrixOpsWithMo
     Buffer nativeMatrix;
     Buffer nativeResult;
     Buffer descriptor;
+    Buffer monoid;
 
     @Override
     @Setup
@@ -37,11 +38,12 @@ public class ReduceColumnWiseWithSemiringNativeBenchmark extends MatrixOpsWithMo
         descriptor = createDescriptor();
         // otherwise would be reduceRowWise
         setDescriptorValue(descriptor, GrB_INP0, GrB_TRAN);
+        monoid = monoids.get(monoidName);
     }
 
     @Benchmark
     public void reduceColWiseNative(Blackhole bh) {
-        checkStatusCode(GRBOPSMAT.matrixReduceMonoid(nativeResult, null, null, monoids.get(monoidName), nativeMatrix, descriptor));
+        checkStatusCode(GRBOPSMAT.matrixReduceMonoid(nativeResult, null, null, monoid, nativeMatrix, descriptor));
         bh.consume(vectorWait(nativeResult));
     }
 
