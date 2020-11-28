@@ -15,6 +15,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import java.nio.Buffer;
 import java.util.HashMap;
 
+import static com.github.fabianmurariu.unsafe.GRBCORE.*;
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 
 public class MxMWithSemiringNativeBenchmark extends MatrixOpsWithSemiringBaseBenchmark {
@@ -29,6 +30,7 @@ public class MxMWithSemiringNativeBenchmark extends MatrixOpsWithSemiringBaseBen
     protected Buffer nativeMatrix;
     protected Buffer nativeResult;
     protected Buffer semiring;
+    Buffer descriptor;
 
     @Param({PLUS_TIMES, OR_PAIR, OR_AND, MIN_MAX})
     protected String semiRingName;
@@ -43,11 +45,13 @@ public class MxMWithSemiringNativeBenchmark extends MatrixOpsWithSemiringBaseBen
         nativeResult = GRBCORE.createMatrix(GRAPHBLAS.doubleType(), matrix.numRows, matrix.numCols);
         var monoids = semiRings.get(semiRingName);
         semiring = GRBCORE.createSemiring(monoids.getLeft(), monoids.getRight());
+        descriptor = createDescriptor();
+        setDescriptorValue(descriptor, GxB_AxB_METHOD, GxB_AxB_GUSTAVSON);
     }
 
     @Benchmark
     public void mxmNative(Blackhole bh) {
-        checkStatusCode(GRBOPSMAT.mxm(nativeResult, null, null, semiring, nativeMatrix, nativeMatrix, null));
+        checkStatusCode(GRBOPSMAT.mxm(nativeResult, null, null, semiring, nativeMatrix, nativeMatrix, descriptor));
         bh.consume(GRBCORE.matrixWait(nativeResult));
     }
 
@@ -55,6 +59,7 @@ public class MxMWithSemiringNativeBenchmark extends MatrixOpsWithSemiringBaseBen
     public void tearDown() {
         GRBCORE.freeMatrix(nativeResult);
         GRBCORE.freeMatrix(nativeMatrix);
+        GRBCORE.freeDescriptor(descriptor);
         checkStatusCode(GRBCORE.grbFinalize());
     }
 }

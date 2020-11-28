@@ -1,8 +1,5 @@
 package org.github.florentind.bench.ejmlOps.mask;
 
-import com.github.fabianmurariu.unsafe.GRAPHBLAS;
-import com.github.fabianmurariu.unsafe.GRBMONOID;
-import com.github.fabianmurariu.unsafe.GRBOPSMAT;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Setup;
@@ -11,10 +8,11 @@ import org.openjdk.jmh.infra.Blackhole;
 
 import java.nio.Buffer;
 
-import static com.github.fabianmurariu.unsafe.GRAPHBLAS.*;
+import static com.github.fabianmurariu.unsafe.GRAPHBLAS.doubleType;
+import static com.github.fabianmurariu.unsafe.GRAPHBLAS.timesBinaryOpDouble;
 import static com.github.fabianmurariu.unsafe.GRBCORE.*;
-import static com.github.fabianmurariu.unsafe.GRBMONOID.*;
-import static com.github.fabianmurariu.unsafe.GRBOPSMAT.*;
+import static com.github.fabianmurariu.unsafe.GRBMONOID.plusMonoidDouble;
+import static com.github.fabianmurariu.unsafe.GRBOPSMAT.mxm;
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 
 public class MxMWithMaskNativeBenchmark extends MxMWithMaskBaseBenchmark {
@@ -36,6 +34,7 @@ public class MxMWithMaskNativeBenchmark extends MxMWithMaskBaseBenchmark {
         nativeResult = createMatrix(doubleType(), matrix.numRows, matrix.numCols);
         semiring = createSemiring(plusMonoidDouble(), timesBinaryOpDouble());
         descriptor = createDescriptor();
+        setDescriptorValue(descriptor, GxB_AxB_METHOD, GxB_AxB_GUSTAVSON);
         if (negatedMask) setDescriptorValue(descriptor, GrB_MASK, GrB_COMP);
         if (structuralMask) setDescriptorValue(descriptor, GrB_MASK, GrB_STRUCTURE);
     }
