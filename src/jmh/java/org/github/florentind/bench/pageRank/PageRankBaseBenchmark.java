@@ -17,16 +17,16 @@ import java.util.HashMap;
 
 public class PageRankBaseBenchmark extends EjmlGraphBaseBenchmark {
     protected static HashMap<String, Pair<Integer, Integer>> nodeCountIterationsPairs = new HashMap<>() {{
-        put("0.1M,20", Pair.of(100_000, 20));
-        put("0.5M,20", Pair.of(500_000, 20));
-        put("1M,20", Pair.of(1_000_000, 20));
-        put("5M,20", Pair.of(5_000_000, 20));
-        put("1M,5", Pair.of(1_000_000, 5));
-        put("1M,10", Pair.of(1_000_000, 10));
-        put("1M,15", Pair.of(1_000_000, 15));
+        put("0.1M;20", Pair.of(100_000, 20));
+        put("0.5M;20", Pair.of(500_000, 20));
+        put("1M;20", Pair.of(1_000_000, 20));
+        put("5M;20", Pair.of(5_000_000, 20));
+        put("1M;5", Pair.of(1_000_000, 5));
+        put("1M;10", Pair.of(1_000_000, 10));
+        put("1M;15", Pair.of(1_000_000, 15));
     }};
 
-    @Param({"0.1M,20", "0.5M,20", "1M,20", "5M,20", "1M,5", "1M,10", "1M,15"})
+    @Param({"0.1M;20", "0.5M;20", "1M;20", "5M;20", "1M;5", "1M;10", "1M;15"})
     protected String nodeCountIterationCombinations;
 
     protected int nodeCount;
