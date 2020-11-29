@@ -29,22 +29,35 @@ baseLineForMask["structuralMask"] = "None"
 baseLineForMask["avgEntriesPerColumnInMask"] = "None"
 
 mask_parameters = ["negatedMask", "structuralMask"]
+scoreUnit = maskResults["Units"].unique()[0]
+matrixDim = maskResults["dimension"].unique()
+assert len(matrixDim) == 1
+matrixDim = matrixDim[0]
 
 for entriesPerMaskColumn in maskResults["avgEntriesPerColumnInMask"].unique():
-    # bar plot negated/non-negated
-    title = "MxM with negated Mask with {} entries per mask column".format(entriesPerMaskColumn)
-    negatedMaskDf = maskResults[(maskResults["structuralMask"]) & (maskResults["avgEntriesPerColumnInMask"] == entriesPerMaskColumn)]
-    negatedMaskDf = negatedMaskDf.append(baseLineForMask)
-    negatedPlot = sns.barplot(x="Library", y="Score", hue="negatedMask", data=negatedMaskDf)
-    negatedPlot.set_title(title)
-    plt.show()
+    for boolVal in [True, False]:
+        # bar plot negated/non-negated
+        title = "MxM with negated Mask with {} entries per mask column \n (matrices dim: {}, structural: {})".format(
+            entriesPerMaskColumn, matrixDim, boolVal)
+        negatedMaskDf = maskResults[(maskResults["structuralMask"] == boolVal) & (
+                    maskResults["avgEntriesPerColumnInMask"] == entriesPerMaskColumn)]
+        negatedMaskDf = negatedMaskDf.append(baseLineForMask)
+        negatedPlot = sns.barplot(x="Library", y="Score", hue="negatedMask", data=negatedMaskDf)
+        negatedPlot.set_title(title)
+        negatedPlot.set_ylabel("Time in {}".format(scoreUnit))
+        negatedPlot.set_xlabel("GraphBLAS library")
+        plt.show()
 
-    title = "MxM with structural Mask with {} entries per mask column".format(entriesPerMaskColumn)
-    structuralMaskDf = maskResults[(maskResults["negatedMask"]) & (maskResults["avgEntriesPerColumnInMask"] == entriesPerMaskColumn)]
-    structuralMaskDf = structuralMaskDf.append(baseLineForMask)
-    structuralPlot = sns.barplot(x="Library", y="Score", hue="structuralMask", data=structuralMaskDf)
-    structuralPlot.set_title(title)
-    plt.show()
+        title = "MxM with structural Mask with {} entries per mask column \n (matrices dim: {}, negated: {})".format(
+            entriesPerMaskColumn, matrixDim, boolVal)
+        structuralMaskDf = maskResults[(maskResults["negatedMask"] == boolVal) & (
+                    maskResults["avgEntriesPerColumnInMask"] == entriesPerMaskColumn)]
+        structuralMaskDf = structuralMaskDf.append(baseLineForMask)
+        structuralPlot = sns.barplot(x="Library", y="Score", hue="structuralMask", data=structuralMaskDf)
+        structuralPlot.set_title(title)
+        structuralPlot.set_ylabel("Time in {}".format(scoreUnit))
+        structuralPlot.set_xlabel("GraphBLAS library")
+        plt.show()
 
 # import seaborn as sns
 

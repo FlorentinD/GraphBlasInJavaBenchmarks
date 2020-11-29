@@ -74,7 +74,7 @@ public class MxMWithMaskBenchmarksTest {
         checkStatusCode(GRBOPSMAT.mxm(nativeResult, nativeMask, null, semiring, nativeMatrix, nativeMatrix, descriptor));
         matrixWait(nativeResult);
 
-        //System.out.println("ejmlResult.nz_length = " + ejmlResult.nz_length);
+        //System.out.println(String.format("(avgDegreeInMask: %d negated: %b, structural: %b) result size: %d", avgDegreeInMask, negatedMask, structuralMask,ejmlResult.nz_length));
         assertEquals(ejmlResult.nz_length, GRBCORE.nvalsMatrix(nativeResult));
 
         freeMatrix(nativeResult);

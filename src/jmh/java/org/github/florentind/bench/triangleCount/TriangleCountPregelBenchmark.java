@@ -13,9 +13,6 @@ public class TriangleCountPregelBenchmark extends TriangleCountBaseBenchmark {
     @Param({"1", "8"})
     private int concurrency;
 
-    @Param({"true"})
-    private boolean useIndices;
-
     @Benchmark
     public void pregel(Blackhole bh) {
         var triangleCountJob = Pregel.create(
