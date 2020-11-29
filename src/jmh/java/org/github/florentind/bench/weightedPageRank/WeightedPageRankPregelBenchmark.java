@@ -16,6 +16,10 @@ public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchma
     @Param({"1", "8"})
     private int concurrency;
 
+    // skipping 5M version (takes too long)
+    @Param({"0.1M,20", "0.5M,20", "1M,20", "1M,5", "1M,10", "1M,15"})
+    protected String nodeCountIterationCombinations;
+
     private PageRankPregel.PageRankPregelConfig config;
 
     private Pregel<PageRankPregel.PageRankPregelConfig> pregel;
@@ -34,7 +38,10 @@ public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchma
 
         // as Pregel implementation has no good way to normalize the weights
         EjmlUtil.normalizeOutgoingWeights(graph);
+    }
 
+    @org.openjdk.jmh.annotations.Benchmark
+    public void pregel(Blackhole bh) {
         // init Pregel structures beforehand
         pregel = Pregel.create(
                 graph,
@@ -43,11 +50,7 @@ public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchma
                 Pools.DEFAULT,
                 AllocationTracker.empty()
         );
-    }
 
-    // TODO: add tolerance feature to Pregel (otherwise Pregel has an advantage)
-    @org.openjdk.jmh.annotations.Benchmark
-    public void pregel(Blackhole bh) {
         bh.consume(pregel.run());
     }
 }

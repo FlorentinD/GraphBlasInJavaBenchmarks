@@ -14,10 +14,6 @@ public class PageRankPregelBenchmark extends PageRankBaseBenchmark {
     @Param({"1", "8"})
     private int concurrency;
 
-    // as Pregel is to slow for 3 million nodes
-    @Param({"300000"})
-    int nodeCount;
-
     private PageRankPregel.PageRankPregelConfig config;
 
     private Pregel<PageRankPregel.PageRankPregelConfig> pregel;
@@ -32,6 +28,11 @@ public class PageRankPregelBenchmark extends PageRankBaseBenchmark {
                 .concurrency(concurrency)
                 .build();
 
+
+    }
+
+    @org.openjdk.jmh.annotations.Benchmark
+    public void pregel(Blackhole bh) {
         // init Pregel structures beforehand
         pregel = Pregel.create(
                 graph,
@@ -40,12 +41,7 @@ public class PageRankPregelBenchmark extends PageRankBaseBenchmark {
                 Pools.DEFAULT,
                 AllocationTracker.empty()
         );
-    }
 
-    // TODO: add tolerance feature to Pregel (otherwise Pregel has an advantage)
-    // TODO: also normalize result as in ejml version done automatically?
-    @org.openjdk.jmh.annotations.Benchmark
-    public void pregel(Blackhole bh) {
         bh.consume(pregel.run());
     }
 }
