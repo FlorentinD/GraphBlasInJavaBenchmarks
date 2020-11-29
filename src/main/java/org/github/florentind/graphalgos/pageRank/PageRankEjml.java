@@ -38,7 +38,7 @@ public class PageRankEjml {
 
         // init result vector
         double[] pr = new double[nodeCount];
-        double[] prevResult = new double[nodeCount];
+        double[] prevPr = new double[nodeCount];
         Arrays.fill(pr, 1.0 / nodeCount);
 
         double[] importanceVec = new double[nodeCount];
@@ -47,8 +47,10 @@ public class PageRankEjml {
 
         //iterations
         for (; iterations < maxIterations && resultDiff > tolerance; iterations++) {
-            // cache result from previous iteration
-            System.arraycopy(pr, 0, prevResult, 0, pr.length);
+            // Swap prevPr and result
+            tmp = pr;
+            pr = prevPr;
+            prevPr = tmp;
 
             //
             // Importance calculation
@@ -58,7 +60,7 @@ public class PageRankEjml {
             // Reason: outDegrees vector would be sparse in other GraphBLAS implementations (here always dense)
             // ! this should only be done if outDegree != 0?
             //  (otherwise division through 0, but result is ignored in next mult-op either way) (assume mask overhead is higher than gain)
-            CommonOps_DArray.elementWiseMult(pr, outDegrees, pr, (a, b) -> a / b);
+            CommonOps_DArray.elementWiseMult(prevPr, outDegrees, pr, (a, b) -> a / b);
 
             // Calculate total PR of all inbound nodes
             //  --> importanceResultVec (instead of allocating a new result array per iteration)
@@ -83,9 +85,9 @@ public class PageRankEjml {
             CommonOps_DArray.apply(pr, score -> score * dampingFactor + teleport);
 
             // calculate diff (for tolerance check)
-            CommonOps_DArray.elementWiseMult(prevResult, pr, prevResult, (a,b) -> a - b);
-            CommonOps_DArray.apply(prevResult, Math::abs);
-            resultDiff = CommonOps_DArray.reduceScalar(prevResult,0, DMonoids.PLUS.func);
+            CommonOps_DArray.elementWiseMult(prevPr, pr, prevPr, (a,b) -> a - b);
+            CommonOps_DArray.apply(prevPr, Math::abs);
+            resultDiff = CommonOps_DArray.reduceScalar(prevPr,0, DMonoids.PLUS.func);
         }
 
         return new PageRankResult(pr, iterations);
@@ -128,7 +130,7 @@ public class PageRankEjml {
 
         // init result vector
         double[] pr = new double[nodeCount];
-        double[] prevResult = new double[nodeCount];
+        double[] prevPr = new double[nodeCount];
         Arrays.fill(pr, 1.0 / nodeCount);
 
         double[] tmp;
@@ -137,8 +139,10 @@ public class PageRankEjml {
 
         //iterations
         for (; iterations < maxIterations && resultDiff > tolerance; iterations++) {
-            // cache result from previous iteration
-            System.arraycopy(pr, 0, prevResult, 0, pr.length);
+            // Swap prevPr and result
+            tmp = pr;
+            pr = prevPr;
+            prevPr = tmp;
 
             //
             // Importance calculation
@@ -149,7 +153,7 @@ public class PageRankEjml {
             //  --> importanceResultVec (instead of allocating a new result array per iteration)
             // PLUS_TIMES as now entries are relevant
             importanceVec = MatrixVectorMultWithSemiRing_DSCC.mult(
-                    pr,
+                    prevPr,
                     adjacencyMatrix,
                     importanceVec,
                     DSemiRings.PLUS_TIMES,
@@ -170,9 +174,9 @@ public class PageRankEjml {
 
             // !! Difference to reference: no tolerance contained
             // calculate diff (for tolerance check)
-            CommonOps_DArray.elementWiseMult(prevResult, pr, prevResult, (a,b) -> a - b);
-            CommonOps_DArray.apply(prevResult, Math::abs);
-            resultDiff = CommonOps_DArray.reduceScalar(prevResult, 0, DMonoids.PLUS.func);
+            CommonOps_DArray.elementWiseMult(prevPr, pr, prevPr, (a,b) -> a - b);
+            CommonOps_DArray.apply(prevPr, Math::abs);
+            resultDiff = CommonOps_DArray.reduceScalar(prevPr, 0, DMonoids.PLUS.func);
         }
 
         return new PageRankResult(pr, iterations);

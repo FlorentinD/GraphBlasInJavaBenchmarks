@@ -49,7 +49,7 @@ public class PageRankNative {
        checkStatusCode(mxv(dOut, null, null, plusSecondSemiring, adjacencyMatrix, tmp_one_array, null));
 
         Buffer pr = createVector(doubleType(), nodeCount);
-        Buffer prevResult = createVector(doubleType(), nodeCount);
+        Buffer prevPr = createVector(doubleType(), nodeCount);
         checkStatusCode(assignVectorDouble(pr, null, null, 1.0 / nodeCount, GrB_ALL, nodeCount, null));
 
         Buffer invertedMask = createDescriptor();
@@ -60,11 +60,15 @@ public class PageRankNative {
 
         int iteration = 0;
 
+        Buffer tmp;
+
         Buffer plusFirstSemiring = createSemiring(plusMonoidDouble(), firstBinaryOpDouble());
 
         for (; iteration < maxIterations && resultDiff > tolerance; iteration++) {
-            // ?? !Difference: in C would just swap prevResult and result
-            assign(prevResult, null, secondBinaryOpDouble(), pr, GrB_ALL, nodeCount, null);
+            // Swap prevPr and result
+            tmp = pr;
+            pr = prevPr;
+            prevPr = tmp;
 
             //
             // Importance calculation
@@ -72,12 +76,12 @@ public class PageRankNative {
 
             // Multiply importance by damping factor
             checkStatusCode(
-                    assignVectorDouble(pr, null, timesBinaryOpDouble(), dampingFactor, GrB_ALL, nodeCount, null)
+                    assignVectorDouble(prevPr, null, timesBinaryOpDouble(), dampingFactor, GrB_ALL, nodeCount, null)
             );
 
             // Divide previous PageRank with number of outbound edges
             checkStatusCode(
-                    elemWiseMulIntersectBinOp(pr, null, null, divBinaryOpDouble(), pr, dOut, null)
+                    elemWiseMulIntersectBinOp(pr, null, null, divBinaryOpDouble(), prevPr, dOut, null)
             );
 
             // Calculate total PR of all inbound vertices
@@ -93,9 +97,9 @@ public class PageRankNative {
 
 
             // Calculate result difference
-            checkStatusCode(elemWiseAddUnionBinOp(prevResult, null, null, minusBinaryOpDouble(), prevResult, pr, null));
-            checkStatusCode(vectorApply(prevResult, null, null, absUnaryOpDouble(), prevResult, null));
-            resultDiff = vectorReduceAllDouble(0.0, null, plusMonoidDouble(), prevResult, null);
+            checkStatusCode(elemWiseAddUnionBinOp(prevPr, null, null, minusBinaryOpDouble(), prevPr, pr, null));
+            checkStatusCode(vectorApply(prevPr, null, null, absUnaryOpDouble(), prevPr, null));
+            resultDiff = vectorReduceAllDouble(0.0, null, plusMonoidDouble(), prevPr, null);
         }
 
         double[] values = new double[Math.toIntExact(nodeCount)];
@@ -106,7 +110,7 @@ public class PageRankNative {
         freeVector(dOut);
         freeVector(tmp_one_array);
         freeVector(pr);
-        freeVector(prevResult);
+        freeVector(prevPr);
         freeDescriptor(invertedMask);
         freeSemiring(plusSecondSemiring);
         freeSemiring(plusFirstSemiring);
@@ -156,7 +160,7 @@ public class PageRankNative {
 
 
         Buffer pr = createVector(doubleType(), nodeCount);
-        Buffer prevResult = createVector(doubleType(), nodeCount);
+        Buffer prevPr = createVector(doubleType(), nodeCount);
         checkStatusCode(assignVectorDouble(pr, null, null, 1.0 / nodeCount, GrB_ALL, nodeCount, null));
 
         Buffer invertedMask = createDescriptor();
@@ -167,11 +171,15 @@ public class PageRankNative {
 
         int iteration = 0;
 
+        Buffer tmp;
+
         Buffer plusTimesSemiring = createSemiring(plusMonoidDouble(), timesBinaryOpDouble());
 
         for (; iteration < maxIterations && resultDiff > tolerance; iteration++) {
-            // !Difference: in C would just swap prevResult and result
-            checkStatusCode(assign(prevResult, null, secondBinaryOpDouble(), pr, GrB_ALL, nodeCount, null));
+            // cache prev result
+            tmp = pr;
+            pr = prevPr;
+            prevPr = tmp;
 
             //
             // Importance calculation
@@ -179,13 +187,13 @@ public class PageRankNative {
 
             // Multiply importance by damping factor
             checkStatusCode(
-                    assignVectorDouble(pr, null, timesBinaryOpDouble(), dampingFactor, GrB_ALL, nodeCount, null)
+                    assignVectorDouble(prevPr, null, timesBinaryOpDouble(), dampingFactor, GrB_ALL, nodeCount, null)
             );
 
             // Calculate total PR of all inbound vertices
             // using plusFirst, as nz adj. matrix values are always 1
             checkStatusCode(
-                    vxm(pr, null, null, plusTimesSemiring, pr, adjacencyMatrix, null)
+                    vxm(pr, null, null, plusTimesSemiring, prevPr, adjacencyMatrix, null)
             );
 
             //
@@ -195,9 +203,9 @@ public class PageRankNative {
 
 
             // Calculate result difference
-            checkStatusCode(elemWiseAddUnionBinOp(prevResult, null, null, minusBinaryOpDouble(), prevResult, pr, null));
-            checkStatusCode(vectorApply(prevResult, null, null, absUnaryOpDouble(), prevResult, null));
-            resultDiff = vectorReduceAllDouble(0.0, null, plusMonoidDouble(), prevResult, null);
+            checkStatusCode(elemWiseAddUnionBinOp(prevPr, null, null, minusBinaryOpDouble(), prevPr, pr, null));
+            checkStatusCode(vectorApply(prevPr, null, null, absUnaryOpDouble(), prevPr, null));
+            resultDiff = vectorReduceAllDouble(0.0, null, plusMonoidDouble(), prevPr, null);
         }
 
         double[] values = new double[Math.toIntExact(nodeCount)];
@@ -208,7 +216,7 @@ public class PageRankNative {
 
         freeVector(sumOutWeights);
         freeVector(pr);
-        freeVector(prevResult);
+        freeVector(prevPr);
         freeDescriptor(invertedMask);
         freeSemiring(anyDivSemiRing);
         freeSemiring(plusTimesSemiring);
