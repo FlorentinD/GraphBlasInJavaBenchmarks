@@ -32,6 +32,10 @@ public class EjmlGraphBaseBenchmark extends BaseBenchmark {
 //    String dataset;
 
 
+    @Param({"1"})
+    private int concurrency;
+
+
     protected CSRGraph getCSRGraph() {
         return (CSRGraph) new StoreLoaderBuilder()
             .api(db)
