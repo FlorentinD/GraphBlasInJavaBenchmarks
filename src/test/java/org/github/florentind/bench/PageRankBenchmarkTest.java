@@ -8,11 +8,11 @@ import org.github.florentind.core.ejml.EjmlGraph;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.core.jgrapht.JGraphTConverter;
 import org.github.florentind.graphalgos.pageRank.PageRankEjml;
-import org.github.florentind.graphalgos.pageRank.PageRankGraphalyticsEjml;
 import org.github.florentind.graphalgos.pageRank.PageRankNative;
-import org.github.florentind.graphalgos.pageRank.ResultUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.pr.ImmutablePageRankPregelConfig;
 import org.neo4j.graphalgo.beta.pregel.pr.PageRankPregel;
@@ -31,10 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PageRankBenchmarkTest extends BaseBenchmarkTest {
-    private static final int NODE_COUNT = 300_000;
+    private static final int NODE_COUNT = 500_000;
     private static final int MAX_ITERATIONS = 20;
     private static final double DAMPING_FACTOR = 0.85;
-    private static final double TOLERANCE = 1e-7;
+    private static final double TOLERANCE = 1e-32;
     private static final int CONCURRENCY = 1;
 
     @Override
@@ -84,11 +84,12 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
         assertArrayEquals(goldStandard.getRight(), pregelResult.getRight(), 1e-2);
     }
 
-    @Test
-    void testNative() {
+    @ParameterizedTest
+    @ValueSource(strings = {"true", "false"})
+    void testNative(boolean by_col) {
         GRBCORE.initNonBlocking();
 
-        Buffer nativeMatrix = ToNativeMatrixConverter.convert(graph, true);
+        Buffer nativeMatrix = ToNativeMatrixConverter.convert(graph, by_col);
         var nativeResult = PageRankNative.compute(nativeMatrix, DAMPING_FACTOR, TOLERANCE, MAX_ITERATIONS, CONCURRENCY);
 
         GRBCORE.grbFinalize();

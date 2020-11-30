@@ -7,7 +7,6 @@ import static com.github.fabianmurariu.unsafe.GRBALG.vectorReduceAllDouble;
 import static com.github.fabianmurariu.unsafe.GRBCORE.*;
 import static com.github.fabianmurariu.unsafe.GRBMONOID.*;
 import static com.github.fabianmurariu.unsafe.GRBOPSMAT.*;
-import static com.github.fabianmurariu.unsafe.GRBOPSVEC.assign;
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 
 public class PageRankNative {
@@ -46,7 +45,7 @@ public class PageRankNative {
         Buffer tmp_one_array = createVector(longType(), nodeCount);
         assignVectorLong(tmp_one_array, null, null, 1, GrB_ALL, nodeCount, null);
         Buffer plusSecondSemiring = createSemiring(plusMonoidLong(), secondBinaryOpLong());
-       checkStatusCode(mxv(dOut, null, null, plusSecondSemiring, adjacencyMatrix, tmp_one_array, null));
+        checkStatusCode(mxv(dOut, null, null, plusSecondSemiring, adjacencyMatrix, tmp_one_array, null));
 
         Buffer pr = createVector(doubleType(), nodeCount);
         Buffer prevPr = createVector(doubleType(), nodeCount);

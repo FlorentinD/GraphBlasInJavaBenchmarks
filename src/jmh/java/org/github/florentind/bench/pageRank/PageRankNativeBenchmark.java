@@ -17,11 +17,14 @@ public class PageRankNativeBenchmark extends PageRankBaseBenchmark {
     @Param({"1", "8"})
     private int concurrency;
 
+    @Param({"true"})
+    private boolean by_col;
+
     @Setup
     public void setup() {
         super.setup();
         GRBCORE.initNonBlocking();
-        jniMatrix = ToNativeMatrixConverter.convert(graph);
+        jniMatrix = ToNativeMatrixConverter.convert(graph, by_col);
     }
 
     @org.openjdk.jmh.annotations.Benchmark
