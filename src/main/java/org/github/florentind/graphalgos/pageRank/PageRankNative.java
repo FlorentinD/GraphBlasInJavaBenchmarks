@@ -51,10 +51,6 @@ public class PageRankNative {
         Buffer prevPr = createVector(doubleType(), nodeCount);
         checkStatusCode(assignVectorDouble(pr, null, null, 1.0 / nodeCount, GrB_ALL, nodeCount, null));
 
-        Buffer invertedMask = createDescriptor();
-        checkStatusCode(setDescriptorValue(invertedMask, GrB_MASK, GrB_COMP));
-        checkStatusCode(setDescriptorValue(invertedMask, GrB_MASK, GrB_STRUCTURE));
-
         final double teleport = (1 - dampingFactor) / nodeCount;
 
         int iteration = 0;
@@ -110,7 +106,6 @@ public class PageRankNative {
         freeVector(tmp_one_array);
         freeVector(pr);
         freeVector(prevPr);
-        freeDescriptor(invertedMask);
         freeSemiring(plusSecondSemiring);
         freeSemiring(plusFirstSemiring);
 
@@ -162,10 +157,6 @@ public class PageRankNative {
         Buffer prevPr = createVector(doubleType(), nodeCount);
         checkStatusCode(assignVectorDouble(pr, null, null, 1.0 / nodeCount, GrB_ALL, nodeCount, null));
 
-        Buffer invertedMask = createDescriptor();
-        checkStatusCode(setDescriptorValue(invertedMask, GrB_MASK, GrB_COMP));
-        checkStatusCode(setDescriptorValue(invertedMask, GrB_MASK, GrB_STRUCTURE));
-
         final double teleport = (1 - dampingFactor) / nodeCount;
 
         int iteration = 0;
@@ -216,7 +207,6 @@ public class PageRankNative {
         freeVector(sumOutWeights);
         freeVector(pr);
         freeVector(prevPr);
-        freeDescriptor(invertedMask);
         freeSemiring(anyDivSemiRing);
         freeSemiring(plusTimesSemiring);
         // contains the normalized matrix and can be freed
