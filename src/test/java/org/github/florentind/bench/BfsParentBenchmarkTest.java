@@ -12,6 +12,7 @@ import org.github.florentind.graphalgos.bfs.BfsNative;
 import org.github.florentind.graphalgos.bfs.BfsResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.neo4j.graphalgo.Orientation;
 import org.neo4j.graphalgo.api.Graph;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.bfs.BFSParentPregel;
@@ -35,6 +36,11 @@ public class BfsParentBenchmarkTest extends BaseBenchmarkTest {
     @Override
     long nodeCount() {
         return NODE_COUNT;
+    }
+
+    @Override
+    Orientation orientation() {
+        return Orientation.UNDIRECTED;
     }
 
     @Override
