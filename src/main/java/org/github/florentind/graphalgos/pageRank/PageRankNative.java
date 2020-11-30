@@ -16,7 +16,6 @@ public class PageRankNative {
 
     /**
      * based on https://github.com/GraphBLAS/LAGraph/blob/master/Source/Algorithm/LAGraph_pagerank2.c
-     * and therefore LDBC-Graphalytics conform
      *
      * @param adjacencyMatrix (Input) Graph
      * @param dampingFactor   How often are teleports
@@ -69,14 +68,14 @@ public class PageRankNative {
             // Importance calculation
             //
 
-            // Multiply importance by damping factor
-            checkStatusCode(
-                    assignVectorDouble(prevPr, null, timesBinaryOpDouble(), dampingFactor, GrB_ALL, nodeCount, null)
-            );
-
             // Divide previous PageRank with number of outbound edges
             checkStatusCode(
                     elemWiseMulIntersectBinOp(pr, null, null, divBinaryOpDouble(), prevPr, dOut, null)
+            );
+
+            // Multiply importance by damping factor
+            checkStatusCode(
+                    assignVectorDouble(pr, null, timesBinaryOpDouble(), dampingFactor, GrB_ALL, nodeCount, null)
             );
 
             // Calculate total PR of all inbound vertices
@@ -176,12 +175,14 @@ public class PageRankNative {
             //
 
             // Multiply importance by damping factor
+            // (This results in not fully correct tolerance calculations,
+            //      but works for the benchmarks in the evaluation as early exit via tolerance is avoided)
+            // Ideally an apply could be used with the user defined function x*dampingFactor (written into pr vector)
             checkStatusCode(
                     assignVectorDouble(prevPr, null, timesBinaryOpDouble(), dampingFactor, GrB_ALL, nodeCount, null)
             );
 
             // Calculate total PR of all inbound vertices
-            // using plusFirst, as nz adj. matrix values are always 1
             checkStatusCode(
                     vxm(pr, null, null, plusTimesSemiring, prevPr, adjacencyMatrix, null)
             );
