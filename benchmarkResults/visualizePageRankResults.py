@@ -7,9 +7,13 @@ import pandas as pd
 
 # weighted source: results/weightedPageRank/weightedPageRankResult.csv
 weighted = True
+orientation = "Natural"
+# orientation = "Undirected"
 
 benchmarkResult = pd.read_csv(
     "results/{}.csv".format("weightedPageRank/weightedPageRankResultsServer" if weighted else "pageRank/pageRankResultsServer"))
+
+benchmarkResult = benchmarkResult[benchmarkResult.orientation == orientation]
 
 print(benchmarkResult.dtypes)
 print(benchmarkResult.head(5))
@@ -44,22 +48,27 @@ print("{} entries for iterations".format(len(iterationScalingResult)))
 import matplotlib.pyplot as plt
 import seaborn as sns
 from benchmarkResults.helper import grouped_barplot
+from benchmarkResults.helper import libColors
 
 # plot iteration scaling results
 # Idea: x-axis = "iterations" , y-axis = score , hue = library, style = concurrency
 # TODO: also show error?!
 
-iterationsPlot = sns.lineplot(data=iterationScalingResult, x="Iterations", y="Score", hue="Library", style="concurrency", markers=True)
+iterationsPlot = sns.lineplot(data=iterationScalingResult, x="Iterations", y="Score",
+                              hue="Library", palette = libColors(), style="concurrency", markers=True)
 iterationsPlot.set_ylabel("Time in {}".format(iterationScalingResult.Units.unique()[0]))
 iterationsPlot.set_yscale('log')
+iterationsPlot.legend(bbox_to_anchor=(1, 1), loc='upper left', ncol=1)
 outFile = "out/{}_iterationScale.jpg".format("weightedPageRank" if weighted else "pageRank")
 plt.savefig(outFile, bbox_inches='tight')
 plt.show()
 
 
-nodeCountPlot = sns.lineplot(data=nodeCountScalingResults, x="NodeCount", y="Score", hue="Library", style="concurrency", markers=True)
+nodeCountPlot = sns.lineplot(data=nodeCountScalingResults, x="NodeCount", y="Score",
+                             hue="Library", palette = libColors(),style="concurrency", markers=True)
 nodeCountPlot.set_ylabel("Time in {}".format(nodeCountScalingResults.Units.unique()[0]))
 nodeCountPlot.set_xlabel("NodeCount x 10⁶")
+nodeCountPlot.legend(bbox_to_anchor=(1, 1), loc='upper left', ncol=1)
 outFile = "out/{}_nodeScale.jpg".format("weightedPageRank" if weighted else "pageRank")
 plt.savefig(outFile, bbox_inches='tight')
 #nodeCountPlot.set_yscale('log')

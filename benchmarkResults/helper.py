@@ -2,6 +2,33 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
+def libColors():
+    return {
+        "ejml": "tab:blue",
+        "ejml-Global": "tab:purple",
+        "ejml-NodeWise": "tab:blue",
+        "ejml-Sparse": "tab:purple",
+        "ejml-Dense": "tab:blue",
+        "ejml-Dense-Sparse": "tab:cyan",
+        "jGraphT": "tab:brown",
+        "jGraphT-Global": "tab:brown",
+        "gds": "tab:olive",
+        "gds-NodeWise": "tab:olive",
+        "jni":"tab:red",
+        "jni-Global": "tab:orange",
+        "jni-NodeWise": "tab:red",
+        "pregel": "tab:green",
+        "pregel-NodeWise": "tab:green"
+    }
+
+def booleanColorMap():
+    return {
+        True: "tab:green",
+        False: "tab:orange",
+        "None": "tab:grey"
+    }
+
+
 # for plotting the error
 # https://stackoverflow.com/questions/42017049/seaborn-how-to-add-error-bars-on-a-grouped-barplot
 # + small bug fix if only one sub-categorie exists

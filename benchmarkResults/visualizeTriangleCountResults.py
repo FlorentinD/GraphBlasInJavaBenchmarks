@@ -10,7 +10,7 @@ print(benchmarkResult.dtypes)
 
 benchmarkResult["Library-Variant"] = benchmarkResult.Benchmark.str.split(".").str[-1]
 
-for (prev, replacement) in {"ejml": "ejml-", "jni": "jni-"}.items():
+for (prev, replacement) in {"NodeWise": "-NodeWise", "Global": "-Global"}.items():
     benchmarkResult["Library-Variant"] = benchmarkResult["Library-Variant"].str.replace(prev, replacement)
 
 benchmarkResult["nodeCount"] = benchmarkResult.nodeCount / (10 ** 6)
@@ -27,7 +27,7 @@ print(benchmarkResult.head(5))
 # import seaborn as sns
 import matplotlib.pyplot as plt
 import seaborn as sns
-from benchmarkResults.helper import grouped_barplot
+from benchmarkResults.helper import grouped_barplot, libColors
 
 # get meta info like units, mode, avg-degree ...
 title = "TriangleCount \n on a undirected random power-law graph with an average degree of {} \n using the {} of {}".format(
@@ -36,10 +36,11 @@ title = "TriangleCount \n on a undirected random power-law graph with an average
     )
 
 # sns approach fails to easily plot pre-aggregated error
-linePlot = sns.lineplot(x="nodeCount", y="Score", hue="Library-Variant", style="concurrency", data=benchmarkResult,
+linePlot = sns.lineplot(x="nodeCount", y="Score", hue="Library-Variant", palette = libColors(), style="concurrency", data=benchmarkResult,
                         markers=True, legend="brief")
 linePlot.set_ylabel("Time in {}".format(benchmarkResult.Units.unique()[0]))
 linePlot.set_xlabel("NodeCount x 10⁶")
+linePlot.legend(bbox_to_anchor=(1, 1), loc='upper left', ncol=1)
 linePlot.set_yscale('log')
 
 

@@ -71,6 +71,7 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
         ejmlGraph = EjmlGraph.create(graph);
 
         expected =  TriangleCountEjml.computeNodeWise(ejmlGraph.matrix(), true);
+//        System.out.println(expected.totalCount());
     }
 
     @Test

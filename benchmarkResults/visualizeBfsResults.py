@@ -10,6 +10,10 @@ print(benchmarkResult.dtypes)
 
 benchmarkResult["Name"] = benchmarkResult.Benchmark.str.split(".").str[-1]
 benchmarkResult[["Library","BfsVariant"]] = benchmarkResult.Name.str.split("Bfs", expand=True)
+
+for (prev, replacement) in {"ejml": "ejml-", "DenseSparse": "Dense-Sparse"}.items():
+    benchmarkResult["Library"] = benchmarkResult["Library"].str.replace(prev, replacement)
+
 benchmarkResult["nodeCount"] = benchmarkResult.nodeCount / (10 ** 6)
 
 print(benchmarkResult.head(5))
@@ -28,10 +32,9 @@ bfsVariants = [gb.get_group(x) for x in gb.groups]
 # import seaborn as sns
 import matplotlib.pyplot as plt
 import seaborn as sns
-from benchmarkResults.helper import grouped_barplot
+from benchmarkResults.helper import grouped_barplot, libColors
 
-
-allLibs = ["jni", "pregel", "ejml", "ejmlSparse", "ejmlDenseSparse",  "ejmlDense", "jGraphT"]
+allLibs = ["jni", "pregel", "ejml", "ejml-Sparse", "ejml-Dense-Sparse",  "ejml-Dense", "jGraphT"]
 for variant in bfsVariants:
     # get meta info like units, mode, avg-degree ...
     containedLibs = variant.Library.unique()
@@ -41,10 +44,11 @@ for variant in bfsVariants:
 
     # sns approach fails to easily plot pre-aggregated error
     linePlot = sns.lineplot(x="nodeCount", y="Score", hue="Library", style="concurrency", data=variant,
-                            hue_order=hueOrder, markers=True, legend="brief")
+                            hue_order=hueOrder, palette = libColors(), markers=True, legend="brief")
     linePlot.set_ylabel("Time in {}".format(variant.Units.unique()[0]))
     linePlot.set_xlabel("NodeCount x 10⁶")
-    #linePlot.set_yscale('linear')
+    linePlot.legend(bbox_to_anchor=(1, 1), loc='upper left', ncol=1)
+    #linePlot.set_yscale('log')
     linePlot.set_title(variant.BfsVariant.unique()[0])
 
     # fig, ax = plt.subplots()
