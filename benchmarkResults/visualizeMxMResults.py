@@ -46,6 +46,8 @@ for entriesPerMaskColumn in maskResults["avgEntriesPerColumnInMask"].unique():
         negatedPlot.set_title(title)
         negatedPlot.set_ylabel("Time in {}".format(scoreUnit))
         negatedPlot.set_xlabel("GraphBLAS library")
+        outFile = "out/mxm_mask_negated_avgMaskEntries{}_structural{}.jpg".format(entriesPerMaskColumn, boolVal)
+        plt.savefig(outFile, bbox_inches='tight')
         plt.show()
 
         title = "MxM with structural Mask with {} entries per mask column \n (matrices dim: {}, negated: {})".format(
@@ -57,6 +59,8 @@ for entriesPerMaskColumn in maskResults["avgEntriesPerColumnInMask"].unique():
         structuralPlot.set_title(title)
         structuralPlot.set_ylabel("Time in {}".format(scoreUnit))
         structuralPlot.set_xlabel("GraphBLAS library")
+        outFile = "out/mxm_mask_strutural_avgMaskEntries{}_negated{}.jpg".format(entriesPerMaskColumn, boolVal)
+        plt.savefig(outFile, bbox_inches='tight')
         plt.show()
 
 # import seaborn as sns

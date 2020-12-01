@@ -6,7 +6,7 @@
 import pandas as pd
 
 # weighted source: results/weightedPageRank/weightedPageRankResult.csv
-weighted = False
+weighted = True
 
 benchmarkResult = pd.read_csv(
     "results/{}.csv".format("weightedPageRank/weightedPageRankResultsServer" if weighted else "pageRank/pageRankResultsServer"))

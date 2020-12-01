@@ -1,0 +1,17 @@
+Benchmark,avgEntriesPerColumn,avgEntriesPerColumnInMask,degreeDistribution,denseMask,dimension,negatedMask,structuralMask,Mode,Cnt,Score,Error,Units
+ejmlOps.mask.MxMWithMaskBenchmark.mxmWithMask,4,5,UNIFORM,N/A,100000,false,false,avgt,10,21.414,0.477,ms/op
+ejmlOps.mask.MxMWithMaskBenchmark.mxmWithMask,4,5,UNIFORM,N/A,100000,false,true,avgt,10,20.198,0.496,ms/op
+ejmlOps.mask.MxMWithMaskBenchmark.mxmWithMask,4,5,UNIFORM,N/A,100000,true,false,avgt,10,50.201,1.176,ms/op
+ejmlOps.mask.MxMWithMaskBenchmark.mxmWithMask,4,5,UNIFORM,N/A,100000,true,true,avgt,10,48.747,1.115,ms/op
+ejmlOps.mask.MxMWithMaskBenchmark.mxmWithMask,4,50,UNIFORM,N/A,100000,false,false,avgt,10,25.445,0.572,ms/op
+ejmlOps.mask.MxMWithMaskBenchmark.mxmWithMask,4,50,UNIFORM,N/A,100000,false,true,avgt,10,18.909,0.493,ms/op
+ejmlOps.mask.MxMWithMaskBenchmark.mxmWithMask,4,50,UNIFORM,N/A,100000,true,false,avgt,10,69.279,3.296,ms/op
+ejmlOps.mask.MxMWithMaskBenchmark.mxmWithMask,4,50,UNIFORM,N/A,100000,true,true,avgt,10,59.231,1.483,ms/op
+ejmlOps.mask.MxMWithMaskNativeBenchmark.mxmNativeWithMask,4,5,UNIFORM,N/A,100000,false,false,avgt,10,6.914,1.870,ms/op
+ejmlOps.mask.MxMWithMaskNativeBenchmark.mxmNativeWithMask,4,5,UNIFORM,N/A,100000,false,true,avgt,10,6.301,1.395,ms/op
+ejmlOps.mask.MxMWithMaskNativeBenchmark.mxmNativeWithMask,4,5,UNIFORM,N/A,100000,true,false,avgt,10,60.070,3.338,ms/op
+ejmlOps.mask.MxMWithMaskNativeBenchmark.mxmNativeWithMask,4,5,UNIFORM,N/A,100000,true,true,avgt,10,57.212,5.916,ms/op
+ejmlOps.mask.MxMWithMaskNativeBenchmark.mxmNativeWithMask,4,50,UNIFORM,N/A,100000,false,false,avgt,10,138.124,6.827,ms/op
+ejmlOps.mask.MxMWithMaskNativeBenchmark.mxmNativeWithMask,4,50,UNIFORM,N/A,100000,false,true,avgt,10,139.366,6.967,ms/op
+ejmlOps.mask.MxMWithMaskNativeBenchmark.mxmNativeWithMask,4,50,UNIFORM,N/A,100000,true,false,avgt,10,188.018,10.037,ms/op
+ejmlOps.mask.MxMWithMaskNativeBenchmark.mxmNativeWithMask,4,50,UNIFORM,N/A,100000,true,true,avgt,10,190.271,17.513,ms/op
