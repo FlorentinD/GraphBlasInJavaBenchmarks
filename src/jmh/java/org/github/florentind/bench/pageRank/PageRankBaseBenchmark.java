@@ -39,7 +39,7 @@ public class PageRankBaseBenchmark extends EjmlGraphBaseBenchmark {
     @Param({"0.85"})
     protected float dampingFactor;
 
-    @Param({"Natural"})
+    @Param({"Undirected"})
     protected String orientation;
 
     @Param({"1e-32"})
