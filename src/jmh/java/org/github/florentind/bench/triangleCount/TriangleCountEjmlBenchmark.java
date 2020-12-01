@@ -13,7 +13,7 @@ public class TriangleCountEjmlBenchmark extends TriangleCountBaseBenchmark {
     }
 
     @org.openjdk.jmh.annotations.Benchmark
-    public void ejmlGlobalSandia(Blackhole bh) {
+    public void ejmlGlobal(Blackhole bh) {
         bh.consume(TriangleCountEjml.computeTotalSandia(graph.matrix()));
     }
 }

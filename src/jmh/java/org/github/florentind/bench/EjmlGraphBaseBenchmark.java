@@ -57,6 +57,8 @@ public class EjmlGraphBaseBenchmark extends BaseBenchmark {
         // for usage of higher concurrency in gds benchmarks
         GdsEdition.instance().setToEnterpriseEdition();
 
+        assert(GdsEdition.instance().isOnEnterpriseEdition());
+
 
         hugeGraph.release();
     }
