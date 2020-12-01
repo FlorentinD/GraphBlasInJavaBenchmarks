@@ -8,6 +8,6 @@ import org.openjdk.jmh.infra.Blackhole;
 public class ReduceColumnWiseWithMaskBenchmark extends ReduceColumnWiseWithMaskBaseBenchmark {
     @Benchmark
     public void reduceColWiseWithMask(Blackhole bh) {
-        bh.consume(CommonOps_DSCC.reduceColumnWise(matrix, DMonoids.TIMES.id, DMonoids.TIMES.func, null, mask, null, true));
+        bh.consume(CommonOps_DSCC.reduceColumnWise(matrix, DMonoids.PLUS.id, DMonoids.PLUS.func, null, mask, null, true));
     }
 }

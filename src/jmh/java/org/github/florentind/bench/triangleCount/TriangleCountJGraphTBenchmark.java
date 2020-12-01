@@ -21,7 +21,7 @@ public class TriangleCountJGraphTBenchmark extends TriangleCountBaseBenchmark {
     }
 
     @org.openjdk.jmh.annotations.Benchmark
-    public void globalJGraphT(Blackhole bh) {
+    public void jGraphTGlobal(Blackhole bh) {
         bh.consume(GraphMetrics.getNumberOfTriangles(jGraph));
     }
 }

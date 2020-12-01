@@ -14,7 +14,7 @@ public class TriangleCountGdsBenchmark extends TriangleCountBaseBenchmark {
 
 
     @Benchmark
-    public void gds(Blackhole bh) {
+    public void gdsNodeWise(Blackhole bh) {
         var config = ImmutableTriangleCountBaseConfig
                 .builder()
                 .concurrency(concurrency)

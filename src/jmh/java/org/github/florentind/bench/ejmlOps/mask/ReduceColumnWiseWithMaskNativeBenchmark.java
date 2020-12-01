@@ -37,7 +37,7 @@ public class ReduceColumnWiseWithMaskNativeBenchmark extends ReduceColumnWiseWit
         nativeMatrix = ToNativeMatrixConverter.convert(matrix);
         nativeMask = ToNativeVectorConverter.convert(maskVector);
         nativeResult = createVector(doubleType(), matrix.numRows);
-        nativeMonoid = GRBMONOID.timesMonoidDouble();
+        nativeMonoid = GRBMONOID.plusMonoidDouble();
         descriptor = createDescriptor();
         // otherwise would be reduceRowWise
         setDescriptorValue(descriptor, GrB_INP0, GrB_TRAN);

@@ -14,7 +14,7 @@ public class TriangleCountPregelBenchmark extends TriangleCountBaseBenchmark {
     private int concurrency;
 
     @Benchmark
-    public void pregel(Blackhole bh) {
+    public void pregelNodeWise(Blackhole bh) {
         var triangleCountJob = Pregel.create(
                 graph,
                 ImmutableTriangleCountPregelConfig.builder()
