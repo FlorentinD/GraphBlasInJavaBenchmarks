@@ -1,0 +1,9 @@
+Benchmark                         (avgDegree)  (concurrency)  (degreeDistribution)  (nodeCount)  (weighted)  Mode  Cnt     Score    Error  Units
+GraphLoadBenchmark.loadEjmlGraph            4              1             POWER_LAW      1000000        true  avgt   10   468.851 ± 10.832  ms/op
+GraphLoadBenchmark.loadEjmlGraph            4              1             POWER_LAW      1000000       false  avgt   10   456.568 ± 11.251  ms/op
+GraphLoadBenchmark.loadEjmlGraph            8              1             POWER_LAW      1000000        true  avgt   10  1271.586 ± 24.478  ms/op
+GraphLoadBenchmark.loadEjmlGraph            8              1             POWER_LAW      1000000       false  avgt   10  1238.792 ± 16.408  ms/op
+GraphLoadBenchmark.loadJniGraph             4              1             POWER_LAW      1000000        true  avgt   10   579.571 ±  9.786  ms/op
+GraphLoadBenchmark.loadJniGraph             4              1             POWER_LAW      1000000       false  avgt   10   572.419 ±  7.916  ms/op
+GraphLoadBenchmark.loadJniGraph             8              1             POWER_LAW      1000000        true  avgt   10  1336.831 ± 22.132  ms/op
+GraphLoadBenchmark.loadJniGraph             8              1             POWER_LAW      1000000       false  avgt   10  1309.605 ± 14.491  ms/op

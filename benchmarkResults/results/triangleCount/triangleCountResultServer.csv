@@ -31,8 +31,6 @@ triangleCount.TriangleCountGdsBenchmark.gdsNodeWise,4,8,10000,avgt,10,6.956,0.09
 triangleCount.TriangleCountGdsBenchmark.gdsNodeWise,4,8,100000,avgt,10,129.470,0.453,ms/op
 triangleCount.TriangleCountGdsBenchmark.gdsNodeWise,4,8,500000,avgt,10,1654.002,4.914,ms/op
 triangleCount.TriangleCountGdsBenchmark.gdsNodeWise,4,8,1000000,avgt,10,5485.445,25.928,ms/op
-triangleCount.TriangleCountJGraphTBenchmark.jGraphTGlobal,4,1,10000,avgt,10,2012.924,131.739,ms/op
-triangleCount.TriangleCountJGraphTBenchmark.jGraphTGlobal,4,1,100000,avgt,10,164391.432,2207.198,ms/op
 triangleCount.TriangleCountPregelBenchmark.pregelNodeWise,4,1,10000,avgt,10,21.243,2.521,ms/op
 triangleCount.TriangleCountPregelBenchmark.pregelNodeWise,4,1,100000,avgt,10,197.018,6.021,ms/op
 triangleCount.TriangleCountPregelBenchmark.pregelNodeWise,4,1,500000,avgt,10,1029.010,12.077,ms/op
@@ -41,3 +39,5 @@ triangleCount.TriangleCountPregelBenchmark.pregelNodeWise,4,8,10000,avgt,10,37.2
 triangleCount.TriangleCountPregelBenchmark.pregelNodeWise,4,8,100000,avgt,10,190.865,36.712,ms/op
 triangleCount.TriangleCountPregelBenchmark.pregelNodeWise,4,8,500000,avgt,10,907.753,139.997,ms/op
 triangleCount.TriangleCountPregelBenchmark.pregelNodeWise,4,8,1000000,avgt,10,2114.655,169.363,ms/op
+triangleCount.TriangleCountJGraphTBenchmark.jGraphTGlobal,4,1,10000,avgt,10,2012.924,131.739,ms/op
+triangleCount.TriangleCountJGraphTBenchmark.jGraphTGlobal,4,1,100000,avgt,10,164391.432,2207.198,ms/op
