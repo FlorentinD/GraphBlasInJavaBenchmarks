@@ -2,6 +2,7 @@ package org.github.florentind.bench.loading;
 
 
 import com.github.fabianmurariu.unsafe.GRBCORE;
+import org.github.florentind.bench.BaseBenchmark;
 import org.github.florentind.core.ejml.EjmlGraph;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
@@ -17,13 +18,7 @@ import java.nio.Buffer;
 import java.util.concurrent.TimeUnit;
 
 
-@BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 2)
-@Measurement(iterations = 5)
-@State(Scope.Benchmark)
-@Fork(value = 2, warmups = 1)
-public class SwitchMatrixFormatBenchmark {
+public class SwitchMatrixFormatBenchmark extends BaseBenchmark {
 
     protected HugeGraph graph;
 
@@ -64,14 +59,14 @@ public class SwitchMatrixFormatBenchmark {
     }
 
     // TODO: atm this takes no time at all
-//    @Benchmark
-//    public void switchMatrixFormat(Blackhole bh) {
-//        if (byCol) {
-//            bh.consume(GRBCORE.makeCSR(jniMatrix));
-//        } else {
-//            bh.consume(GRBCORE.makeCSC(jniMatrix));
-//        }
-//    }
+    @Benchmark
+    public void switchMatrixFormat(Blackhole bh) {
+        if (byCol) {
+            bh.consume(GRBCORE.makeCSR(jniMatrix));
+        } else {
+            bh.consume(GRBCORE.makeCSC(jniMatrix));
+        }
+    }
 
     @TearDown
     public void tearDown() {

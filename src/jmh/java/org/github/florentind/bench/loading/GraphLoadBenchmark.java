@@ -1,6 +1,7 @@
 package org.github.florentind.bench.loading;
 
 
+import org.github.florentind.bench.BaseBenchmark;
 import org.github.florentind.core.ejml.EjmlGraph;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.core.jgrapht.JGraphTConverter;
@@ -20,19 +21,12 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.fabianmurariu.unsafe.GRBCORE.*;
 
-
-@BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 2)
-@Measurement(iterations = 5)
-@State(Scope.Benchmark)
-@Fork(value = 2, warmups = 1)
-public class GraphLoadBenchmark {
+public class GraphLoadBenchmark extends BaseBenchmark {
 
     @Param({"1000000"})
     int nodeCount;
 
-    @Param({"2", "4", "8"})
+    @Param({"4", "8"})
     int avgDegree;
 
     @Param({"POWER_LAW"})
@@ -79,12 +73,12 @@ public class GraphLoadBenchmark {
         bh.consume(matrixWait(ToNativeMatrixConverter.convert(graph)));
     }
 
-    // directed, weighted graph
-    @Benchmark
-    public void loadJGraphTGraph(Blackhole bh) {
-        bh.consume(JGraphTConverter.convert(graph));
-    }
 //    @Benchmark
+//    public void loadJGraphTGraph(Blackhole bh) {
+//        bh.consume(JGraphTConverter.convert(graph));
+//    }
+
+    //    @Benchmark
 //    public void loadJniEdeWise(Blackhole bh) {
 //        bh.consume(GRBCORE.matrixWait(ToNativeMatrixConverter.convertEdgeWise(graph, true)));
 //    }
