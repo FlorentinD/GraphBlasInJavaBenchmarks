@@ -41,6 +41,7 @@ public class MxMWithSemiringNativeBenchmark extends MatrixOpsWithSemiringBaseBen
         super.setup();
 
         GRBCORE.initNonBlocking();
+        setGlobalInt(GxB_NTHREADS, 1);
         nativeMatrix = ToNativeMatrixConverter.convert(matrix);
         nativeResult = GRBCORE.createMatrix(GRAPHBLAS.doubleType(), matrix.numRows, matrix.numCols);
         var monoids = semiRings.get(semiRingName);

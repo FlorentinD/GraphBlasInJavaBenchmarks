@@ -34,6 +34,7 @@ public class ReduceColumnWiseWithMaskNativeBenchmark extends ReduceColumnWiseWit
         super.setup();
 
         initNonBlocking();
+        setGlobalInt(GxB_NTHREADS, 1);
         nativeMatrix = ToNativeMatrixConverter.convert(matrix);
         nativeMask = ToNativeVectorConverter.convert(maskVector);
         nativeResult = createVector(doubleType(), matrix.numRows);

@@ -33,6 +33,7 @@ public class ReduceColumnWiseWithSemiringNativeBenchmark extends MatrixOpsWithMo
         super.setup();
 
         initNonBlocking();
+        setGlobalInt(GxB_NTHREADS, 1);
         nativeMatrix = ToNativeMatrixConverter.convert(matrix);
         nativeResult = createVector(doubleType(), matrix.numRows);
         descriptor = createDescriptor();

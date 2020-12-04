@@ -19,6 +19,8 @@ import org.openjdk.jmh.infra.Blackhole;
 import java.nio.Buffer;
 import java.util.HashMap;
 
+import static com.github.fabianmurariu.unsafe.GRBCORE.GxB_NTHREADS;
+import static com.github.fabianmurariu.unsafe.GRBCORE.setGlobalInt;
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 
 public class MxMWithDifferentMethodsNativeBenchmark extends MatrixOpsBaseBenchmark {
@@ -52,6 +54,7 @@ public class MxMWithDifferentMethodsNativeBenchmark extends MatrixOpsBaseBenchma
         super.setup();
 
         GRBCORE.initNonBlocking();
+        setGlobalInt(GxB_NTHREADS, 1);
         nativeMatrix = ToNativeMatrixConverter.convert(matrix);
         nativeResult = GRBCORE.createMatrix(GRAPHBLAS.doubleType(), matrix.numRows, matrix.numCols);
         semiring = GRBCORE.createSemiring(GRBMONOID.plusMonoidDouble(), GRAPHBLAS.anyBinaryOpDouble());

@@ -29,6 +29,7 @@ public class MxMWithMaskNativeBenchmark extends MxMWithMaskBaseBenchmark {
         super.setup();
 
         initNonBlocking();
+        setGlobalInt(GxB_NTHREADS, 1);
         nativeMatrix = ToNativeMatrixConverter.convert(matrix);
         nativeMask = ToNativeMatrixConverter.convert(maskMatrix);
         nativeResult = createMatrix(doubleType(), matrix.numRows, matrix.numCols);
