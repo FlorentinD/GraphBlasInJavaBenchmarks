@@ -25,10 +25,8 @@ public class BfsEjml {
         // ! as dense -> always using vxm instead of mxv
       public BfsDenseDoubleResult computeDense(DMatrixSparseCSC adjacencyMatrix, BfsVariation bfsVariation, int startNode, int maxIterations) {
         int nodeCount = adjacencyMatrix.numCols;
-        // if the inputVector entry is not zero -> return true (sparse adjacency matrix -> entry exists == true)
-        DBinaryOperator firstNotZero = (a, b) -> (a != 0) ? 1 : 0;
         // as dense here: cannot use FIRST/ANY instead of OR
-        DSemiRing levelSemiRing = new DSemiRing(DMonoids.OR, firstNotZero);
+        DSemiRing levelSemiRing = new DSemiRing(DMonoids.OR, EjmlUtil.FIRST_MONOID);
         DSemiRing semiRing = bfsVariation == BfsVariation.PARENTS ? DSemiRings.MIN_FIRST : levelSemiRing;
         double[] result = new double[nodeCount];
         Arrays.fill(result, semiRing.add.id);
