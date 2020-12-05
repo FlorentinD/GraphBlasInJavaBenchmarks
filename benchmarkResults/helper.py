@@ -6,19 +6,19 @@ def libColors():
     return {
         "ejml": "tab:blue",
         "ejml-Global": "tab:purple",
-        "ejml-NodeWise": "tab:blue",
+        "ejml-VertexWise": "tab:blue",
         "ejml-Sparse": "tab:purple",
         "ejml-Dense": "tab:blue",
         "ejml-Dense-Sparse": "tab:cyan",
         "jGraphT": "tab:brown",
         "jGraphT-Global": "tab:brown",
         "gds": "tab:olive",
-        "gds-NodeWise": "tab:olive",
+        "gds-VertexWise": "tab:olive",
         "jni":"tab:red",
         "jni-Global": "tab:orange",
-        "jni-NodeWise": "tab:red",
-        "pregel": "tab:green",
-        "pregel-NodeWise": "tab:green"
+        "jni-VertexWise": "tab:red",
+        "gds-pregel": "tab:green",
+        "gds-pregel-VertexWise": "tab:green"
     }
 
 def booleanColorMap():

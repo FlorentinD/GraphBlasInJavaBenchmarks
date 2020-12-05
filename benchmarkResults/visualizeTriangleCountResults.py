@@ -10,7 +10,7 @@ print(benchmarkResult.dtypes)
 
 benchmarkResult["Library-Variant"] = benchmarkResult.Benchmark.str.split(".").str[-1]
 
-for (prev, replacement) in {"NodeWise": "-NodeWise", "Global": "-Global"}.items():
+for (prev, replacement) in {"NodeWise": "-VertexWise", "Global": "-Global", "pregel": "gds-pregel"}.items():
     benchmarkResult["Library-Variant"] = benchmarkResult["Library-Variant"].str.replace(prev, replacement)
 
 benchmarkResult["nodeCount"] = benchmarkResult.nodeCount / (10 ** 6)
@@ -39,9 +39,23 @@ title = "TriangleCount \n on a undirected random power-law graph with an average
 linePlot = sns.lineplot(x="nodeCount", y="Score", hue="Library-Variant", palette = libColors(), style="concurrency", data=benchmarkResult,
                         markers=True, legend="brief")
 linePlot.set_ylabel("Time in {}".format(benchmarkResult.Units.unique()[0]))
-linePlot.set_xlabel("NodeCount x 10⁶")
+linePlot.set_xlabel("Number of vertices x 10⁶")
 linePlot.legend(bbox_to_anchor=(1, 1), loc='upper left', ncol=1)
 linePlot.set_yscale('log')
+plt.tight_layout(pad=1)
+plt.savefig("out/triangleCount.jpg", bbox_inches='tight')
+plt.show()
+
+# linePlot = sns.lineplot(x="nodeCount", y="Score", hue="Library-Variant", palette = libColors(), style="concurrency",
+#                         data=benchmarkResult[~benchmarkResult["Library-Variant"].str.startswith("jGraphT")],
+#                         markers=True, legend="brief")
+# linePlot.set_ylabel("Time in {}".format(benchmarkResult.Units.unique()[0]))
+# linePlot.set_xlabel("NodeCount x 10⁶")
+# linePlot.legend(bbox_to_anchor=(1, 1), loc='upper left', ncol=1)
+# linePlot.set_yscale('linear')
+# plt.ylim(0, 6000)
+# plt.savefig("out/triangleCount_withoutJGraphT.jpg", bbox_inches='tight')
+# plt.show()
 
 
 # fig, ax = plt.subplots()
@@ -50,5 +64,4 @@ linePlot.set_yscale('log')
 # barplot.title(title)
 # ax.set_yscale('log')
 #
-plt.savefig("out/triangleCount.jpg", bbox_inches='tight')
-plt.show()
+

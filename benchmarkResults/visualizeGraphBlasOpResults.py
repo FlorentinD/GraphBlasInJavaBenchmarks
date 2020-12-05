@@ -27,6 +27,9 @@ maskResults["Library"] = maskResults.Benchmark.str.split("." + graphBlasOperatio
                                                                                                    regex=True)
 maskResults["Library"] = np.where((maskResults.Library.str.len() == 0), "Ejml", maskResults.Library)
 
+if (graphBlasOperation == "reduceColWise"):
+    maskResults = maskResults[(maskResults.denseMask == False)]
+
 print(semiringResults.head(5))
 
 # get base-line for withMask results
@@ -35,6 +38,7 @@ operatorForMask = operatorsForMask[graphBlasOperation]
 dimensionForMask = maskResults["dimension"].unique()
 baseLineForMask = semiringResults[(semiringResults["dimension"].isin(dimensionForMask)) & (
     semiringResults[operatorColumn].str.endswith(operatorForMask))].copy()
+baseLineForMask = baseLineForMask[baseLineForMask["concurrency"] == 1]
 #assert len(baseLineForMask) == 3
 baseLineForMask["negatedMask"] = "None"
 baseLineForMask["structuralMask"] = "None"
@@ -49,6 +53,7 @@ matrixDim = matrixDim[0]
 for entriesPerMaskColumn in maskResults["avgEntriesPerColumnInMask"].unique():
     for boolVal in [True, False]:
         # bar plot negated/non-negated
+        maskResults = maskResults[maskResults["concurrency"] == 1]
         title = "{} with negated Mask with {} entries per mask column \n (matrices dim: {}, structural: {})" \
             .format(graphBlasOperation, entriesPerMaskColumn, matrixDim, boolVal)
         negatedMaskDf = maskResults[(maskResults["structuralMask"] == boolVal) & (
@@ -81,8 +86,10 @@ for entriesPerMaskColumn in maskResults["avgEntriesPerColumnInMask"].unique():
 
 title = "MxM with different semirings"
 
+semiringResults = semiringResults[semiringResults["concurrency"] == 1]
 semiringPlot = sns.lineplot(data=semiringResults, x="dimension", y="Score", hue=operatorColumn, style="Library",
                             markers=True)
+plt.savefig("out/{}WithSemiring.jpg".format(graphBlasOperation))
 plt.show()
 
 # fig, ax = plt.subplots()

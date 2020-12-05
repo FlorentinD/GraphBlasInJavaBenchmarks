@@ -7,8 +7,8 @@ import pandas as pd
 
 # weighted source: results/weightedPageRank/weightedPageRankResult.csv
 weighted = True
-orientation = "Natural"
-# orientation = "Undirected"
+#orientation = "Natural"
+orientation = "Undirected"
 
 benchmarkResult = pd.read_csv(
     "results/{}.csv".format("weightedPageRank/weightedPageRankResultsServer" if weighted else "pageRank/pageRankResultsServer"))
@@ -19,15 +19,17 @@ print(benchmarkResult.dtypes)
 print(benchmarkResult.head(5))
 
 benchmarkResult["Library"] = benchmarkResult.Benchmark.str.split(".").str[-1]
-benchmarkResult["Name"] = "(" + benchmarkResult.Library + "," + benchmarkResult.concurrency.apply(
-    str) + ")"
+
+for (prev, replacement) in {"NodeWise": "-VertexWise", "Global": "-Global", "pregel": "gds-pregel"}.items():
+    benchmarkResult["Library"] = benchmarkResult["Library"].str.replace(prev, replacement)
+
 
 benchmarkResult[["NodeCount", "Iterations"]] = benchmarkResult.nodeCountIterationCombinations.str.split(";", expand=True)
 # convert strings 0.1M to 100_000
 benchmarkResult["NodeCount"] = benchmarkResult.NodeCount.apply(lambda x: float(x[:-1]))
 benchmarkResult["Iterations"] = benchmarkResult.Iterations.apply(lambda x: int(x))
 
-nodeCountScalingResults = benchmarkResult[benchmarkResult["Iterations"] == 20]
+nodeCountScalingResults = benchmarkResult[benchmarkResult["Iterations"] == 20].copy()
 nodeCountScalingResults["Score"] = benchmarkResult["Score"] / 1000.0
 nodeCountScalingResults["Units"] = "s/op"
 
@@ -59,7 +61,8 @@ iterationsPlot = sns.lineplot(data=iterationScalingResult, x="Iterations", y="Sc
 iterationsPlot.set_ylabel("Time in {}".format(iterationScalingResult.Units.unique()[0]))
 iterationsPlot.set_yscale('log')
 iterationsPlot.legend(bbox_to_anchor=(1, 1), loc='upper left', ncol=1)
-outFile = "out/{}_iterationScale.jpg".format("weightedPageRank" if weighted else "pageRank")
+outFile = "out/{}_{}_iterationScale.jpg".format("weightedPageRank" if weighted else "pageRank", orientation)
+plt.tight_layout(pad=1)
 plt.savefig(outFile, bbox_inches='tight')
 plt.show()
 
@@ -67,9 +70,10 @@ plt.show()
 nodeCountPlot = sns.lineplot(data=nodeCountScalingResults, x="NodeCount", y="Score",
                              hue="Library", palette = libColors(),style="concurrency", markers=True)
 nodeCountPlot.set_ylabel("Time in {}".format(nodeCountScalingResults.Units.unique()[0]))
-nodeCountPlot.set_xlabel("NodeCount x 10⁶")
+nodeCountPlot.set_xlabel("Number of vertices x 10⁶")
 nodeCountPlot.legend(bbox_to_anchor=(1, 1), loc='upper left', ncol=1)
-outFile = "out/{}_nodeScale.jpg".format("weightedPageRank" if weighted else "pageRank")
+outFile = "out/{}_{}_nodeScale.jpg".format("weightedPageRank" if weighted else "pageRank", orientation)
+plt.tight_layout(pad=1.5)
 plt.savefig(outFile, bbox_inches='tight')
 #nodeCountPlot.set_yscale('log')
 plt.show()
