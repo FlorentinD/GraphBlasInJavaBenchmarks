@@ -11,7 +11,7 @@ print(benchmarkResult.dtypes)
 benchmarkResult["Name"] = benchmarkResult.Benchmark.str.split(".").str[-1]
 benchmarkResult[["Library","BfsVariant"]] = benchmarkResult.Name.str.split("Bfs", expand=True)
 
-for (prev, replacement) in {"ejml": "ejml-", "DenseSparse": "Dense-Sparse", "pregel": "gds-pregel"}.items():
+for (prev, replacement) in {"ejml": "ejml-", "DenseSparse": "Dense-Sparse", "pregel": "gds-pregel", "jni": "java-native"}.items():
     benchmarkResult["Library"] = benchmarkResult["Library"].str.replace(prev, replacement)
 
 benchmarkResult["nodeCount"] = benchmarkResult.nodeCount / (10 ** 6)
@@ -34,7 +34,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from benchmarkResults.helper import grouped_barplot, libColors
 
-allLibs = ["jni", "gds-pregel", "ejml", "ejml-Sparse", "ejml-Dense-Sparse",  "ejml-Dense", "jGraphT"]
+allLibs = ["graphblas-java-native", "gds-pregel", "ejml", "ejml-Sparse", "ejml-Dense-Sparse",  "ejml-Dense", "jGraphT"]
 for variant in bfsVariants:
     # get meta info like units, mode, avg-degree ...
     containedLibs = variant.Library.unique()

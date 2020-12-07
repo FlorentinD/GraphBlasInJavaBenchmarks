@@ -14,9 +14,9 @@ def libColors():
         "jGraphT-Global": "tab:brown",
         "gds": "tab:olive",
         "gds-VertexWise": "tab:olive",
-        "jni":"tab:red",
-        "jni-Global": "tab:orange",
-        "jni-VertexWise": "tab:red",
+        "java-native":"tab:red",
+        "java-native-Global": "tab:orange",
+        "java-native-VertexWise": "tab:red",
         "gds-pregel": "tab:green",
         "gds-pregel-VertexWise": "tab:green"
     }
@@ -32,7 +32,7 @@ def booleanColorMap():
 # for plotting the error
 # https://stackoverflow.com/questions/42017049/seaborn-how-to-add-error-bars-on-a-grouped-barplot
 # + small bug fix if only one sub-categorie exists
-def grouped_barplot(df, categorie, hueColumn, valueColumn, err, ax):
+def grouped_barplot(df, categorie, hueColumn, valueColumn, err, ax, colorMap, showValues):
     u = df[categorie].unique()
     x = np.arange(len(u))
     subx = df[hueColumn].unique()
@@ -51,12 +51,14 @@ def grouped_barplot(df, categorie, hueColumn, valueColumn, err, ax):
                     width=width,
                     label=gr,
                     yerr=dfg[err].values,
+                    color=colorMap[gr],
                     ecolor="gray")
         )
 
     # print values above bar
-    for bar in bars:
-        autolabel(bar, ax)
+    if showValues:
+        for bar in bars:
+            autolabel(bar, ax)
 
     plt.xlabel(categorie)
     plt.ylabel("Time in {}".format(df.Units.iloc[0]))

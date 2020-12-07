@@ -20,7 +20,7 @@ print(benchmarkResult.head(5))
 
 benchmarkResult["Library"] = benchmarkResult.Benchmark.str.split(".").str[-1]
 
-for (prev, replacement) in {"NodeWise": "-VertexWise", "Global": "-Global", "pregel": "gds-pregel"}.items():
+for (prev, replacement) in {"NodeWise": "-VertexWise", "Global": "-Global", "pregel": "gds-pregel", "jni": "java-native"}.items():
     benchmarkResult["Library"] = benchmarkResult["Library"].str.replace(prev, replacement)
 
 

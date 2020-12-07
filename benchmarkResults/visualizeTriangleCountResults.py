@@ -10,7 +10,7 @@ print(benchmarkResult.dtypes)
 
 benchmarkResult["Library-Variant"] = benchmarkResult.Benchmark.str.split(".").str[-1]
 
-for (prev, replacement) in {"NodeWise": "-VertexWise", "Global": "-Global", "pregel": "gds-pregel"}.items():
+for (prev, replacement) in {"NodeWise": "-VertexWise", "Global": "-Global", "pregel": "gds-pregel", "jni": "java-native"}.items():
     benchmarkResult["Library-Variant"] = benchmarkResult["Library-Variant"].str.replace(prev, replacement)
 
 benchmarkResult["nodeCount"] = benchmarkResult.nodeCount / (10 ** 6)
