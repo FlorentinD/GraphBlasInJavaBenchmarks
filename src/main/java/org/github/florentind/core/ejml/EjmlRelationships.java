@@ -58,24 +58,45 @@ public interface EjmlRelationships {
         graph.forEachNode((id) -> {
             targetIds.clear();
 
-            graph.forEachRelationship(id, DEFAULT_RELATIONSHIP_PROPERTY, (src, trg, weight) -> {
-                int srcIntId = Math.toIntExact(src);
-                int trgIntId = Math.toIntExact(trg);
+            if (graph.hasRelationshipProperty()) {
+                graph.forEachRelationship(id, DEFAULT_RELATIONSHIP_PROPERTY, (src, trg, weight) -> {
+                    int srcIntId = Math.toIntExact(src);
+                    int trgIntId = Math.toIntExact(trg);
 
-                if (!targetIds.get(trgIntId)) {
-                    // saving as reversed as accessing the CSC format is made for accessing column wise (normally incoming rels)
-                    tripleStore.addItem(trgIntId, srcIntId, weight);
-                    targetIds.set(trgIntId);
-                } else {
-                    throw new IllegalArgumentException(
-                        formatWithLocale(
-                            "Retrieved multiple relationships for %d -> %d, please use an aggregation",
-                            srcIntId,
-                            trgIntId
-                        ));
-                }
-                return true;
-            });
+                    if (!targetIds.get(trgIntId)) {
+                        // saving as reversed as accessing the CSC format is made for accessing column wise (normally incoming rels)
+                        tripleStore.addItem(trgIntId, srcIntId, weight);
+                        targetIds.set(trgIntId);
+                    } else {
+                        throw new IllegalArgumentException(
+                                formatWithLocale(
+                                        "Retrieved multiple relationships for %d -> %d, please use an aggregation",
+                                        srcIntId,
+                                        trgIntId
+                                ));
+                    }
+                    return true;
+                });
+            } else {
+                graph.forEachRelationship(id, (src, trg) -> {
+                    int srcIntId = Math.toIntExact(src);
+                    int trgIntId = Math.toIntExact(trg);
+
+                    if (!targetIds.get(trgIntId)) {
+                        // saving as reversed as accessing the CSC format is made for accessing column wise (normally incoming rels)
+                        tripleStore.addItem(trgIntId, srcIntId, DEFAULT_RELATIONSHIP_PROPERTY);
+                        targetIds.set(trgIntId);
+                    } else {
+                        throw new IllegalArgumentException(
+                                formatWithLocale(
+                                        "Retrieved multiple relationships for %d -> %d, please use an aggregation",
+                                        srcIntId,
+                                        trgIntId
+                                ));
+                    }
+                    return true;
+                });
+            }
             return true;
         });
 
