@@ -35,6 +35,9 @@ public class GraphLoadBenchmark extends BaseBenchmark {
     @Param({"true", "false"})
     boolean weighted;
 
+    @Param({"Undirected"})
+    protected String orientation;
+
     @Param({"1"})
     int concurrency;
 
@@ -48,7 +51,7 @@ public class GraphLoadBenchmark extends BaseBenchmark {
                 .averageDegree(avgDegree)
                 .seed(42L)
                 .aggregation(Aggregation.MAX)
-                .orientation(Orientation.NATURAL)
+                .orientation(Orientation.valueOf(orientation))
                 .allocationTracker(AllocationTracker.empty())
                 .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.NO)
                 .relationshipDistribution(RelationshipDistribution.valueOf(degreeDistribution));
