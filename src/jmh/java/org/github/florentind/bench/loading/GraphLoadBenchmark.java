@@ -26,7 +26,7 @@ public class GraphLoadBenchmark extends BaseBenchmark {
     @Param({"1000000"})
     int nodeCount;
 
-    @Param({"4", "8"})
+    @Param({"2","4","6","8"})
     int avgDegree;
 
     @Param({"POWER_LAW"})
