@@ -51,7 +51,7 @@ public class GraphLoadBenchmark extends BaseBenchmark {
                 .averageDegree(avgDegree)
                 .seed(42L)
                 .aggregation(Aggregation.MAX)
-                .orientation(Orientation.valueOf(orientation))
+                .orientation(Orientation.of(orientation))
                 .allocationTracker(AllocationTracker.empty())
                 .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.NO)
                 .relationshipDistribution(RelationshipDistribution.valueOf(degreeDistribution));
