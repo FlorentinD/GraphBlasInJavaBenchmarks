@@ -1,9 +1,18 @@
-Benchmark                         (avgDegree)  (concurrency)  (degreeDistribution)  (nodeCount)  (weighted)  Mode  Cnt     Score    Error  Units
-GraphLoadBenchmark.loadEjmlGraph            4              1             POWER_LAW      1000000        true  avgt   10   468.851 ± 10.832  ms/op
-GraphLoadBenchmark.loadEjmlGraph            4              1             POWER_LAW      1000000       false  avgt   10   456.568 ± 11.251  ms/op
-GraphLoadBenchmark.loadEjmlGraph            8              1             POWER_LAW      1000000        true  avgt   10  1271.586 ± 24.478  ms/op
-GraphLoadBenchmark.loadEjmlGraph            8              1             POWER_LAW      1000000       false  avgt   10  1238.792 ± 16.408  ms/op
-GraphLoadBenchmark.loadJniGraph             4              1             POWER_LAW      1000000        true  avgt   10   579.571 ±  9.786  ms/op
-GraphLoadBenchmark.loadJniGraph             4              1             POWER_LAW      1000000       false  avgt   10   572.419 ±  7.916  ms/op
-GraphLoadBenchmark.loadJniGraph             8              1             POWER_LAW      1000000        true  avgt   10  1336.831 ± 22.132  ms/op
-GraphLoadBenchmark.loadJniGraph             8              1             POWER_LAW      1000000       false  avgt   10  1309.605 ± 14.491  ms/op
+Benchmark,avgDegree,concurrency,degreeDistribution,nodeCount,orientation,weighted,Mode,Cnt,Score,Error,Units
+GraphLoadBenchmark.loadEjmlGraph,2,1,POWER_LAW,1000000,Undirected,true,avgt,10,200.777,9.132,ms/op
+GraphLoadBenchmark.loadEjmlGraph,2,1,POWER_LAW,1000000,Undirected,false,avgt,10,180.731,4.739,ms/op
+GraphLoadBenchmark.loadEjmlGraph,4,1,POWER_LAW,1000000,Undirected,true,avgt,10,723.405,13.374,ms/op
+GraphLoadBenchmark.loadEjmlGraph,4,1,POWER_LAW,1000000,Undirected,false,avgt,10,685.800,13.136,ms/op
+GraphLoadBenchmark.loadEjmlGraph,6,1,POWER_LAW,1000000,Undirected,true,avgt,10,1382.321,39.742,ms/op
+GraphLoadBenchmark.loadEjmlGraph,6,1,POWER_LAW,1000000,Undirected,false,avgt,10,1268.865,33.452,ms/op
+GraphLoadBenchmark.loadEjmlGraph,8,1,POWER_LAW,1000000,Undirected,true,avgt,10,1906.984,28.115,ms/op
+GraphLoadBenchmark.loadEjmlGraph,8,1,POWER_LAW,1000000,Undirected,false,avgt,10,1811.600,37.852,ms/op
+GraphLoadBenchmark.loadJniGraph,2,1,POWER_LAW,1000000,Undirected,true,avgt,10,645.098,9.334,ms/op
+GraphLoadBenchmark.loadJniGraph,2,1,POWER_LAW,1000000,Undirected,false,avgt,10,630.497,7.524,ms/op
+GraphLoadBenchmark.loadJniGraph,4,1,POWER_LAW,1000000,Undirected,true,avgt,10,1591.074,25.829,ms/op
+GraphLoadBenchmark.loadJniGraph,4,1,POWER_LAW,1000000,Undirected,false,avgt,10,1451.554,16.864,ms/op
+GraphLoadBenchmark.loadJniGraph,6,1,POWER_LAW,1000000,Undirected,true,avgt,10,2459.887,77.150,ms/op
+GraphLoadBenchmark.loadJniGraph,6,1,POWER_LAW,1000000,Undirected,false,avgt,10,2280.055,23.339,ms/op
+GraphLoadBenchmark.loadJniGraph,8,1,POWER_LAW,1000000,Undirected,true,avgt,10,3039.815,88.659,ms/op
+GraphLoadBenchmark.loadJniGraph,8,1,POWER_LAW,1000000,Undirected,false,avgt,10,2942.075,159.328,ms/op
+

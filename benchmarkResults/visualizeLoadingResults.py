@@ -5,15 +5,18 @@
 # read csv
 import pandas as pd
 
-benchmarkResult = pd.read_csv("results/triangleCount/triangleCountResultServer.csv")
+# fixed nodeCount -> put in figure title
+# weighted/un-weighted -> style, libary -> color, avg-degree -> x Axis
+benchmarkResult = pd.read_csv("results/loading/loadingResultsServer.csv")
 print(benchmarkResult.dtypes)
 
-benchmarkResult["Library-Variant"] = benchmarkResult.Benchmark.str.split(".").str[-1]
+benchmarkResult["Library"] = benchmarkResult.Benchmark.str.split(".load").str[-1]
 
-for (prev, replacement) in {"NodeWise": "-VertexWise", "Global": "-Global", "pregel": "gds-pregel", "jni": "java-native"}.items():
-    benchmarkResult["Library-Variant"] = benchmarkResult["Library-Variant"].str.replace(prev, replacement)
+for (prev, replacement) in {"Jni": "java-native", "Graph": "", "Ejml": "ejml"}.items():
+    benchmarkResult["Library"] = benchmarkResult["Library"].str.replace(prev, replacement)
 
-benchmarkResult["nodeCount"] = benchmarkResult.nodeCount / (10 ** 6)
+benchmarkResult["Score"] = benchmarkResult["Score"] / 1000.0
+benchmarkResult["Units"] = "s/op"
 
 print(benchmarkResult.head(5))
 
@@ -29,21 +32,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from benchmarkResults.helper import grouped_barplot, libColors, getUnit
 
-# get meta info like units, mode, avg-degree ...
-title = "TriangleCount \n on a undirected random power-law graph with an average degree of {} \n using the {} of {}".format(
-        benchmarkResult.avgDegree.iloc[0],
-        benchmarkResult.Mode.iloc[0], benchmarkResult.Cnt.iloc[0]
-    )
-
 # sns approach fails to easily plot pre-aggregated error
-linePlot = sns.lineplot(x="nodeCount", y="Score", hue="Library-Variant", palette = libColors(), style="concurrency", data=benchmarkResult,
+linePlot = sns.lineplot(x="avgDegree", y="Score", hue="Library", palette = libColors(), style="weighted", data=benchmarkResult,
                         markers=True, legend="brief")
 linePlot.set_ylabel("Runtime in {}".format(getUnit(benchmarkResult)), fontsize=12)
-linePlot.set_xlabel("Number of vertices x 10⁶", fontsize=12)
+linePlot.set_xlabel("Average vertex-degree", fontsize=12)
 linePlot.legend(bbox_to_anchor=(1, 1), loc='upper left', ncol=1)
-linePlot.set_yscale('log')
+#linePlot.set_yscale('log')
 plt.tight_layout(pad=1)
-plt.savefig("out/triangleCount.pdf", bbox_inches='tight')
+plt.savefig("out/loadGraph.pdf", bbox_inches='tight')
 plt.show()
 
 # linePlot = sns.lineplot(x="nodeCount", y="Score", hue="Library-Variant", palette = libColors(), style="concurrency",

@@ -3,13 +3,11 @@
 # TODO visualize semring results
 
 import matplotlib.pyplot as plt
-from benchmarkResults.helper import grouped_barplot
+from benchmarkResults.helper import grouped_barplot, getUnit, booleanColorMap
 import numpy as np
 # read csv
 import pandas as pd
 import seaborn as sns
-
-from benchmarkResults.helper import booleanColorMap
 
 graphBlasOperation = "mxm"
 #graphBlasOperation = "reduceColWise"
@@ -57,10 +55,12 @@ matrixDim = maskResults["dimension"].unique()
 assert len(matrixDim) == 1
 matrixDim = matrixDim[0]
 
+maskResults = maskResults[maskResults["concurrency"] == 1]
+
 # assuming default: e.g. are non-negated and non-structural
 for entriesPerMaskColumn in maskResults["avgEntriesPerColumnInMask"].unique():
+        maxValue = int(pd.Series.max(maskResults[(maskResults["avgEntriesPerColumnInMask"] == entriesPerMaskColumn)].Score) * 1.3)
         # bar plot negated/non-negated
-        maskResults = maskResults[maskResults["concurrency"] == 1]
         #title = "{} with negated Mask with {} entries per mask column \n (matrices dim: {})".format(graphBlasOperation, entriesPerMaskColumn, matrixDim)
         negatedMaskDf = maskResults[(maskResults["structuralMask"] == False) & (
                 maskResults["avgEntriesPerColumnInMask"] == entriesPerMaskColumn)]
@@ -70,9 +70,11 @@ for entriesPerMaskColumn in maskResults["avgEntriesPerColumnInMask"].unique():
         #                           palette=booleanColorMap(), data=negatedMaskDf)
         negatedPlot = grouped_barplot(negatedMaskDf, "Library", "negatedMask", "Score", "Error", ax, booleanColorMap(), False)
         #negatedPlot.title(title)
-        negatedPlot.xlabel("GraphBLAS library")
+        negatedPlot.ylabel("Runtime in {}".format(getUnit(negatedMaskDf)), fontsize=12)
+        negatedPlot.xlabel("GraphBLAS library", fontsize=12)
         ax.legend(title='Mask negated')
-        outFile = "out/{}_mask_negated_avgMaskEntries{}.jpg".format(graphBlasOperation,entriesPerMaskColumn)
+        ax.set_ylim([0, maxValue])
+        outFile = "out/{}_mask_negated_avgMaskEntries{}.pdf".format(graphBlasOperation,entriesPerMaskColumn)
         plt.savefig(outFile, bbox_inches='tight')
         plt.show()
 
@@ -86,8 +88,10 @@ for entriesPerMaskColumn in maskResults["avgEntriesPerColumnInMask"].unique():
         structuralPlot = grouped_barplot(structuralMaskDf, "Library", "structuralMask", "Score", "Error", ax, booleanColorMap(), False)
         #structuralPlot.title(title)
         ax.legend(title='Mask structural')
-        structuralPlot.xlabel("GraphBLAS library")
-        outFile = "out/{}_mask_strutural_avgMaskEntries{}.jpg".format(graphBlasOperation, entriesPerMaskColumn)
+        ax.set_ylim([0, maxValue])
+        structuralPlot.ylabel("Runtime in {}".format(getUnit(structuralMaskDf)), fontsize=12)
+        structuralPlot.xlabel("GraphBLAS library", fontsize=12)
+        outFile = "out/{}_mask_strutural_avgMaskEntries{}.pdf".format(graphBlasOperation, entriesPerMaskColumn)
         plt.savefig(outFile, bbox_inches='tight')
         plt.show()
 
@@ -103,9 +107,9 @@ if (graphBlasOperation == "mxm"):
 
 semiringPlot = sns.lineplot(data=semiringResults, x="dimension", y="Score", hue=operatorColumn, style="Library",
                             markers=True)
-semiringPlot.set_ylabel("Time in {}".format(semiringResults["Units"].unique()[0]))
-semiringPlot.set_xlabel("Matrix-Dimension x 10⁶")
-plt.savefig("out/{}WithSemiring.jpg".format(graphBlasOperation))
+semiringPlot.set_ylabel("Runtime in {}".format(getUnit(semiringResults)), fontsize=12)
+semiringPlot.set_xlabel("Matrix-Dimension x 10⁶", fontsize=12)
+plt.savefig("out/{}WithSemiring.pdf".format(graphBlasOperation))
 plt.show()
 
 # fig, ax = plt.subplots()

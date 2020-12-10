@@ -6,7 +6,7 @@
 import pandas as pd
 
 # weighted source: results/weightedPageRank/weightedPageRankResult.csv
-weighted = True
+weighted = False
 #orientation = "Natural"
 orientation = "Undirected"
 
@@ -49,31 +49,34 @@ print("{} entries for iterations".format(len(iterationScalingResult)))
 # import seaborn as sns
 import matplotlib.pyplot as plt
 import seaborn as sns
-from benchmarkResults.helper import grouped_barplot
-from benchmarkResults.helper import libColors
+from benchmarkResults.helper import grouped_barplot, getUnit, libColors
 
 # plot iteration scaling results
 # Idea: x-axis = "iterations" , y-axis = score , hue = library, style = concurrency
 # TODO: also show error?!
 
+
 iterationsPlot = sns.lineplot(data=iterationScalingResult, x="Iterations", y="Score",
                               hue="Library", palette = libColors(), style="concurrency", markers=True)
-iterationsPlot.set_ylabel("Time in {}".format(iterationScalingResult.Units.unique()[0]))
+iterationsPlot.set_ylabel("Runtime in {}".format(getUnit(iterationScalingResult)), fontsize=12)
 iterationsPlot.set_yscale('log')
 iterationsPlot.legend(bbox_to_anchor=(1, 1), loc='upper left', ncol=1)
-outFile = "out/{}_{}_iterationScale.jpg".format("weightedPageRank" if weighted else "pageRank", orientation)
+outFile = "out/{}_{}_iterationScale.pdf".format("weightedPageRank" if weighted else "pageRank", orientation)
 plt.tight_layout(pad=1)
 plt.savefig(outFile, bbox_inches='tight')
 plt.show()
 
-
+fig, ax = plt.subplots()
 nodeCountPlot = sns.lineplot(data=nodeCountScalingResults, x="NodeCount", y="Score",
                              hue="Library", palette = libColors(),style="concurrency", markers=True)
-nodeCountPlot.set_ylabel("Time in {}".format(nodeCountScalingResults.Units.unique()[0]))
-nodeCountPlot.set_xlabel("Number of vertices x 10⁶")
+nodeCountPlot.set_ylabel("Runtime in {}".format(getUnit(nodeCountScalingResults)), fontsize=12)
+nodeCountPlot.set_xlabel("Number of vertices x 10⁶", fontsize=12)
 nodeCountPlot.legend(bbox_to_anchor=(1, 1), loc='upper left', ncol=1)
-outFile = "out/{}_{}_nodeScale.jpg".format("weightedPageRank" if weighted else "pageRank", orientation)
+outFile = "out/{}_{}_nodeScale.pdf".format("weightedPageRank" if weighted else "pageRank", orientation)
 plt.tight_layout(pad=1.5)
+if not weighted:
+    ax.get_legend().remove()
+
 plt.savefig(outFile, bbox_inches='tight')
 #nodeCountPlot.set_yscale('log')
 plt.show()

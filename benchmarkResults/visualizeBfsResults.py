@@ -32,30 +32,34 @@ bfsVariants = [gb.get_group(x) for x in gb.groups]
 # import seaborn as sns
 import matplotlib.pyplot as plt
 import seaborn as sns
-from benchmarkResults.helper import grouped_barplot, libColors
+from benchmarkResults.helper import grouped_barplot, libColors, getUnit
 
-allLibs = ["graphblas-java-native", "gds-pregel", "ejml", "ejml-Sparse", "ejml-Dense-Sparse",  "ejml-Dense", "jGraphT"]
+allLibs = ["java-native", "gds-pregel", "ejml", "ejml-Sparse", "ejml-Dense-Sparse",  "ejml-Dense", "jGraphT"]
 for variant in bfsVariants:
     # get meta info like units, mode, avg-degree ...
     containedLibs = variant.Library.unique()
     hueOrder = [i for i in allLibs if i in containedLibs]
-
+    fig, ax = plt.subplots()
 
 
     # sns approach fails to easily plot pre-aggregated error
     linePlot = sns.lineplot(x="nodeCount", y="Score", hue="Library", style="concurrency", data=variant,
                             hue_order=hueOrder, palette = libColors(), markers=True)
-    linePlot.set_ylabel("Time in {}".format(variant.Units.unique()[0]))
-    linePlot.set_xlabel("Number of vertices x 10⁶")
+    linePlot.set_ylabel("Runtime in {}".format(getUnit(variant)), fontsize=12)
+    linePlot.set_xlabel("Number of vertices x 10⁶", fontsize=12)
     linePlot.legend(bbox_to_anchor=(1, 1), loc='upper left', ncol=1)
+
     plt.tight_layout(pad=1)
     yscale = 'log'
     linePlot.set_yscale(yscale)
+    if variant.BfsVariant.unique()[0] == "Parent":
+        ax.get_legend().remove()
+
     #linePlot.set_title(variant.BfsVariant.unique()[0])
 
     # fig, ax = plt.subplots()
     # barplot = grouped_barplot(variant, "nodeCount", "Name", "Score", "Error", ax)
     # barplot.title(title)
     #
-    plt.savefig("out/bfs_{}_yscale_{}.jpg".format(variant['BfsVariant'].iloc[0], yscale))
+    plt.savefig("out/bfs_{}_yscale_{}.pdf".format(variant['BfsVariant'].iloc[0], yscale))
     plt.show()

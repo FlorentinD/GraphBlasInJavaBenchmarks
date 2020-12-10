@@ -15,6 +15,7 @@ def libColors():
         "gds": "tab:olive",
         "gds-VertexWise": "tab:olive",
         "java-native":"tab:red",
+        "java-native (SuiteSparse)":"tab:red",
         "java-native-Global": "tab:orange",
         "java-native-VertexWise": "tab:red",
         "gds-pregel": "tab:green",
@@ -28,6 +29,8 @@ def booleanColorMap():
         "None": "tab:grey"
     }
 
+def getUnit(benchmarkDf):
+    return benchmarkDf.Units.unique()[0].split("/")[0]
 
 # for plotting the error
 # https://stackoverflow.com/questions/42017049/seaborn-how-to-add-error-bars-on-a-grouped-barplot
@@ -61,7 +64,7 @@ def grouped_barplot(df, categorie, hueColumn, valueColumn, err, ax, colorMap, sh
             autolabel(bar, ax)
 
     plt.xlabel(categorie)
-    plt.ylabel("Time in {}".format(df.Units.iloc[0]))
+    plt.ylabel("Runtime in {}".format(getUnit(df)))
     plt.xticks(x, u)
     plt.legend(loc="upper left")
     return plt
