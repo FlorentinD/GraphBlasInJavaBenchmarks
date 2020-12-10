@@ -26,7 +26,7 @@ public class PageRankBaseBenchmark extends EjmlGraphBaseBenchmark {
         put("1M;15", Pair.of(1_000_000, 15));
     }};
 
-    @Param({"0.1M;20", "0.5M;20", "1M;20", "5M;20", "1M;5", "1M;10", "1M;15"})
+    @Param({"1M;20"})
     protected String nodeCountIterationCombinations;
 
     protected int nodeCount;

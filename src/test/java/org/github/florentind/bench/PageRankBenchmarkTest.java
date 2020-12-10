@@ -1,18 +1,13 @@
 package org.github.florentind.bench;
 
-import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 import org.github.florentind.core.ejml.EjmlGraph;
-import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.core.jgrapht.JGraphTConverter;
 import org.github.florentind.graphalgos.pageRank.PageRankEjml;
-import org.github.florentind.graphalgos.pageRank.PageRankNative;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.pr.ImmutablePageRankPregelConfig;
 import org.neo4j.graphalgo.beta.pregel.pr.PageRankPregel;
@@ -23,8 +18,6 @@ import org.neo4j.graphalgo.pagerank.PageRank;
 import org.neo4j.graphalgo.pagerank.PageRankFactory;
 import org.neo4j.graphalgo.pagerank.PageRankStreamConfig;
 import org.neo4j.logging.NullLog;
-
-import java.nio.Buffer;
 
 import static org.github.florentind.graphalgos.pageRank.ResultUtil.normalize;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -82,20 +75,6 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
 
         assertEquals(goldStandard.getMiddle(), pregelResult.getMiddle());
         assertArrayEquals(goldStandard.getRight(), pregelResult.getRight(), 1e-2);
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"true", "false"})
-    void testNative(boolean by_col) {
-        GRBCORE.initNonBlocking();
-
-        Buffer nativeMatrix = ToNativeMatrixConverter.convert(graph, by_col);
-        var nativeResult = PageRankNative.compute(nativeMatrix, DAMPING_FACTOR, TOLERANCE, MAX_ITERATIONS, CONCURRENCY);
-
-        GRBCORE.grbFinalize();
-
-        assertEquals(goldStandard.getMiddle(), nativeResult.iterations());
-        assertArrayEquals(goldStandard.getRight(), normalize(nativeResult.result()), 1e-2);
     }
 
     Triple<String, Integer, double[]> getEjmlResult() {

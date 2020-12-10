@@ -1,14 +1,9 @@
 package org.github.florentind.graphalgos.triangleCount;
 
-import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.ejml.data.DMatrixSparseCSC;
-import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import java.nio.Buffer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -59,34 +54,5 @@ public class TriangleCountTest {
             assertEquals(EXPECTED_NODEWISE_TC[i], result.get(i));
         }
         assertEquals(EXPECTED_TRIANGLE_COUNT, result.totalCount());
-    }
-
-    @Test
-    public void nativeSandia() {
-        GRBCORE.initNonBlocking();
-
-        Buffer jniMatrix = ToNativeMatrixConverter.convert(inputMatrix);
-
-        assertEquals(EXPECTED_TRIANGLE_COUNT, TriangleCountNative.computeTotalSandia(jniMatrix, 1));
-
-        GRBCORE.freeMatrix(jniMatrix);
-        GRBCORE.grbFinalize();
-    }
-
-    @Test
-    public void nativeNodeWise() {
-        GRBCORE.initNonBlocking();
-
-        Buffer jniMatrix = ToNativeMatrixConverter.convert(inputMatrix);
-
-        var result = TriangleCountNative.computeNodeWise(jniMatrix, 1);
-
-        for (int i = 0; i < EXPECTED_NODEWISE_TC.length; i++) {
-            assertEquals(EXPECTED_NODEWISE_TC[i], result.get(i));
-        }
-        assertEquals(EXPECTED_TRIANGLE_COUNT, result.totalCount());
-
-        GRBCORE.freeMatrix(jniMatrix);
-        GRBCORE.grbFinalize();
     }
 }

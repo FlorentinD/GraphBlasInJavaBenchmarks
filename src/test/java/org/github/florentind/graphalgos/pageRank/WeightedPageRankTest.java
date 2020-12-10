@@ -1,14 +1,11 @@
 package org.github.florentind.graphalgos.pageRank;
 
-import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.sparse.csc.CommonOps_DSCC;
-import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.nio.Buffer;
 import java.util.stream.Stream;
 
 import static org.github.florentind.graphalgos.pageRank.ResultUtil.normalize;
@@ -108,27 +105,5 @@ public class WeightedPageRankTest {
         assertEquals(20, result.iterations());
         // other tolerance as maxIterations reached and not tolerance
         assertArrayEquals(expectedScores, normalize(result.result()), 1e-2f);
-    }
-
-    @ParameterizedTest(name = "{0}")
-    @MethodSource("weightedGraphs")
-    public void pageRankNative(String desc, DMatrixSparseCSC adjMatrix, double[] expectedScores) {
-        GRBCORE.initNonBlocking();
-
-        Buffer nativeMatrix = ToNativeMatrixConverter.convert(adjMatrix);
-
-        PageRankResult result = PageRankNative.computeWeighted(
-                nativeMatrix,
-                DAMPING_FACTOR,
-                TOLERANCE,
-                MAX_ITERATIONS,
-                1
-        );
-
-        assertEquals(20, result.iterations());
-        // other tolerance as maxIterations reached and not tolerance
-        assertArrayEquals(expectedScores, normalize(result.result()), 1e-2f);
-
-        GRBCORE.grbFinalize();
     }
 }

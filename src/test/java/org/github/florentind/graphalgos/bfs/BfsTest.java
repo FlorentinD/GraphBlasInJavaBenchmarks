@@ -2,23 +2,18 @@
 
 package org.github.florentind.graphalgos.bfs;
 
-import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.sparse.csc.CommonOps_DSCC;
-import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.nio.Buffer;
 import java.util.stream.Stream;
 
-import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 import static org.github.florentind.graphalgos.bfs.BfsEjml.BfsVariation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 @SuppressWarnings({"UnusedMethod"})
 public class BfsTest {
@@ -94,35 +89,6 @@ public class BfsTest {
 
         assertEquals(denseIt.iterations(), sparseIt.iterations());
         assertEquals(denseIt.nodesVisited(), sparseIt.nodesVisited());
-    }
-
-    @ParameterizedTest
-    @MethodSource("bfsVariantSource")
-    public void testNativeBfs(BfsVariation variation, double[] expected) {
-        GRBCORE.initNonBlocking();
-
-        Buffer nativeMatrix = ToNativeMatrixConverter.convert(inputMatrixTransposed);
-
-        BfsResult result = null;
-
-        switch (variation) {
-            case LEVEL:
-                result = new BfsNative().computeLevel(nativeMatrix, 0, 6, 1);
-                break;
-            case PARENTS:
-                result = new BfsNative().computeParent(nativeMatrix, 0, 6, 1);
-                break;
-            default:
-                fail();
-        }
-
-        checkStatusCode(GRBCORE.freeMatrix(nativeMatrix));
-        checkStatusCode(GRBCORE.grbFinalize());
-
-        // only level variant implemented atm
-        assertBfsResult(expected, result);
-        // as the result is set at the beginning of each iteration
-        assertEquals(EXPECTED_ITERATIONS, result.iterations());
     }
 
     private void assertBfsResult(double[] expected, BfsResult result) {

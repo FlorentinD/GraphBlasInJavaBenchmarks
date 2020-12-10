@@ -1,12 +1,9 @@
 package org.github.florentind.bench;
 
-import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.github.florentind.core.ejml.EjmlGraph;
-import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.core.jgrapht.JGraphTConverter;
 import org.github.florentind.graphalgos.triangleCount.NativeNodeWiseTriangleCountResult;
 import org.github.florentind.graphalgos.triangleCount.TriangleCountEjml;
-import org.github.florentind.graphalgos.triangleCount.TriangleCountNative;
 import org.github.florentind.graphalgos.triangleCount.TriangleCountResult;
 import org.jgrapht.GraphMetrics;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,14 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.neo4j.graphalgo.Orientation;
-import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
-import org.neo4j.graphalgo.beta.generator.RelationshipDistribution;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.triangleCount.ImmutableTriangleCountPregelConfig;
 import org.neo4j.graphalgo.beta.pregel.triangleCount.TriangleCountPregel;
-import org.neo4j.graphalgo.config.RandomGraphGeneratorConfig;
-import org.neo4j.graphalgo.core.Aggregation;
-import org.neo4j.graphalgo.core.GdsEdition;
 import org.neo4j.graphalgo.core.concurrency.Pools;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.neo4j.graphalgo.core.utils.paged.HugeAtomicLongArray;
@@ -29,8 +21,6 @@ import org.neo4j.graphalgo.triangle.ImmutableTriangleCountBaseConfig;
 import org.neo4j.graphalgo.triangle.IntersectingTriangleCount;
 import org.neo4j.graphalgo.triangle.IntersectingTriangleCountFactory;
 import org.neo4j.logging.NullLog;
-
-import java.nio.Buffer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -70,7 +60,7 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
 
         ejmlGraph = EjmlGraph.create(graph);
 
-        expected =  TriangleCountEjml.computeNodeWise(ejmlGraph.matrix(), true);
+        expected = TriangleCountEjml.computeNodeWise(ejmlGraph.matrix(), true);
 //        System.out.println(expected.totalCount());
     }
 
@@ -111,34 +101,6 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
         // ! no need to transpose as symmetric anyway
         // without a mask, this quickly OOMs
         assertEquals(expected.totalCount(), TriangleCountEjml.computeTotalCohen(ejmlGraph.matrix(), true));
-    }
-
-    @Test
-    public void testNativeSandia() {
-        GRBCORE.initNonBlocking();
-
-        Buffer jniMatrix = ToNativeMatrixConverter.convert(ejmlGraph);
-
-        long actual = TriangleCountNative.computeTotalSandia(jniMatrix, CONCURRENCY);
-
-        GRBCORE.freeMatrix(jniMatrix);
-        GRBCORE.grbFinalize();
-
-        assertEquals(expected.totalCount(), actual);
-    }
-
-    @Test
-    public void testNativeNodeWise() {
-        GRBCORE.initNonBlocking();
-
-        Buffer jniMatrix = ToNativeMatrixConverter.convert(ejmlGraph);
-
-        var result = TriangleCountNative.computeNodeWise(jniMatrix, CONCURRENCY);
-
-        GRBCORE.freeMatrix(jniMatrix);
-        GRBCORE.grbFinalize();
-
-        assertNodeWiseCount(expected, result);
     }
 
     @Test
