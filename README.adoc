@@ -25,18 +25,13 @@ git checkout mask_rebased
 ./gradlew install
 
 # SuiteSparse:Graphblas (make sure to install under `usr/local` and you might not need setting the LD_LIBRARY_PATH)
-# might need to add `/usr/local/lib` to `/etc/ld.so.conf` to avoid an `UnsatisfiedLinkError`
-# or add run `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib; ldconfig` before
-# Problem: `ld` ignores symbolic links in `usr/local/lib`
-# or some other magic like waiting for 1h and it solves the `UnsatisfiedLinkError` itself
-# ! AVX2 flag needs to manually set in the CMakeList (false by default)
 git clone git@github.com:DrTimothyAldenDavis/GraphBLAS.git
 cd GraphBLAS/
 make JOBS=32
 sudo make install -j32 INSTALL=/usr/local/
 cd ..
 
-# graphblas-java-native (my fork, as I added some mappings which are not merged yet?)
+# graphblas-java-native
 git@github.com:fabianmurariu/graphblas-java-native.git
 cd graphblas-java-native/
 cd graphblas-java/
@@ -45,12 +40,6 @@ mvn clean install
 cd ..
 mvn clean install -Dgpg.skip
 cd ..
-
-# graph-data-science (at some point not depending on a local version anymore  ..)
-git clone git@github.com:neo4j/graph-data-science.git
-cd graph-data-science/
-./gradlew publishToMavenLocal
-
 
 # run benchmarks (exclude, include benchmarks via build.gradle)
 cd GraphBlasInJavaBenchmarks/
