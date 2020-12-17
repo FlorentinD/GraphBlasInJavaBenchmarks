@@ -9,8 +9,10 @@ benchmarkResult = pd.read_csv("results/triangleCount/triangleCountResultServer.c
 print(benchmarkResult.dtypes)
 
 benchmarkResult["Library-Variant"] = benchmarkResult.Benchmark.str.split(".").str[-1]
+benchmarkResult = benchmarkResult.rename(columns={"concurrency": "Concurrency"})
+benchmarkResult["Library-Variant"] = benchmarkResult["Library-Variant"].str.title()
 
-for (prev, replacement) in {"NodeWise": "-VertexWise", "Global": "-Global", "pregel": "gds-pregel", "jni": "java-native"}.items():
+for (prev, replacement) in {"nodewise": "-VertexWise", "global": "-Global", "Pregel": "GDS-Pregel", "Jni": "Java-Native", "Jgrapht": "JGraphT", "Ejml": "EJML", "Gds": "GDS"}.items():
     benchmarkResult["Library-Variant"] = benchmarkResult["Library-Variant"].str.replace(prev, replacement)
 
 benchmarkResult["nodeCount"] = benchmarkResult.nodeCount / (10 ** 6)
@@ -36,27 +38,16 @@ title = "TriangleCount \n on a undirected random power-law graph with an average
     )
 
 # sns approach fails to easily plot pre-aggregated error
-linePlot = sns.lineplot(x="nodeCount", y="Score", hue="Library-Variant", palette = libColors(), style="concurrency", data=benchmarkResult,
+fig, ax = plt.subplots(figsize=(6,3))
+linePlot = sns.lineplot(x="nodeCount", y="Score", hue="Library-Variant", palette = libColors(), style="Concurrency", data=benchmarkResult,
                         markers=True, legend="brief")
 linePlot.set_ylabel("Runtime in {}".format(getUnit(benchmarkResult)), fontsize=12)
 linePlot.set_xlabel("Number of vertices x 10⁶", fontsize=12)
-linePlot.legend(bbox_to_anchor=(1, 1), loc='upper left', ncol=1)
+linePlot.legend(bbox_to_anchor=(0.5, -0.4), loc='lower center', ncol=3, bbox_transform=fig.transFigure)
 linePlot.set_yscale('log')
-plt.tight_layout(pad=1)
+#plt.tight_layout(pad=1)
 plt.savefig("out/triangleCount.pdf", bbox_inches='tight')
 plt.show()
-
-# linePlot = sns.lineplot(x="nodeCount", y="Score", hue="Library-Variant", palette = libColors(), style="concurrency",
-#                         data=benchmarkResult[~benchmarkResult["Library-Variant"].str.startswith("jGraphT")],
-#                         markers=True, legend="brief")
-# linePlot.set_ylabel("Time in {}".format(benchmarkResult.Units.unique()[0]))
-# linePlot.set_xlabel("NodeCount x 10⁶")
-# linePlot.legend(bbox_to_anchor=(1, 1), loc='upper left', ncol=1)
-# linePlot.set_yscale('linear')
-# plt.ylim(0, 6000)
-# plt.savefig("out/triangleCount_withoutJGraphT.jpg", bbox_inches='tight')
-# plt.show()
-
 
 # fig, ax = plt.subplots()
 #

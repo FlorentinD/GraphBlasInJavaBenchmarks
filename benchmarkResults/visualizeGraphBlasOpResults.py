@@ -9,8 +9,8 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-graphBlasOperation = "mxm"
-#graphBlasOperation = "reduceColWise"
+#graphBlasOperation = "mxm"
+graphBlasOperation = "reduceColWise"
 
 operatorColumns = {"mxm": "Semiring", "reduceColWise": "Monoid"}
 operatorColumn = operatorColumns[graphBlasOperation]
@@ -38,7 +38,7 @@ if (graphBlasOperation == "reduceColWise"):
 print(semiringResults.head(5))
 
 # get base-line for withMask results
-operatorsForMask = {"mxm": "Plus;Times", "reduceColWise": "Plus"}
+operatorsForMask = {"mxm": "(PLUS;TIMES)", "reduceColWise": "PLUS"}
 operatorForMask = operatorsForMask[graphBlasOperation]
 dimensionForMask = maskResults["dimension"].unique()
 baseLineForMask = semiringResults[(semiringResults["dimension"].isin(dimensionForMask)) & (
@@ -95,9 +95,6 @@ for entriesPerMaskColumn in maskResults["avgEntriesPerColumnInMask"].unique():
         plt.savefig(outFile, bbox_inches='tight')
         plt.show()
 
-# import seaborn as sns
-
-
 
 semiringResults = semiringResults[semiringResults["concurrency"] == 1]
 
@@ -105,20 +102,11 @@ if (graphBlasOperation == "mxm"):
     semiringResults["Score"] = semiringResults["Score"] / 1_000
     semiringResults["Units"] = "s/op"
 
+fig, ax = plt.subplots(figsize=(6,3))
 semiringPlot = sns.lineplot(data=semiringResults, x="dimension", y="Score", hue=operatorColumn, style="Library",
                             markers=True)
 semiringPlot.set_ylabel("Runtime in {}".format(getUnit(semiringResults)), fontsize=12)
 semiringPlot.set_xlabel("Matrix-Dimension x 10⁶", fontsize=12)
-plt.savefig("out/{}WithSemiring.pdf".format(graphBlasOperation))
+semiringPlot.legend(bbox_to_anchor=(0.5, -0.4), loc='lower center', ncol=2, bbox_transform=fig.transFigure)
+plt.savefig("out/{}WithSemiring.pdf".format(graphBlasOperation), bbox_inches='tight')
 plt.show()
-
-# fig, ax = plt.subplots()
-# barplot = grouped_barplot(variant, "dimension", "Name", "Score", "Error", ax)
-# barplot.title(title)
-
-# sns approach fails to easily plot pre-aggregated error
-# barplot = sns.barplot(x="nodeCount", y="Score", hue="Name", data=variant)
-# barplot.set_ylabel(yLabel)
-
-# plt.savefig("out/mxmWithSemiring.jpg")
-# plt.show()

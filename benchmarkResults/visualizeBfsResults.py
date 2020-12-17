@@ -10,8 +10,9 @@ print(benchmarkResult.dtypes)
 
 benchmarkResult["Name"] = benchmarkResult.Benchmark.str.split(".").str[-1]
 benchmarkResult[["Library","BfsVariant"]] = benchmarkResult.Name.str.split("Bfs", expand=True)
+benchmarkResult = benchmarkResult.rename(columns={"concurrency": "Concurrency"})
 
-for (prev, replacement) in {"ejml": "ejml-", "DenseSparse": "Dense-Sparse", "pregel": "gds-pregel", "jni": "java-native"}.items():
+for (prev, replacement) in {"ejml": "EJML-", "DenseSparse": "Dense-Sparse", "pregel": "GDS-Pregel", "jni": "Java-Native", "jGraphT": "JGraphT"}.items():
     benchmarkResult["Library"] = benchmarkResult["Library"].str.replace(prev, replacement)
 
 benchmarkResult["nodeCount"] = benchmarkResult.nodeCount / (10 ** 6)
@@ -34,26 +35,27 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from benchmarkResults.helper import grouped_barplot, libColors, getUnit
 
-allLibs = ["java-native", "gds-pregel", "ejml", "ejml-Sparse", "ejml-Dense-Sparse",  "ejml-Dense", "jGraphT"]
-for variant in bfsVariants:
+allLibs = ["Java-Native", "GDS-Pregel", "EJML", "EJML-Sparse", "EJML-Dense-Sparse",  "EJML-Dense", "JGraphT"]
+fig, axes = plt.subplots(1, 2, figsize=(6,3), sharey=True, sharex=True)
+
+for id, variant in enumerate(bfsVariants):
     # get meta info like units, mode, avg-degree ...
     containedLibs = variant.Library.unique()
     hueOrder = [i for i in allLibs if i in containedLibs]
-    fig, ax = plt.subplots()
-
 
     # sns approach fails to easily plot pre-aggregated error
-    linePlot = sns.lineplot(x="nodeCount", y="Score", hue="Library", style="concurrency", data=variant,
+    linePlot = sns.lineplot(ax=axes[id], x="nodeCount", y="Score", hue="Library", style="Concurrency", data=variant,
                             hue_order=hueOrder, palette = libColors(), markers=True)
     linePlot.set_ylabel("Runtime in {}".format(getUnit(variant)), fontsize=12)
     linePlot.set_xlabel("Number of vertices x 10⁶", fontsize=12)
-    linePlot.legend(bbox_to_anchor=(1, 1), loc='upper left', ncol=1)
+    linePlot.set_title("{}-Variant".format(variant['BfsVariant'].iloc[0]))
+    linePlot.legend(bbox_to_anchor=(0.5, -0.4), loc='lower center', ncol=3, bbox_transform=fig.transFigure)
 
-    plt.tight_layout(pad=1)
+    #plt.tight_layout(pad=1)
     yscale = 'log'
     linePlot.set_yscale(yscale)
     if variant.BfsVariant.unique()[0] == "Parent":
-        ax.get_legend().remove()
+        axes[id].get_legend().remove()
 
     #linePlot.set_title(variant.BfsVariant.unique()[0])
 
@@ -61,5 +63,5 @@ for variant in bfsVariants:
     # barplot = grouped_barplot(variant, "nodeCount", "Name", "Score", "Error", ax)
     # barplot.title(title)
     #
-    plt.savefig("out/bfs_{}_yscale_{}.pdf".format(variant['BfsVariant'].iloc[0], yscale))
-    plt.show()
+plt.savefig("out/bfs_yscale_{}.pdf".format(yscale), bbox_inches='tight')
+plt.show()

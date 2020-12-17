@@ -4,22 +4,22 @@ import math
 
 def libColors():
     return {
-        "ejml": "tab:blue",
-        "ejml-Global": "tab:purple",
-        "ejml-VertexWise": "tab:blue",
-        "ejml-Sparse": "tab:purple",
-        "ejml-Dense": "tab:blue",
-        "ejml-Dense-Sparse": "tab:cyan",
-        "jGraphT": "tab:brown",
-        "jGraphT-Global": "tab:brown",
-        "gds": "tab:olive",
-        "gds-VertexWise": "tab:olive",
-        "java-native":"tab:red",
-        "java-native (SuiteSparse)":"tab:red",
-        "java-native-Global": "tab:orange",
-        "java-native-VertexWise": "tab:red",
-        "gds-pregel": "tab:green",
-        "gds-pregel-VertexWise": "tab:green"
+        "EJML": "tab:blue",
+        "EJML-Global": "tab:purple",
+        "EJML-VertexWise": "tab:blue",
+        "EJML-Sparse": "tab:purple",
+        "EJML-Dense": "tab:blue",
+        "EJML-Dense-Sparse": "tab:cyan",
+        "JGraphT": "tab:brown",
+        "JGraphT-Global": "tab:brown",
+        "GDS": "tab:olive",
+        "GDS-VertexWise": "tab:olive",
+        "Java-Native":"tab:red",
+        "Java-Native (SuiteSparse)":"tab:red",
+        "Java-Native-Global": "tab:orange",
+        "Java-Native-VertexWise": "tab:red",
+        "GDS-Pregel": "tab:green",
+        "GDS-Pregel-VertexWise": "tab:green"
     }
 
 def booleanColorMap():
