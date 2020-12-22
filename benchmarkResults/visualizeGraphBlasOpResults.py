@@ -107,6 +107,7 @@ semiringPlot = sns.lineplot(data=semiringResults, x="dimension", y="Score", hue=
                             markers=True)
 semiringPlot.set_ylabel("Runtime in {}".format(getUnit(semiringResults)), fontsize=12)
 semiringPlot.set_xlabel("Matrix-Dimension x 10⁶", fontsize=12)
-semiringPlot.legend(bbox_to_anchor=(0.5, -0.4), loc='lower center', ncol=2, bbox_transform=fig.transFigure)
+semiringPlot.set_xticks(semiringResults["dimension"].unique())
+semiringPlot.legend(bbox_to_anchor=(0.5, -0.45), loc='lower center', ncol=2, bbox_transform=fig.transFigure)
 plt.savefig("out/{}WithSemiring.pdf".format(graphBlasOperation), bbox_inches='tight')
 plt.show()

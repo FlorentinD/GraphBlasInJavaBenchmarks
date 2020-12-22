@@ -13,7 +13,7 @@ orientation = "Undirected"
 
 fig, axes = plt.subplots(1, 2, figsize=(6,3), sharey=True, sharex=True)
 
-for id,weighted in enumerate([True, False]):
+for id,weighted in enumerate([False, True]):
     benchmarkResult = pd.read_csv(
         "results/{}.csv".format("weightedPageRank/weightedPageRankResultsServer" if weighted else "pageRank/pageRankResultsServer"))
 

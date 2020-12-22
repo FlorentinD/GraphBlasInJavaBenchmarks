@@ -29,7 +29,7 @@ fig, ax = plt.subplots(figsize=(6,3))
 linePlot = sns.lineplot(x="avgDegree", y="Score", hue="Library", palette = libColors(), style="weighted", data=benchmarkResult,
                         markers=True, legend="brief")
 linePlot.set_ylabel("Runtime in {}".format(getUnit(benchmarkResult)), fontsize=12)
-linePlot.set_xlabel("Average vertex-degree", fontsize=12)
+linePlot.set_xlabel("Average vertex degree", fontsize=12)
 linePlot.legend(bbox_to_anchor=(0.5, -0.15), loc='lower center', ncol=2, bbox_transform=fig.transFigure)
 #linePlot.set_yscale('log')
 plt.tight_layout(pad=1)
