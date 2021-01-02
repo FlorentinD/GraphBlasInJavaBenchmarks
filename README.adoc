@@ -20,10 +20,9 @@ It compares existing graph algorithm implementations in GDS and JGraphT against 
 * Graph algorithms BFS, (weighted) PageRank, and Triangle Count
 
 
-*Relies on locally build EJML and graphblas-java-native*
-
-
 == Setting up the project
+
+*Relies on locally build EJML and graphblas-java-native*
 
 === Prerequisites
 
