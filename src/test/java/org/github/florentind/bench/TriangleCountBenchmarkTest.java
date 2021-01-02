@@ -85,9 +85,6 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
                 .build(ejmlGraph, config, AllocationTracker.empty(), NullLog.getInstance())
                 .compute();
 
-
-        long globalTriangles = result.globalTriangles();
-
         assertNodeWiseCount(expected, result);
     }
 
@@ -151,7 +148,7 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
     @Test
     public void testPregel() {
         var triangleCountJob = Pregel.create(
-                graph,
+                ejmlGraph,
                 ImmutableTriangleCountPregelConfig.builder()
                         .concurrency(CONCURRENCY)
                         .build(),

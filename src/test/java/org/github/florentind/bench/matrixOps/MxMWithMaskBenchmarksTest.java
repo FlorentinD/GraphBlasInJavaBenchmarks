@@ -68,6 +68,7 @@ public class MxMWithMaskBenchmarksTest {
         var semiring = createSemiring(GRBMONOID.plusMonoidDouble(), GRAPHBLAS.timesBinaryOpDouble());
         var descriptor = createDescriptor();
 
+        setDescriptorValue(descriptor, GxB_AxB_METHOD, GxB_AxB_GUSTAVSON);
         if (negatedMask) setDescriptorValue(descriptor, GrB_MASK, GrB_COMP);
         if (structuralMask) setDescriptorValue(descriptor, GrB_MASK, GrB_STRUCTURE);
 

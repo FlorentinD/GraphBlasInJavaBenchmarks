@@ -116,7 +116,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
                 .build();
 
         PageRank pageRank = new PageRankFactory<>().build(
-                graph,
+                EjmlGraph.create(graph),
                 config,
                 AllocationTracker.empty(),
                 NullLog.getInstance()
@@ -137,7 +137,7 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
 
         PageRankPregel computation = new PageRankPregel();
         var pageRankJob = Pregel.create(
-                graph,
+                EjmlGraph.create(graph),
                 config,
                 computation,
                 Pools.DEFAULT,

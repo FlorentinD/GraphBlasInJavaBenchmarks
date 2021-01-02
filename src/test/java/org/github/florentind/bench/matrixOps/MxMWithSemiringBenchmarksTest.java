@@ -32,7 +32,6 @@ public class MxMWithSemiringBenchmarksTest {
     protected static final String OR_PAIR = "Or, Pair";
     protected static final String MIN_MAX = "Min, Max";
 
-    // TODO: create Semirings here
     protected static final HashMap<String, Pair<DSemiRing, Pair<Buffer, Buffer>>> semirings = new HashMap<>() {{
         put(PLUS_TIMES, Pair.of(DSemiRings.PLUS_TIMES, Pair.of(GRBMONOID.plusMonoidDouble(), GRAPHBLAS.timesBinaryOpDouble())));
         put(OR_AND, Pair.of(DSemiRings.OR_AND, Pair.of(GRBMONOID.lorMonoid(), GRAPHBLAS.landBinaryOp())));
@@ -40,11 +39,11 @@ public class MxMWithSemiringBenchmarksTest {
         put(OR_PAIR, Pair.of(EjmlUtil.OR_PAIR, Pair.of(GRBMONOID.lorMonoid(), GRAPHBLAS.pairBinaryOpBoolean())));
     }};
 
-    private static final Random RAND = new Random(42);
+    private static final int RAND = 42;
     protected DMatrixSparseCSC matrix;
 
     // smaller dimension than in benchmark for faster equal check
-    private int dimension = 100;
+    private int dimension = 1_000;
     private int avgDegree = 4;
 
     private static Stream<Arguments> mxmVariants() {
@@ -54,8 +53,8 @@ public class MxMWithSemiringBenchmarksTest {
     }
 
     @BeforeEach
-    public void setup() {
-        matrix = RandomMatrices_DSCC.generateUniform(dimension, dimension, avgDegree, 1, 2, RAND);
+    public void setup() throws Throwable {
+        matrix = EjmlUtil.createOrLoadRandomMatrix(dimension, dimension, avgDegree, 1, 2, RAND);
     }
 
     @ParameterizedTest(name = "semiring: {0}")
@@ -65,6 +64,7 @@ public class MxMWithSemiringBenchmarksTest {
                 .mult(matrix, matrix, null, ejmlSemiring, null, null, true);
 
         GRBCORE.initNonBlocking();
+        setGlobalInt(GxB_NTHREADS, 1);
 
         var nativeMatrix = ToNativeMatrixConverter.convert(matrix);
         var nativeResult = createMatrix(GRAPHBLAS.doubleType(), matrix.numRows, matrix.numCols);

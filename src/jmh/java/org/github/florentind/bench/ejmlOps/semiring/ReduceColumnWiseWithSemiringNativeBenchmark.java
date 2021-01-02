@@ -18,8 +18,10 @@ import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatu
 public class ReduceColumnWiseWithSemiringNativeBenchmark extends MatrixOpsWithMonoidBaseBenchmark {
     protected static final HashMap<String, Buffer> monoids = new HashMap<>() {{
         put(PLUS, GRBMONOID.plusMonoidDouble());
+        put(TIMES, GRBMONOID.timesMonoidDouble());
         put(OR, GRBMONOID.lorMonoid());
         put(MIN, GRBMONOID.minMonoidDouble());
+        put(AND, GRBMONOID.landMonoid());
     }};
 
     Buffer nativeMatrix;
