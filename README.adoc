@@ -1,8 +1,26 @@
 = GraphBLAS in Java Benchmarks
 
-Master Thesis project comparing different graph-algorithms written in gds-pregel and ejml against existing once in  JGraphT and GDS.
+This project contains implementations, benchmarks and visualization used in my master thesis _GraphBLAS in the context of Java_.
+It compares existing graph algorithm implementations in GDS and JGraphT against implementations via EJML, graphblas-java-native and GDS-Pregel.
 
-*Relies on locally build ejml, gds and graphblas-java-native*
+*Implementations*:
+
+* EJML-Graph format implementing the Graph API of GDS, which represents the graph by an EJML matrix.
+* Algorithms implemented via EJML and graphblas-java-native:
+    ** Breadth First Search (LEVEL and PARENT)
+    ** PageRank (weighted and unweighted)
+    ** Triangle Count (global and vertex-wise)
+* Format converters:
+    ** GDS graph -> EJML-Graph | JGraphT graph | graphblas-java-native matrix
+    ** EJML matrix -> graphblas-java-native matrix
+
+*Benchmarks*:
+
+* Semiring and Mask in EJML and graphblas-java-native via mxm and column-wise reduce
+* Graph algorithms BFS, (weighted) PageRank, and Triangle Count
+
+
+*Relies on locally build EJML and graphblas-java-native*
 
 
 == Setting up the project
