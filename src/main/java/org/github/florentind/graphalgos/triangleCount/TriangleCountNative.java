@@ -10,8 +10,6 @@ import static com.github.fabianmurariu.unsafe.GRBOPSMAT.*;
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 
 public class TriangleCountNative {
-    // TODO compare C<L> = L * L with C<L> = U_t * L (exploiting column-wise storage)
-
     public static long computeTotalSandia(Buffer matrix, int concurrency) {
         setGlobalInt(GxB_NTHREADS, concurrency);
 

@@ -77,10 +77,6 @@ public class PageRankGraphalyticsEjml {
             //
 
             // Divide previous PageRank with number of outbound edges
-            // Difference to reference: need to use nonDanglingNodesMask here to avoid division by 0
-            // Reason: outDegrees vector would be sparse in other GraphBLAS implementations (here always dense)
-            // TODO: this should only be done if outDegree != 0?
-            //  (otherwise division through 0, but result is ignored in next mult-op either way) (see Performance impact first)
             CommonOps_DArray.elementWiseMult(pr, outDegrees, pr, (a, b) -> a / b);
 
             // Multiply importance by damping factor
@@ -130,7 +126,6 @@ public class PageRankGraphalyticsEjml {
      * @return pr-scores (sum of all scores = 1)
      */
     public PageRankResult computeWeighted(DMatrixSparseCSC adjacencyMatrix, double dampingFactor, double tolerance, int maxIterations) {
-        // TODO: have a flag whether weights are already normalized?
         // Differences: normalize weights on copy adjacency matrix stuff -> no division by outDegree needed at beginning of iteration
 
         int nodeCount = adjacencyMatrix.getNumCols();
@@ -188,8 +183,6 @@ public class PageRankGraphalyticsEjml {
             //
             // Importance calculation
             //
-
-            // TODO: is apply faster if first arraycopy pr to importanceVec and then apply on same vector?
 
             // Multiply prev pr by damping factor and save into importanceVec
             CommonOps_DArray.apply(pr, i -> i * dampingFactor);

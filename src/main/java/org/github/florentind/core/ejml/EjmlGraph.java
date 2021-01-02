@@ -46,7 +46,6 @@ public final class EjmlGraph extends FilterGraph {
 
     /**
      * Converts a Graph into an EJML graph.
-     * ! Releases its topology
      */
     public static EjmlGraph create(CSRGraph graph, boolean releaseTopology) {
         EjmlRelationships ejmlRelationships = EjmlRelationships.of(graph);
@@ -121,7 +120,6 @@ public final class EjmlGraph extends FilterGraph {
         return new EjmlGraphIntersect(transposedMatrix, maxDegree);
     }
 
-    // TODO: transfer this into the gds repo?
     @Override
     public RelationshipIntersect intersection() {
         return this.intersection(9223372036854775807L);

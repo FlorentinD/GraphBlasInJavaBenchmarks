@@ -96,8 +96,6 @@ public class BfsNative {
      * Result entries: 0 -> not found ; else  parent = entry - 1 (result ids indexed by 1)
      */
     public BfsDenseIntegerResult computeParent(Buffer adjacencyMatrixTransposed, int startNode, int maxIterations, int concurrency) {
-        // TODO use `GxB_ANY_SECONDI1_INT64` with SECONDI1 being a `positional binary operator` (GraphBLAS 4.0 feature)
-
         checkStatusCode(setGlobalInt(GxB_NTHREADS, concurrency));
 
         long nodeCount = nrows(adjacencyMatrixTransposed);
@@ -111,7 +109,7 @@ public class BfsNative {
 
         // node-id vector (not needed using GRAPHBLAS 2.0 (index aware apply can be used)
         Buffer idVector = createVector(intType(), nodeCount);
-        // TODO: faster than building based on arrays? (JNI overhead ..)
+
         for (int i = 0; i < nodeCount; i++) {
             setVectorElementInt(idVector, i, i + 1);
         }

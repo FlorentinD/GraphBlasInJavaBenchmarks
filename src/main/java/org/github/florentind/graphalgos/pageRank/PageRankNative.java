@@ -127,7 +127,6 @@ public class PageRankNative {
         // Matrix A row sum
         //
         // normalize weights
-        // TODO: extract into helper function (to measure impact of normalization)
         //
         Buffer sumOutWeights = createVector(doubleType(), nodeCount);
         // normalize weights
@@ -142,7 +141,6 @@ public class PageRankNative {
         double[] sums = new double[sumCount];
         long[] sumIndices = new long[sumCount];
         checkStatusCode(extractVectorTuplesDouble(sumOutWeights, sums, sumIndices));
-        // TODO: better way to set diagonal in matrix based on a vector?
         checkStatusCode(buildMatrixFromTuplesDouble(sumOutWeightsDia, sumIndices, sumIndices, sums, sumCount, firstBinaryOpDouble()));
 
         // any, as based diagonal only produces computation done per entry

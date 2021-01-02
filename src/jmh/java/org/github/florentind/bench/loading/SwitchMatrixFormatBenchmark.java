@@ -58,7 +58,7 @@ public class SwitchMatrixFormatBenchmark extends BaseBenchmark {
         jniMatrix = ToNativeMatrixConverter.convert(graph, byCol);
     }
 
-    // TODO: atm this takes no time at all
+    //this takes no time at all
     @Benchmark
     public void switchMatrixFormat(Blackhole bh) {
         if (byCol) {

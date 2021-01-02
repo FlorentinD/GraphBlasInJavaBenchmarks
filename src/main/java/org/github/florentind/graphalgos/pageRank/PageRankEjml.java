@@ -105,7 +105,6 @@ public class PageRankEjml {
      * @return pr-scores (sum of all scores = 1)
      */
     public PageRankResult computeWeighted(DMatrixSparseCSC adjacencyMatrix, double dampingFactor, double tolerance, int maxIterations) {
-        // TODO: have a flag whether weights are already normalized?
         // Differences: normalize weights on copy adjacency matrix stuff -> no division by outDegree needed at beginning of iteration
 
         int nodeCount = adjacencyMatrix.getNumCols();

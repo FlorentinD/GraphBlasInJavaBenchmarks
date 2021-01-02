@@ -13,7 +13,6 @@ public abstract class MatrixOpsBaseBenchmark extends BaseBenchmark {
     @Param({"100000", "500000", "1000000"})
     protected int dimension;
 
-    // TODO also scale avgEntriesPerColumn?
     @Param({"4"})
     protected int avgEntriesPerColumn;
 
