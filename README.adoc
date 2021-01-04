@@ -22,7 +22,7 @@ It compares existing graph algorithm implementations in https://github.com/neo4j
 
 == Setting up the project
 
-*Relies on locally build https://github.com/FlorentinD/ejml/tree/mask_rebased[fork of EJML] and graphblas-java-native*
+*Relies on locally build https://github.com/FlorentinD/ejml/tree/mask_rebased[fork of EJML]*
 
 === Prerequisites
 
@@ -46,17 +46,6 @@ git clone git@github.com:DrTimothyAldenDavis/GraphBLAS.git
 cd GraphBLAS/
 make JOBS=32
 sudo make install -j32 INSTALL=/usr/local/
-cd ..
-
-# graphblas-java-native
-git@github.com:fabianmurariu/graphblas-java-native.git
-cd graphblas-java-native/
-cd graphblas-java/
-# this might need a restart to work
-mvn clean install
-cd ..
-mvn clean install -Dgpg.skip
-cd ..
 
 # run benchmarks (exclude, include benchmarks via build.gradle)
 cd GraphBlasInJavaBenchmarks/
