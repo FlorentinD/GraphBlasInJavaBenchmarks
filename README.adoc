@@ -1,7 +1,7 @@
 = GraphBLAS in Java Benchmarks
 
 This project contains implementations, benchmarks and visualization used in my master thesis _GraphBLAS in the context of Java_.
-It compares existing graph algorithm implementations in GDS and JGraphT against implementations via EJML, graphblas-java-native and GDS-Pregel.
+It compares existing graph algorithm implementations in https://github.com/neo4j/graph-data-science[GDS] and https://github.com/jgrapht/jgrapht[JGraphT] against implementations via https://github.com/lessthanoptimal/ejml[EJML], https://github.com/fabianmurariu/graphblas-java-native[graphblas-java-native] and the Pregel-API of GDS.
 
 *Implementations*:
 
@@ -22,7 +22,7 @@ It compares existing graph algorithm implementations in GDS and JGraphT against 
 
 == Setting up the project
 
-*Relies on locally build EJML and graphblas-java-native*
+*Relies on locally build https://github.com/FlorentinD/ejml/tree/mask_rebased[fork of EJML] and graphblas-java-native*
 
 === Prerequisites
 
