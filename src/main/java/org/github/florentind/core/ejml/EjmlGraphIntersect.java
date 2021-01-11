@@ -28,11 +28,11 @@ public class EjmlGraphIntersect extends GraphIntersect<EjmlAdjacencyCursor> {
 
     EjmlGraphIntersect(final DMatrixSparseCSC adjacencyMatrix, long maxDegree) {
         super(
-            new EjmlAdjacencyCursor(adjacencyMatrix),
-            new EjmlAdjacencyCursor(adjacencyMatrix),
-            new EjmlAdjacencyCursor(adjacencyMatrix),
-            new EjmlAdjacencyCursor(adjacencyMatrix),
-            maxDegree
+                new EjmlAdjacencyCursor(adjacencyMatrix),
+                new EjmlAdjacencyCursor(adjacencyMatrix),
+                new EjmlAdjacencyCursor(adjacencyMatrix),
+                maxDegree,
+                adjacencyMatrix.numRows
         );
         this.adjacencyMatrix = adjacencyMatrix;
     }
