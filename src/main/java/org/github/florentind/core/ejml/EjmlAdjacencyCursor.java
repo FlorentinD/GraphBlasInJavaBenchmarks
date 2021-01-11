@@ -36,7 +36,8 @@ public class EjmlAdjacencyCursor implements AdjacencyCursor {
     public void init(long node) {
         int nodeId = (int) node;
         sourceNodeId = nodeId;
-        currentOffset = adjacencyMatrix.col_idx[nodeId];
+        // first value accessed via next/peekVLong (hence init with offset one before)
+        currentOffset = adjacencyMatrix.col_idx[nodeId] - 1;
         // as exclusive range
         maxOffset = adjacencyMatrix.col_idx[nodeId + 1] - 1;
     }
@@ -60,7 +61,7 @@ public class EjmlAdjacencyCursor implements AdjacencyCursor {
 
     @Override
     public long peekVLong() {
-        return adjacencyMatrix.nz_rows[currentOffset];
+        return adjacencyMatrix.nz_rows[currentOffset + 1];
     }
 
     @Override
@@ -82,7 +83,8 @@ public class EjmlAdjacencyCursor implements AdjacencyCursor {
     @Override
     public long skipUntil(long nodeId) {
         int targetId = -1;
-        for (; currentOffset <= maxOffset; currentOffset++) {
+        for (; currentOffset < maxOffset;) {
+            currentOffset++;
             targetId = adjacencyMatrix.nz_rows[currentOffset];
             if (targetId > nodeId) {
                 return targetId;
@@ -107,7 +109,8 @@ public class EjmlAdjacencyCursor implements AdjacencyCursor {
     @Override
     public long advance(long nodeId) {
         int targetId = -1;
-        for (; currentOffset <= maxOffset; currentOffset++) {
+        for (; currentOffset < maxOffset;) {
+            currentOffset++;
             targetId = adjacencyMatrix.nz_rows[currentOffset];
             if (targetId >= nodeId) {
                 return targetId;
