@@ -2,14 +2,9 @@ package org.github.florentind.core.grapblas_native;
 
 import com.github.fabianmurariu.unsafe.GRAPHBLAS;
 import com.github.fabianmurariu.unsafe.GRBCORE;
-import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.data.DVectorSparse;
-import org.github.florentind.core.ejml.EjmlRelationships;
-import org.neo4j.graphalgo.api.Graph;
 
 import java.nio.Buffer;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * converting a DMatrixSparseCSC into a GraphBLAS matrix (returning a buffer)

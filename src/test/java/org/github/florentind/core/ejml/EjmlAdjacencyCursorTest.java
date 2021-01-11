@@ -7,6 +7,7 @@ import org.neo4j.graphalgo.api.CSRGraph;
 import org.neo4j.graphalgo.extension.GdlExtension;
 import org.neo4j.graphalgo.extension.GdlGraph;
 import org.neo4j.graphalgo.extension.Inject;
+import org.neo4j.graphalgo.extension.TestGraph;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,6 +30,15 @@ class EjmlAdjacencyCursorTest extends BaseTest {
         EjmlGraph ejmlGraph = EjmlGraph.create(graph);
         adjacencyCursor = new EjmlAdjacencyCursor(ejmlGraph.matrix());
         adjacencyCursor.init(0);
+    }
+
+    @Test
+    void remaining() {
+        assertEquals(3, adjacencyCursor.remaining());
+        adjacencyCursor.nextVLong();
+        adjacencyCursor.nextVLong();
+        adjacencyCursor.nextVLong();
+        assertEquals(0, adjacencyCursor.remaining());
     }
 
     @Test
