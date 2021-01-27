@@ -9,7 +9,7 @@ ejmlOps.semiring.MxMWithSemiringBenchmark.mxm,4,UNIFORM,500000,(PLUS;TIMES),1,av
 ejmlOps.semiring.MxMWithSemiringBenchmark.mxm,4,UNIFORM,500000,(OR;PAIR),1,avgt,10,485.618,9.244,ms/op
 ejmlOps.semiring.MxMWithSemiringBenchmark.mxm,4,UNIFORM,500000,(OR;AND),1,avgt,10,603.314,134.873,ms/op
 ejmlOps.semiring.MxMWithSemiringBenchmark.mxm,4,UNIFORM,500000,(MIN;MAX),1,avgt,10,546.380,53.468,ms/op
-ejmlOps.semiring.MxMWithSemiringBenchmark.mxm,4,UNIFORM,1000000,PLUS;TIMES)(inlined),1,avgt,10,1463.892,59.509,ms/op
+ejmlOps.semiring.MxMWithSemiringBenchmark.mxm,4,UNIFORM,1000000,(PLUS;TIMES)(inlined),1,avgt,10,1463.892,59.509,ms/op
 ejmlOps.semiring.MxMWithSemiringBenchmark.mxm,4,UNIFORM,1000000,(PLUS;TIMES),1,avgt,10,1407.532,37.032,ms/op
 ejmlOps.semiring.MxMWithSemiringBenchmark.mxm,4,UNIFORM,1000000,(OR;PAIR),1,avgt,10,1368.604,20.105,ms/op
 ejmlOps.semiring.MxMWithSemiringBenchmark.mxm,4,UNIFORM,1000000,(OR;AND),1,avgt,10,1407.309,28.641,ms/op
