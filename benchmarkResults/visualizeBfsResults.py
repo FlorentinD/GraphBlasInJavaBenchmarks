@@ -44,7 +44,7 @@ for id, variant in enumerate(bfsVariants):
     hueOrder = [i for i in allLibs if i in containedLibs]
 
     # sns approach fails to easily plot pre-aggregated error
-    linePlot = sns.lineplot(ax=axes[id], x="nodeCount", y="Score", hue="Library", style="Concurrency", data=variant,
+    linePlot = sns.lineplot(ax=axes[id], x="nodeCount", y="Score", hue="Library", style="Concurrency", data=variant[variant.Library.isin(allLibs)],
                             hue_order=hueOrder, palette = libColors(), markers=True)
     linePlot.set_ylabel("Runtime in {}".format(getUnit(variant)), fontsize=12)
     linePlot.set_xlabel("Number of vertices x 10⁶", fontsize=12)
@@ -54,7 +54,7 @@ for id, variant in enumerate(bfsVariants):
     #plt.tight_layout(pad=1)
     yscale = 'log'
     linePlot.set_yscale(yscale)
-    if variant.BfsVariant.unique()[0] == "Parent":
+    if id != 0:
         axes[id].get_legend().remove()
 
     #linePlot.set_title(variant.BfsVariant.unique()[0])
