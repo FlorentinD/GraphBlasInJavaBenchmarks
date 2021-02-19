@@ -41,11 +41,16 @@ git checkout mask_rebased
 ./gradlew autogenerate
 ./gradlew install
 
-# SuiteSparse:Graphblas (make sure to install under `usr/local` and you might not need setting the LD_LIBRARY_PATH)
-git clone git@github.com:DrTimothyAldenDavis/GraphBLAS.git
+# graphblas-java-native (make sure to install under `usr/local` and you might not need setting the LD_LIBRARY_PATH)
+git clone --recurse-submodules https://github.com/FlorentinD/graphblas-java-native
+git checkout graphBLAS_4_0_3
+cd graphblas-java-native/
+git submodule update --init --recursive
 cd GraphBLAS/
 make JOBS=32
 sudo make install -j32 INSTALL=/usr/local/
+cd ..
+mvn clean install -Dgpg.skip
 
 # Package gds pregel examples
 # (1) copy pregel examples into bootstrap project

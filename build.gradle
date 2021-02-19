@@ -40,7 +40,7 @@ dependencies {
 
     compileOnly         group: 'org.ejml',                 name: 'ejml-all',        version: ver.ejml
     // TODO: this is locally installed !
-    implementation      group: 'com.github.fabianmurariu',  name: 'graphblas-java-native',   version: ver.'graphblas-java-native'
+    implementation      group: 'com.github.fabianmurariu',  name: 'graphblas-package',   version: ver.'graphblas-package'
     implementation      group: 'org.jgrapht',            name: 'jgrapht-core',      version: ver.jgrapht
     implementation      group: 'org.jgrapht',            name: 'jgrapht-opt',      version: ver.jgrapht
     implementation      group: 'org.neo4j.gds',            name: 'core',            version: ver.gds
