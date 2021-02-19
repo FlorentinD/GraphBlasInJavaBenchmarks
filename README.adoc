@@ -47,6 +47,11 @@ cd GraphBLAS/
 make JOBS=32
 sudo make install -j32 INSTALL=/usr/local/
 
+# Package gds pregel examples
+# (1) copy pregel examples into bootstrap project
+# (2) Create shadowjar
+# (3) copy jar into /libs folder
+
 # run benchmarks (exclude, include benchmarks via build.gradle)
 cd GraphBlasInJavaBenchmarks/
 ./gradlew :jmh --no-daemon

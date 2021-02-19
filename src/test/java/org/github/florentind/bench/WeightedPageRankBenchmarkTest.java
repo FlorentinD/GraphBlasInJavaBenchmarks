@@ -9,7 +9,6 @@ import org.github.florentind.core.ejml.EjmlUtil;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.core.jgrapht.JGraphTConverter;
 import org.github.florentind.graphalgos.pageRank.PageRankEjml;
-import org.github.florentind.graphalgos.pageRank.PageRankGraphalyticsEjml;
 import org.github.florentind.graphalgos.pageRank.PageRankNative;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +20,7 @@ import org.neo4j.graphalgo.beta.pregel.pr.ImmutablePageRankPregelConfig;
 import org.neo4j.graphalgo.beta.pregel.pr.PageRankPregel;
 import org.neo4j.graphalgo.core.concurrency.Pools;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
+import org.neo4j.graphalgo.core.utils.progress.EmptyProgressEventTracker;
 import org.neo4j.graphalgo.pagerank.ImmutablePageRankStreamConfig;
 import org.neo4j.graphalgo.pagerank.PageRank;
 import org.neo4j.graphalgo.pagerank.PageRankFactory;
@@ -63,7 +63,7 @@ public class WeightedPageRankBenchmarkTest extends BaseBenchmarkTest {
 
         goldStandard = getGdsResult();
 
-        assertEquals(MAX_ITERATIONS ,goldStandard.getMiddle());
+        assertEquals(MAX_ITERATIONS, goldStandard.getMiddle());
     }
 
     @Test
@@ -127,7 +127,8 @@ public class WeightedPageRankBenchmarkTest extends BaseBenchmarkTest {
                 graph,
                 weightedConfig,
                 AllocationTracker.empty(),
-                NullLog.getInstance()
+                NullLog.getInstance(),
+                EmptyProgressEventTracker.INSTANCE
         );
 
 
