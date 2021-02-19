@@ -14,17 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.neo4j.graphalgo.Orientation;
-import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
-import org.neo4j.graphalgo.beta.generator.RelationshipDistribution;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.triangleCount.ImmutableTriangleCountPregelConfig;
 import org.neo4j.graphalgo.beta.pregel.triangleCount.TriangleCountPregel;
-import org.neo4j.graphalgo.config.RandomGraphGeneratorConfig;
-import org.neo4j.graphalgo.core.Aggregation;
-import org.neo4j.graphalgo.core.GdsEdition;
 import org.neo4j.graphalgo.core.concurrency.Pools;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.neo4j.graphalgo.core.utils.paged.HugeAtomicLongArray;
+import org.neo4j.graphalgo.core.utils.progress.EmptyProgressEventTracker;
 import org.neo4j.graphalgo.triangle.ImmutableTriangleCountBaseConfig;
 import org.neo4j.graphalgo.triangle.IntersectingTriangleCount;
 import org.neo4j.graphalgo.triangle.IntersectingTriangleCountFactory;
@@ -70,7 +66,7 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
 
         ejmlGraph = EjmlGraph.create(graph);
 
-        expected =  TriangleCountEjml.computeNodeWise(ejmlGraph.matrix(), true);
+        expected = TriangleCountEjml.computeNodeWise(ejmlGraph.matrix(), true);
 //        System.out.println(expected.totalCount());
     }
 
@@ -82,7 +78,13 @@ public class TriangleCountBenchmarkTest extends BaseBenchmarkTest {
                 .build();
 
         var result = new IntersectingTriangleCountFactory<>()
-                .build(ejmlGraph, config, AllocationTracker.empty(), NullLog.getInstance())
+                .build(
+                        ejmlGraph,
+                        config,
+                        AllocationTracker.empty(),
+                        NullLog.getInstance(),
+                        EmptyProgressEventTracker.INSTANCE
+                )
                 .compute();
 
         assertNodeWiseCount(expected, result);

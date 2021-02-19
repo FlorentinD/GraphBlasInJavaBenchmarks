@@ -20,6 +20,10 @@ repositories {
     mavenLocal()
     mavenCentral()
     gradlePluginPortal()
+    // for pregel-bootstrap
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 dependencies {
@@ -53,7 +57,7 @@ dependencies {
     jmhImplementation      group: 'org.neo4j.gds',         name: 'proc',                version: ver.gds
     jmhImplementation      group: 'org.neo4j.gds',         name: 'alpha-algo',          version: ver.gds
     jmhImplementation      group: 'org.neo4j.gds',         name: 'core',                version: ver.gds
-    jmhCompile             group: 'org.neo4j.gds',         name: 'pregel-example',      version: ver.gds
+    jmhCompile             name: 'pregel-bootstrap'
     jmhCompile             group: 'org.neo4j.gds',         name: 'algo',                version: ver.gds
 
 
@@ -75,10 +79,10 @@ dependencies {
     testCompileOnly group: 'org.immutables',    name: 'builder',            version: ver.'immutables'
     testCompileOnly group: 'org.jetbrains',     name: 'annotations',        version: ver.'jetbrains-annotations'
     testCompileOnly  group: 'org.neo4j.gds',    name: 'test-utils',          version: ver.gds
-    testCompileOnly  group: 'org.neo4j.gds',    name: 'alpha-algo',          version: ver.gds
+    testCompileOnly  group: 'org.neo4j.gds',    name: 'algo',          version: ver.gds
 
     // pregel/jmh tests (should be moved to a seperate jmhTest folder?!)
-    testCompile         group: 'org.neo4j.gds',                   name: 'pregel-example',      version: ver.gds
+    testCompile         name: 'pregel-bootstrap'
 }
 
 test {

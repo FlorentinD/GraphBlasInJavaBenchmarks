@@ -48,15 +48,10 @@ make JOBS=32
 sudo make install -j32 INSTALL=/usr/local/
 cd ..
 
-# graphblas-java-native
-git@github.com:fabianmurariu/graphblas-java-native.git
-cd graphblas-java-native/
-cd graphblas-java/
-# this might need a restart to work
-mvn clean install
-cd ..
-mvn clean install -Dgpg.skip
-cd ..
+# Package gds pregel examples
+# (1) copy pregel examples into bootstrap project
+# (2) Create shadowjar
+# (3) copy jar into /libs folder
 
 # run benchmarks (exclude, include benchmarks via build.gradle)
 cd GraphBlasInJavaBenchmarks/

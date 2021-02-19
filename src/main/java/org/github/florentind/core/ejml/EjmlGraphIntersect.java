@@ -31,8 +31,8 @@ public class EjmlGraphIntersect extends GraphIntersect<EjmlAdjacencyCursor> {
                 new EjmlAdjacencyCursor(adjacencyMatrix),
                 new EjmlAdjacencyCursor(adjacencyMatrix),
                 new EjmlAdjacencyCursor(adjacencyMatrix),
-                maxDegree,
-                adjacencyMatrix.numRows
+                new EjmlAdjacencyCursor(adjacencyMatrix),
+                maxDegree
         );
         this.adjacencyMatrix = adjacencyMatrix;
     }

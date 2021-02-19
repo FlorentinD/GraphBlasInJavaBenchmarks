@@ -7,6 +7,7 @@ import org.neo4j.graphalgo.beta.generator.RelationshipDistribution;
 import org.neo4j.graphalgo.config.RandomGraphGeneratorConfig;
 import org.neo4j.graphalgo.core.Aggregation;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
+import org.neo4j.graphalgo.core.utils.progress.EmptyProgressEventTracker;
 import org.neo4j.graphalgo.triangle.ImmutableTriangleCountStatsConfig;
 import org.neo4j.graphalgo.triangle.IntersectingTriangleCount;
 import org.neo4j.graphalgo.triangle.IntersectingTriangleCountFactory;
@@ -45,19 +46,20 @@ public class TriangleCountGraphImplBenchmark extends GraphImplBaseBenchmark {
     public void setup() {
         super.setup();
 
-        config =  ImmutableTriangleCountStatsConfig
-            .builder()
-            .concurrency(concurrency)
-            .build();
+        config = ImmutableTriangleCountStatsConfig
+                .builder()
+                .concurrency(concurrency)
+                .build();
     }
 
     @org.openjdk.jmh.annotations.Benchmark
     public void compute(Blackhole bh) {
         IntersectingTriangleCount algorithm = new IntersectingTriangleCountFactory<>().build(
-            graph,
-            config,
-            AllocationTracker.empty(),
-            NullLog.getInstance()
+                graph,
+                config,
+                AllocationTracker.empty(),
+                NullLog.getInstance(),
+                EmptyProgressEventTracker.INSTANCE
         );
 
         bh.consume(algorithm.compute());

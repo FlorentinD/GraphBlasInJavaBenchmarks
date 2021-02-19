@@ -2,6 +2,7 @@ package org.github.florentind.bench.pageRank;
 
 
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
+import org.neo4j.graphalgo.core.utils.progress.EmptyProgressEventTracker;
 import org.neo4j.graphalgo.pagerank.ImmutablePageRankStatsConfig;
 import org.neo4j.graphalgo.pagerank.PageRank;
 import org.neo4j.graphalgo.pagerank.PageRankBaseConfig;
@@ -36,7 +37,8 @@ public class PageRankGdsBenchmark extends PageRankBaseBenchmark {
                 graph,
                 unweightedConfig,
                 AllocationTracker.empty(),
-                NullLog.getInstance()
+                NullLog.getInstance(),
+                EmptyProgressEventTracker.INSTANCE
         );
 
         bh.consume(algorithm.compute());
