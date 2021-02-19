@@ -8,7 +8,7 @@ ext {
             // FIXME: currently need to build this locally from FlorentinD/ejml/mask_rebase
             'ejml':                         '0.41-SNAPSHOT',
             'gds':                          '1.5.0',
-            'graphblas-java-native':        '0.1.16',
+            'graphblas-package':        '0.1.21',
             'neo4j':                        '4.1.1',
             'gdl':                          '0.3.5',
             'hamcrest':                     '2.1',
