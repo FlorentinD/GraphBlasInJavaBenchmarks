@@ -30,7 +30,7 @@ public class ReduceColumnWiseWithMaskNativeBenchmark extends ReduceColumnWiseWit
 
     @Override
     @Setup
-    public void setup() throws Throwable {
+    public void setup() {
         super.setup();
 
         initNonBlocking();

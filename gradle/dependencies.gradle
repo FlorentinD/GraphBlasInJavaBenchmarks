@@ -9,7 +9,7 @@ ext {
             'ejml':                         '0.41-SNAPSHOT',
             'gds':                          '1.5.0',
             'graphblas-package':        '0.1.21',
-            'neo4j':                        '4.1.1',
+            'neo4j':                        '4.2.3',
             'gdl':                          '0.3.5',
             'hamcrest':                     '2.1',
             'HdrHistogram':                 '2.1.9',

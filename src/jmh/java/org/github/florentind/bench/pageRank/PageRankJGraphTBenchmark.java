@@ -14,7 +14,6 @@ public class PageRankJGraphTBenchmark extends PageRankBaseBenchmark {
     @Setup
     public void setup() {
         super.setup();
-
         jGraph = JGraphTConverter.convert(graph);
     }
 

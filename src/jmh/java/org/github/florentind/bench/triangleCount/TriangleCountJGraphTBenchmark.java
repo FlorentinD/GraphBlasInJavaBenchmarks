@@ -10,13 +10,9 @@ import org.openjdk.jmh.infra.Blackhole;
 public class TriangleCountJGraphTBenchmark extends TriangleCountBaseBenchmark {
     Graph jGraph;
 
-    @Param({"10000", "100000"})
-    int nodeCount;
-
     @Setup
     public void setup() {
         super.setup();
-
         jGraph = JGraphTConverter.convert(graph);
     }
 

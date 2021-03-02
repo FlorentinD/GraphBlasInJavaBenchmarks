@@ -14,7 +14,6 @@ public class PageRankEjmlBenchmark extends PageRankBaseBenchmark {
     @Setup
     public void setup() {
         super.setup();
-
         matrix = getAdjacencyMatrix();
     }
 

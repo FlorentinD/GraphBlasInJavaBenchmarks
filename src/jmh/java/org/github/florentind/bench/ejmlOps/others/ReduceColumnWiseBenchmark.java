@@ -17,7 +17,7 @@ public class ReduceColumnWiseBenchmark extends MatrixOpsBaseBenchmark {
 
     @Override
     @Setup
-    public void setup() throws Throwable {
+    public void setup() {
         super.setup();
         output = new DMatrixRMaj(matrix.numRows, 1);
     }

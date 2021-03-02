@@ -13,45 +13,16 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 
 public class BfsBaseBenchmark extends EjmlGraphBaseBenchmark {
-    @Param({"100000", "500000", "1000000",  "5000000"})
-    int nodeCount;
-
-    @Param({"4"})
-    int avgDegree;
-
     // node in the middle (id-wise)
     int startNode;
 
     // as JGraphT supports no max-iterations parameter
     final static int MAX_ITERATIONS = Integer.MAX_VALUE;
 
-    @Param({"POWER_LAW"})
-    protected String degreeDistribution;
-
-    @Param({"UNDIRECTED"})
-    protected String orientation;
-
     @Override
     @Setup
     public void setup() {
         super.setup();
-        startNode = nodeCount / 2;
-    }
-
-
-    @Override
-    protected CSRGraph getCSRGraph() {
-        return RandomGraphGenerator.builder()
-                .nodeCount(nodeCount)
-                .averageDegree(avgDegree)
-                .seed(42L)
-                .aggregation(Aggregation.MAX)
-                .orientation(Orientation.valueOf(orientation))
-                .relationshipDistribution(RelationshipDistribution.valueOf(degreeDistribution))
-                .allocationTracker(AllocationTracker.empty())
-                .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.NO)
-                .relationshipDistribution(RelationshipDistribution.POWER_LAW)
-                .build().generate();
-
+        startNode = Math.toIntExact(graph.nodeCount() / 2);
     }
 }

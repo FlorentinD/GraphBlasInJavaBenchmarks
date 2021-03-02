@@ -11,3 +11,6 @@ server-connect.adoc
 
 benchmarkResults/__pycache__/
 /benchmarkResults/out/
+/datasets/
+
+libs/

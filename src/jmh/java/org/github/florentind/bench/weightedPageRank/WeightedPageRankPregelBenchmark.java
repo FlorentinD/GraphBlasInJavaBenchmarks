@@ -16,10 +16,6 @@ public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchma
     @Param({"1", "8"})
     private int concurrency;
 
-    // skipping 5M version (takes too long)
-    @Param({"0.1M;20", "0.5M;20", "1M;20", "1M;5", "1M;10", "1M;15"})
-    protected String nodeCountIterationCombinations;
-
     private PageRankPregel.PageRankPregelConfig config;
 
     private Pregel<PageRankPregel.PageRankPregelConfig> pregel;

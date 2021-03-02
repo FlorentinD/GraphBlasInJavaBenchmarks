@@ -37,7 +37,7 @@ public class MxMWithSemiringNativeBenchmark extends MatrixOpsWithSemiringBaseBen
 
     @Override
     @Setup
-    public void setup() throws Throwable {
+    public void setup() {
         super.setup();
 
         GRBCORE.initNonBlocking();
