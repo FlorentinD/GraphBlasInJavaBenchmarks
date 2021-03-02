@@ -22,7 +22,7 @@ public class MxVWithMaskBenchmark extends MatrixOpsBaseBenchmark {
 
     @Override
     @Setup
-    public void setup() throws Throwable {
+    public void setup() {
         super.setup();
 
         denseVector = RandomMatrices_DDRM.rectangle(1, matrix.numCols, new Random(42)).data;

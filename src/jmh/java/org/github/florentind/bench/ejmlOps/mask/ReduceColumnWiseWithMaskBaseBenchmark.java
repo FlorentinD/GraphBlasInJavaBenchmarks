@@ -14,16 +14,18 @@ public class ReduceColumnWiseWithMaskBaseBenchmark extends MatrixOpsWithMaskBase
     @Param({"false", "true"})
     protected boolean denseMask;
 
-    // overriding default
-    @Param({"500000"})
-    protected int dimension;
-
     @Override
     @Setup
-    public void setup() throws Throwable {
+    public void setup() {
         super.setup();
 
-        maskVector = new DVectorSparse(EjmlUtil.createOrLoadRandomMatrix(dimension, 1, avgEntriesPerColumnInMask, 1, 1, 42), false);
+        int dimension = Math.toIntExact(graph.nodeCount());
+
+        try {
+            maskVector = new DVectorSparse(EjmlUtil.createOrLoadRandomMatrix(dimension, 1, avgEntriesPerColumnInMask, 1, 1, 42), false);
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
 
         if (denseMask) {
             double[] denseVector = new double[dimension];

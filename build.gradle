@@ -40,25 +40,31 @@ dependencies {
 
     compileOnly         group: 'org.ejml',                 name: 'ejml-all',        version: ver.ejml
     // TODO: this is locally installed !
-    implementation      group: 'com.github.fabianmurariu',  name: 'graphblas-package',   version: ver.'graphblas-package'
-    implementation      group: 'org.jgrapht',            name: 'jgrapht-core',      version: ver.jgrapht
-    implementation      group: 'org.jgrapht',            name: 'jgrapht-opt',      version: ver.jgrapht
-    implementation      group: 'org.neo4j.gds',            name: 'core',            version: ver.gds
+    implementation      group: 'com.github.fabianmurariu',  name: 'graphblas-package',  version: ver.'graphblas-package'
+    implementation      group: 'org.jgrapht',           name: 'jgrapht-core',          version: ver.jgrapht
+    implementation      group: 'org.jgrapht',           name: 'jgrapht-opt',           version: ver.jgrapht
+    implementation      group: 'org.neo4j.gds',         name: 'core',                version: ver.gds
+    implementation      group: 'org.neo4j.gds',         name: 'proc',                version: ver.gds
+    implementation      group: 'org.neo4j.gds',         name: 'proc-embeddings',     version: ver.gds
+    implementation      group: 'org.neo4j.gds',         name: 'alpha-embeddings',    version: ver.gds
     // TODO: find out why this is needed for the benchmarks
     implementation      group: 'org.neo4j.gds',            name: 'test-utils',      version: ver.gds
 
     // jmh dependencies
     // TODO: try out which ones can be removed
-    jmhAnnotationProcessor group: 'org.neo4j.gds',         name: 'annotations',         version: ver.gds
-    jmhAnnotationProcessor group: 'org.immutables',        name: 'value',               version: ver.'immutables'
-    jmhCompileOnly         group: 'org.immutables',           name: 'builder',            version: ver.'immutables'
+    jmhAnnotationProcessor group: 'org.neo4j.gds',      name: 'annotations',         version: ver.gds
+    jmhAnnotationProcessor group: 'org.immutables',     name: 'value',               version: ver.'immutables'
+    jmhCompileOnly         group: 'org.immutables',     name: 'builder',            version: ver.'immutables'
+    jmhCompileOnly         group: 'org.immutables',     name: 'value-annotations',   version: ver.'immutables'
 
-    jmhCompileOnly         group: 'org.immutables',        name: 'value-annotations',   version: ver.'immutables'
-    jmhImplementation      group: 'org.neo4j.gds',         name: 'proc',                version: ver.gds
-    jmhImplementation      group: 'org.neo4j.gds',         name: 'alpha-algo',          version: ver.gds
-    jmhImplementation      group: 'org.neo4j.gds',         name: 'core',                version: ver.gds
-    jmhCompile             name: 'pregel-bootstrap'
-    jmhCompile             group: 'org.neo4j.gds',         name: 'algo',                version: ver.gds
+    jmhImplementation      group: 'org.neo4j.gds',      name: 'proc',                version: ver.gds
+    jmhImplementation      group: 'org.neo4j.gds',      name: 'proc-embeddings',     version: ver.gds
+    jmhImplementation      group: 'org.neo4j.gds',      name: 'alpha-algo',          version: ver.gds
+    jmhImplementation      group: 'org.neo4j.gds',      name: 'alpha-embeddings',    version: ver.gds
+//    jmhImplementation      group: 'org.neo4j.gds',         name: 'core',                version: ver.gds
+    //jmhImplementation      group: 'org.neo4j.gds',         name: 'neo4j-kernel-adapter',                version: ver.gds
+//    jmhCompile             name: 'pregel-bootstrap'
+    jmhCompile             group: 'org.neo4j.gds',      name: 'algo',                version: ver.gds
 
 
     jmh group: 'com.github.rvesse',       name: 'airline',                  version: ver.'airline'
@@ -91,9 +97,19 @@ test {
     }
 }
 
+jmhJar {
+    manifest {
+        attributes([
+                'Implementation-Version': ver.'neo4j'
+        ])
+
+    }
+}
+
 jmh {
     zip64 = true
     forceGC = true
+
     // regExp which benchmarks to run
     // ejmlSparseBfsLevel
     include = ['.*jGraphTBfsLevel*']

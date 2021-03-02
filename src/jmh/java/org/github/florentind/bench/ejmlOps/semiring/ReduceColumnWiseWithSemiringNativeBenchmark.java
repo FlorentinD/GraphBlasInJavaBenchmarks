@@ -31,7 +31,7 @@ public class ReduceColumnWiseWithSemiringNativeBenchmark extends MatrixOpsWithMo
 
     @Override
     @Setup
-    public void setup() throws Throwable {
+    public void setup() {
         super.setup();
 
         initNonBlocking();

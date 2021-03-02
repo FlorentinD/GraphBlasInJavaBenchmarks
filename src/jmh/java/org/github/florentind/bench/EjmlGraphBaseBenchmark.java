@@ -6,18 +6,19 @@ import org.github.florentind.core.ejml.EjmlGraph;
 import org.github.florentind.core.ejml.EjmlUtil;
 import org.neo4j.graphalgo.StoreLoaderBuilder;
 import org.neo4j.graphalgo.api.CSRGraph;
-import org.neo4j.graphalgo.compat.GdsGraphDatabaseAPI;
 import org.neo4j.graphalgo.core.Aggregation;
 import org.neo4j.graphalgo.core.GdsEdition;
-import org.openjdk.jmh.annotations.*;
-
-import java.util.concurrent.TimeUnit;
+import org.neo4j.kernel.internal.GraphDatabaseAPI;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.TearDown;
 
 /**
  * Benchmarks only based on EJML-Graphs
  */
 public class EjmlGraphBaseBenchmark extends BaseBenchmark {
-    GdsGraphDatabaseAPI db;
+    protected GraphDatabaseAPI db;
+    private DataSetManager datasetManager;
 
     protected EjmlGraph graph;
 
@@ -26,46 +27,39 @@ public class EjmlGraphBaseBenchmark extends BaseBenchmark {
         return EjmlUtil.getAdjacencyMatrix(graph);
     }
 
-//    DatasetManager datasetManager;
-
-//    @Param({"empty"})
-//    String dataset;
-
+    @Param({"LDBC01", "POKEC", "LiveJournal"})
+    String dataset;
 
     @Param({"1"})
     private int concurrency;
 
-
     protected CSRGraph getCSRGraph() {
         return (CSRGraph) new StoreLoaderBuilder()
-            .api(db)
-            .globalAggregation(Aggregation.SINGLE)
-            .build()
-            .graphStore()
-            .getUnion();
+                .api(db)
+                .globalAggregation(Aggregation.SINGLE)
+                .build()
+                .graphStore()
+                .getUnion();
     }
 
     @Setup
     public void setup() {
-//        datasetManager = new DatasetManager(Path.of("/tmp"));
+        datasetManager = new DataSetManager();
+        db = datasetManager.openDb(dataset);
 
-//        db = datasetManager.openDb(dataset);
         var hugeGraph = getCSRGraph();
-
+        System.out.println("nodeCount = " + hugeGraph.nodeCount());
         graph = EjmlGraph.create(hugeGraph);
 
         // for usage of higher concurrency in gds benchmarks
         GdsEdition.instance().setToEnterpriseEdition();
-
-        assert(GdsEdition.instance().isOnEnterpriseEdition());
-
 
         hugeGraph.release();
     }
 
     @TearDown
     public void tearDown() {
-//        datasetManager.closeDb(db);
+        datasetManager.closeDb(db);
         graph.release();
     }
 }

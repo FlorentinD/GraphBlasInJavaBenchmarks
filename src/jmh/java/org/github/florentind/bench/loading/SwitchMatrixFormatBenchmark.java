@@ -3,6 +3,7 @@ package org.github.florentind.bench.loading;
 
 import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.github.florentind.bench.BaseBenchmark;
+import org.github.florentind.bench.EjmlGraphBaseBenchmark;
 import org.github.florentind.core.ejml.EjmlGraph;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
@@ -18,20 +19,9 @@ import java.nio.Buffer;
 import java.util.concurrent.TimeUnit;
 
 
-public class SwitchMatrixFormatBenchmark extends BaseBenchmark {
-
-    protected HugeGraph graph;
+public class SwitchMatrixFormatBenchmark extends EjmlGraphBaseBenchmark {
 
     Buffer jniMatrix;
-
-    @Param({"300000", "3000000"})
-    int nodeCount;
-
-    @Param({"4"})
-    int avgDegree;
-
-    @Param({"POWER_LAW", "UNIFORM"})
-    String degreeDistribution;
 
     @Param({"1"})
     int concurrency;
@@ -42,16 +32,6 @@ public class SwitchMatrixFormatBenchmark extends BaseBenchmark {
 
     @Setup
     public void setup() {
-        graph = RandomGraphGenerator.builder()
-                .nodeCount(nodeCount)
-                .averageDegree(avgDegree)
-                .seed(42L)
-                .aggregation(Aggregation.MAX)
-                .allocationTracker(AllocationTracker.empty())
-                .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.NO)
-                .relationshipDistribution(RelationshipDistribution.valueOf(degreeDistribution))
-                .build().generate();
-
         GRBCORE.initBlocking();
         GRBCORE.setGlobalInt(GRBCORE.GxB_NTHREADS, concurrency);
 
