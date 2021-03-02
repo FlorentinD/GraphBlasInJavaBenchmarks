@@ -19,7 +19,7 @@ import java.util.UUID;
 
 public class DataSetManager {
     public static Map<String, String> DATA_SETS = new HashMap<>() {{
-        put("LDBC01", "ldbc-sf1_40.db");
+        put("LDBC01", "db_sf001_p064_regular_utc_41ce");
         put("POKEC", "pokec_40.db");
         put("LiveJournal", "LiveJournal.db");
     }};

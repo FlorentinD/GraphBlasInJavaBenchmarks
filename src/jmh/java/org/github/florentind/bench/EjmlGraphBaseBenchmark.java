@@ -27,7 +27,7 @@ public class EjmlGraphBaseBenchmark extends BaseBenchmark {
         return EjmlUtil.getAdjacencyMatrix(graph);
     }
 
-    @Param({"LDBC01", "POKEC", "LiveJournal"})
+    @Param({"LiveJournal", "LDBC01", "POKEC"})
     String dataset;
 
     @Param({"1"})
