@@ -6,6 +6,8 @@ import org.neo4j.configuration.GraphDatabaseSettings;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
 import org.neo4j.graphalgo.core.Settings;
+import org.neo4j.graphdb.Result;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
 
 import java.io.IOException;
@@ -19,7 +21,7 @@ import java.util.UUID;
 
 public class DataSetManager {
     public static Map<String, String> DATA_SETS = new HashMap<>() {{
-        put("LDBC01", "db_sf001_p064_regular_utc_41ce");
+        put("LDBC01", "ldbc01.db");
         put("POKEC", "pokec_40.db");
         put("LiveJournal", "LiveJournal.db");
     }};
@@ -30,13 +32,15 @@ public class DataSetManager {
     private final Map<GraphDatabaseAPI, Pair<Path, DatabaseManagementService>> apiServiceMap;
 
     public DataSetManager() {
-        String datasetDir = System.getenv("GRB_JAVA_DATASETS");
+        this(System.getenv("GRB_JAVA_DATASETS"));
+    }
+
+    public DataSetManager(String datasetDir) {
         if (datasetDir == null) {
             throw new IllegalArgumentException("Dataset not set. Set GRB_JAVA_DATASETS to specify the dataset directory");
         }
         this.dataSetDir = Paths.get(datasetDir);
         this.workingDir = Paths.get("build/");
-        System.out.println("Copy graph to: " + workingDir);
         apiServiceMap = new HashMap<>();
     }
 
@@ -69,7 +73,13 @@ public class DataSetManager {
         GraphDatabaseAPI db = (GraphDatabaseAPI) dbms.database(GraphDatabaseSettings.DEFAULT_DATABASE_NAME);
         Runtime.getRuntime().addShutdownHook(new Thread(dbms::shutdown));
 
-        apiServiceMap.put(db, new Pair<>(dataSetDir, dbms));
+        Transaction tx = db.beginTx();
+        Result result = tx.execute("Match (n) Return COUNT(n) as nodeCount");
+        System.out.println("nodes in neo db:" + result.resultAsString());
+        tx.close();
+
+
+        apiServiceMap.put(db, new Pair<>(workingDir, dbms));
 
         return db;
     }
