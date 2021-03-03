@@ -14,29 +14,33 @@ import java.nio.Buffer;
 public class PageRankNativeBenchmark extends PageRankBaseBenchmark {
     Buffer jniMatrix;
 
-    @Param({"1", "8"})
-    private int concurrency;
+    // TODO allow parameter combinations
+    //@Param({"1", "8"})
+    private int concurrency = 8;
 
-    @Param({"true"})
-    private boolean by_col;
+    private boolean by_col = true;
 
-    @Setup
+    @Override
     public void setup() {
         super.setup();
         GRBCORE.initNonBlocking();
         jniMatrix = ToNativeMatrixConverter.convert(graph, by_col);
     }
 
-    @org.openjdk.jmh.annotations.Benchmark
-    public void jni(Blackhole bh) {
-        bh.consume(PageRankNative.compute(jniMatrix, dampingFactor, tolerance, maxIterations, concurrency));
-    }
-
-    @TearDown
+    @Override
     public void tearDown() {
         super.tearDown();
 
         GRBCORE.freeMatrix(jniMatrix);
         GRBCORE.grbFinalize();
+    }
+
+    @Override
+    protected void benchmarkFunc() {
+        PageRankNative.compute(jniMatrix, dampingFactor, tolerance, maxIterations, concurrency);
+    }
+
+    public static void main(String[] args) {
+        new PageRankNativeBenchmark().run();
     }
 }

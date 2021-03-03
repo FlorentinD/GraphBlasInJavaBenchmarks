@@ -11,10 +11,12 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.infra.Blackhole;
 
+import java.util.List;
+
 public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchmark {
 
-    @Param({"1", "8"})
-    private int concurrency;
+//    @Param({"1", "8"})
+//    private List<Integer> concurrency = List.of(1,8);
 
     private PageRankPregel.PageRankPregelConfig config;
 
@@ -36,8 +38,8 @@ public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchma
         EjmlUtil.normalizeOutgoingWeights(graph);
     }
 
-    @org.openjdk.jmh.annotations.Benchmark
-    public void pregel(Blackhole bh) {
+    @Override
+    protected void benchmarkFunc() {
         // init Pregel structures beforehand
         pregel = Pregel.create(
                 graph,
@@ -47,6 +49,6 @@ public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchma
                 AllocationTracker.empty()
         );
 
-        bh.consume(pregel.run());
+        pregel.run();
     }
 }

@@ -14,30 +14,27 @@ import java.nio.Buffer;
 public class WeightedPageRankNativeBenchmark extends WeightedPageRankBaseBenchmark {
     Buffer jniMatrix;
 
-    @Param({"1", "8"})
-    private int concurrency;
+    // @Param({"1", "8"})
+    private int concurrency = 1;
 
-    @Param({"true"})
-    private boolean by_col;
+    private boolean by_col = true;
 
     @Override
-    @Setup
     public void setup() {
         super.setup();
         GRBCORE.initNonBlocking();
         jniMatrix = ToNativeMatrixConverter.convert(graph, by_col);
     }
 
-    @org.openjdk.jmh.annotations.Benchmark
-    public void jni(Blackhole bh) {
-        bh.consume(PageRankNative.computeWeighted(jniMatrix, dampingFactor, tolerance, maxIterations, concurrency));
-    }
-
     @Override
-    @TearDown
     public void tearDown() {
         super.tearDown();
         GRBCORE.freeMatrix(jniMatrix);
         GRBCORE.grbFinalize();
+    }
+
+    @Override
+    protected void benchmarkFunc() {
+        PageRankNative.computeWeighted(jniMatrix, dampingFactor, tolerance, maxIterations, concurrency);
     }
 }

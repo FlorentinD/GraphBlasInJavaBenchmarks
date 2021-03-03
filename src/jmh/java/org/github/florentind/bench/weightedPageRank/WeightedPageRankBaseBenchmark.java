@@ -6,6 +6,6 @@ import org.github.florentind.bench.pageRank.PageRankBaseBenchmark;
 import org.neo4j.graphalgo.api.CSRGraph;
 import org.neo4j.graphalgo.beta.generator.PropertyProducer;
 
-public class WeightedPageRankBaseBenchmark extends PageRankBaseBenchmark {
+public abstract class WeightedPageRankBaseBenchmark extends PageRankBaseBenchmark {
     protected static final String REL_PROPERTY_NAME = "weight";
 }

@@ -11,14 +11,17 @@ public class PageRankJGraphTBenchmark extends PageRankBaseBenchmark {
     Graph jGraph;
 
     @Override
-    @Setup
     public void setup() {
         super.setup();
         jGraph = JGraphTConverter.convert(graph);
     }
 
-    @org.openjdk.jmh.annotations.Benchmark
-    public void jGraphT(Blackhole bh) {
-        bh.consume(new PageRank(jGraph, dampingFactor, maxIterations, tolerance).getScores());
+    @Override
+    protected void benchmarkFunc() {
+        new PageRank(jGraph, dampingFactor, maxIterations, tolerance).getScores();
+    }
+
+    public static void main(String[] args) {
+        new PageRankJGraphTBenchmark().run();
     }
 }

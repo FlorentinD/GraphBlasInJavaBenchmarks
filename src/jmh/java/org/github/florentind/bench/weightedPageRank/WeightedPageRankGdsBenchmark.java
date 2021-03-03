@@ -31,9 +31,8 @@ public class WeightedPageRankGdsBenchmark extends WeightedPageRankBaseBenchmark 
                 .build();
     }
 
-
-    @org.openjdk.jmh.annotations.Benchmark
-    public void gds(Blackhole bh) {
+    @Override
+    protected void benchmarkFunc() {
         PageRank algorithm = new PageRankFactory<>().build(
                 graph,
                 weightedConfig,
@@ -42,6 +41,6 @@ public class WeightedPageRankGdsBenchmark extends WeightedPageRankBaseBenchmark 
                 EmptyProgressEventTracker.INSTANCE
         );
 
-        bh.consume(algorithm.compute());
+        algorithm.compute();
     }
 }

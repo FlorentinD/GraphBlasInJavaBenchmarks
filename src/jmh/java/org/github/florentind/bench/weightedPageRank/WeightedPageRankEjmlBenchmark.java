@@ -11,15 +11,14 @@ public class WeightedPageRankEjmlBenchmark extends WeightedPageRankBaseBenchmark
     DMatrixSparseCSC matrix;
 
     @Override
-    @Setup
     public void setup() {
         super.setup();
 
         matrix = getAdjacencyMatrix();
     }
 
-    @org.openjdk.jmh.annotations.Benchmark
-    public void ejml(Blackhole bh) {
-        bh.consume(new PageRankEjml().computeWeighted(matrix, dampingFactor, tolerance, maxIterations));
+    @Override
+    protected void benchmarkFunc() {
+        new PageRankEjml().computeWeighted(matrix, dampingFactor, tolerance, maxIterations);
     }
 }

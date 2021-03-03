@@ -1,17 +1,20 @@
 package org.github.florentind.bench.pageRank;
 
 
-import org.github.florentind.bench.EjmlGraphBaseBenchmark;
-import org.openjdk.jmh.annotations.Param;
+import org.github.florentind.bench.SimpleEjmlGraphBaseBenchmark;
 
-public class PageRankBaseBenchmark extends EjmlGraphBaseBenchmark {
+import java.util.Map;
 
-    @Param({"20"})
-    protected int maxIterations;
+public abstract class PageRankBaseBenchmark extends SimpleEjmlGraphBaseBenchmark {
 
-    @Param({"0.85"})
-    protected float dampingFactor;
+    protected int maxIterations = 20;
 
-    @Param({"1e-32"})
-    protected float tolerance;
+    protected float dampingFactor = 0.85f;
+
+    protected float tolerance = 1e-32f;
+
+    @Override
+    protected Map<String, String> parameterDesc() {
+        return null;
+    }
 }

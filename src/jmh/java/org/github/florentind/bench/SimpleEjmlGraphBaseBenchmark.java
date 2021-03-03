@@ -1,6 +1,7 @@
 package org.github.florentind.bench;
 
 
+import com.carrotsearch.hppc.LongArrayList;
 import org.ejml.data.DMatrixSparseCSC;
 import org.github.florentind.core.ejml.EjmlGraph;
 import org.github.florentind.core.ejml.EjmlUtil;
@@ -13,10 +14,15 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.LongStream;
+
 /**
  * Benchmarks only based on EJML-Graphs
  */
-public class EjmlGraphBaseBenchmark extends BaseBenchmark {
+public abstract class SimpleEjmlGraphBaseBenchmark {
     protected GraphDatabaseAPI db;
     private DataSetManager datasetManager;
 
@@ -27,11 +33,13 @@ public class EjmlGraphBaseBenchmark extends BaseBenchmark {
         return EjmlUtil.getAdjacencyMatrix(graph);
     }
 
-    @Param({"LDBC01"})
-    String dataset;
+    int warmUpIterations = 5;
+    int iterations = 10;
 
-    @Param({"1"})
-    private int concurrency;
+    // TODO allow multiple datasets
+    String dataset = "LDBC01";
+
+    protected int concurrency = 1;
 
     protected CSRGraph getCSRGraph() {
         return (CSRGraph) new StoreLoaderBuilder()
@@ -42,9 +50,8 @@ public class EjmlGraphBaseBenchmark extends BaseBenchmark {
                 .getUnion();
     }
 
-    @Setup
     public void setup() {
-        datasetManager = new DataSetManager();
+        datasetManager = new DataSetManager("/home/florentin/masterThesis/graphblasOnJavaBenchmarks/datasets");
         db = datasetManager.openDb(dataset);
 
         var hugeGraph = getCSRGraph();
@@ -57,9 +64,38 @@ public class EjmlGraphBaseBenchmark extends BaseBenchmark {
         hugeGraph.release();
     }
 
-    @TearDown
     public void tearDown() {
         datasetManager.closeDb(db);
         graph.release();
+    }
+
+    protected abstract void benchmarkFunc();
+
+    protected abstract Map<String, String> parameterDesc();
+
+    protected void run() {
+        setup();
+
+        for (int i = 0; i < warmUpIterations; i++) {
+            benchmarkFunc();
+            System.out.println(String.format("warmup: %d/%d", i+1, warmUpIterations));
+        }
+
+        List<Long> timings = new ArrayList(iterations);
+        System.out.println("Benchmark: " + this.getClass().getSimpleName());
+
+        for (int i = 0; i < iterations; i++) {
+            var start = System.nanoTime();
+            benchmarkFunc();
+            var end = System.nanoTime();
+            long duration = Math.round((end - start) / 1_000_000.0);
+            System.out.println("Iteration: " + i + ", time: " + duration + "ms");
+            timings.add(duration);
+        }
+
+        System.out.println("avg: " + timings.stream().reduce(0L ,Long::sum) / timings.size());
+        System.out.println("stats: " + timings.stream().mapToLong(Long::longValue).summaryStatistics().toString());
+
+        tearDown();
     }
 }

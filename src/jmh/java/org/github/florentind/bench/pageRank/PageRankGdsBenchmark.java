@@ -1,6 +1,7 @@
 package org.github.florentind.bench.pageRank;
 
 
+import org.github.florentind.graphalgos.pageRank.PageRankEjml;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.neo4j.graphalgo.core.utils.progress.EmptyProgressEventTracker;
 import org.neo4j.graphalgo.pagerank.ImmutablePageRankStatsConfig;
@@ -37,8 +38,8 @@ public class PageRankGdsBenchmark extends PageRankBaseBenchmark {
                 .build();
     }
 
-    @org.openjdk.jmh.annotations.Benchmark
-    public void gds(Blackhole bh) {
+    @Override
+    protected void benchmarkFunc() {
         PageRank algorithm = new PageRankFactory<>().build(
                 graph,
                 unweightedConfig,
@@ -47,6 +48,10 @@ public class PageRankGdsBenchmark extends PageRankBaseBenchmark {
                 EmptyProgressEventTracker.INSTANCE
         );
 
-        bh.consume(algorithm.compute());
+        algorithm.compute();
+    }
+
+    public static void main(String[] args) {
+        new PageRankGdsBenchmark().run();
     }
 }

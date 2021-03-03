@@ -11,8 +11,8 @@ import org.openjdk.jmh.infra.Blackhole;
 
 public class PageRankPregelBenchmark extends PageRankBaseBenchmark {
 
-    @Param({"1", "8"})
-    private int concurrency;
+    //@Param({"1", "8"})
+    private int concurrency = 1;
 
     private PageRankPregel.PageRankPregelConfig config;
 
@@ -29,8 +29,8 @@ public class PageRankPregelBenchmark extends PageRankBaseBenchmark {
                 .build();
     }
 
-    @org.openjdk.jmh.annotations.Benchmark
-    public void pregel(Blackhole bh) {
+    @Override
+    protected void benchmarkFunc() {
         // init Pregel structures beforehand
         pregel = Pregel.create(
                 graph,
@@ -40,6 +40,10 @@ public class PageRankPregelBenchmark extends PageRankBaseBenchmark {
                 AllocationTracker.empty()
         );
 
-        bh.consume(pregel.run());
+        pregel.run();
+    }
+
+    public static void main(String[] args) {
+        new PageRankPregelBenchmark().run();
     }
 }

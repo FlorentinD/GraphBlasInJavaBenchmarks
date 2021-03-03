@@ -11,14 +11,14 @@ import org.openjdk.jmh.infra.Blackhole;
 public class WeightedPageRankJGraphTBenchmark extends WeightedPageRankBaseBenchmark {
     Graph jGraph;
 
-    @Setup
+    @Override
     public void setup() {
         super.setup();
         jGraph = JGraphTConverter.convert(graph);
     }
 
-    @org.openjdk.jmh.annotations.Benchmark
-    public void jGraphT(Blackhole bh) {
-        bh.consume(new PageRank(jGraph, dampingFactor, maxIterations, tolerance).getScores());
+    @Override
+    protected void benchmarkFunc() {
+        new PageRank(jGraph, dampingFactor, maxIterations, tolerance).getScores();
     }
 }
