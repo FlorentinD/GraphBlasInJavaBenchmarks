@@ -6,8 +6,6 @@ import org.neo4j.configuration.GraphDatabaseSettings;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
 import org.neo4j.graphalgo.core.Settings;
-import org.neo4j.graphdb.Result;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
 
 import java.io.IOException;
@@ -68,18 +66,13 @@ public class DataSetManager {
 
         DatabaseManagementService dbms = new DatabaseManagementServiceBuilder(workingCopyGraph)
                 .setConfig(Settings.procedureUnrestricted(), List.of("gds.*"))
+                .setConfig(Settings.failOnMissingFiles(), false)
                 .build();
 
         GraphDatabaseAPI db = (GraphDatabaseAPI) dbms.database(GraphDatabaseSettings.DEFAULT_DATABASE_NAME);
         Runtime.getRuntime().addShutdownHook(new Thread(dbms::shutdown));
 
-        Transaction tx = db.beginTx();
-        Result result = tx.execute("Match (n) Return COUNT(n) as nodeCount");
-        System.out.println("nodes in neo db:" + result.resultAsString());
-        tx.close();
-
-
-        apiServiceMap.put(db, new Pair<>(workingDir, dbms));
+        apiServiceMap.put(db, new Pair<>(workingCopy, dbms));
 
         return db;
     }
@@ -94,5 +87,11 @@ public class DataSetManager {
                 throw new RuntimeException("Could not delete working copy", e);
             }
         }
+    }
+
+    public static void main(String[] args) {
+        DataSetManager dbManager = new DataSetManager("/home/florentin/masterThesis/graphblasOnJavaBenchmarks/datasets/");
+        var db = dbManager.openDb("LDBC01");
+        dbManager.closeDb(db);
     }
 }
