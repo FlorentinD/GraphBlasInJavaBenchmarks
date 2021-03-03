@@ -31,7 +31,7 @@ public class DataSetManager {
 
     public DataSetManager() {
         String datasetDir = System.getenv("GRB_JAVA_DATASETS");
-        if (datasetDir.isEmpty()) {
+        if (datasetDir == null) {
             throw new IllegalArgumentException("Dataset not set. Set GRB_JAVA_DATASETS to specify the dataset directory");
         }
         this.dataSetDir = Paths.get(datasetDir);
