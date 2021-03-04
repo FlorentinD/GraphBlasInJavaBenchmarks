@@ -15,8 +15,11 @@ import java.util.List;
 
 public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchmark {
 
-//    @Param({"1", "8"})
-//    private List<Integer> concurrency = List.of(1,8);
+
+    @Override
+    protected List<Integer> concurrencies() {
+        return List.of(1,8);
+    }
 
     private PageRankPregel.PageRankPregelConfig config;
 
@@ -24,9 +27,15 @@ public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchma
 
     @Override
     @Setup
-    public void setup() {
-        super.setup();
+    public void setup(String dataset) {
+        super.setup(dataset);
 
+        // as Pregel implementation has no good way to normalize the weights
+        EjmlUtil.normalizeOutgoingWeights(graph);
+    }
+
+    @Override
+    protected void benchmarkFunc(Integer concurrency) {
         config = ImmutablePageRankPregelConfig.builder()
                 .maxIterations(maxIterations)
                 .dampingFactor(dampingFactor)
@@ -34,12 +43,6 @@ public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchma
                 .relationshipWeightProperty(REL_PROPERTY_NAME)
                 .build();
 
-        // as Pregel implementation has no good way to normalize the weights
-        EjmlUtil.normalizeOutgoingWeights(graph);
-    }
-
-    @Override
-    protected void benchmarkFunc() {
         // init Pregel structures beforehand
         pregel = Pregel.create(
                 graph,

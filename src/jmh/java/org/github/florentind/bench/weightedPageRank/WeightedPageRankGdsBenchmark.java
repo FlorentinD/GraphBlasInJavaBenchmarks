@@ -8,19 +8,26 @@ import org.neo4j.graphalgo.pagerank.PageRank;
 import org.neo4j.graphalgo.pagerank.PageRankBaseConfig;
 import org.neo4j.graphalgo.pagerank.PageRankFactory;
 import org.neo4j.logging.NullLog;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.infra.Blackhole;
+
+import java.util.List;
 
 public class WeightedPageRankGdsBenchmark extends WeightedPageRankBaseBenchmark {
 
-    @Param({"1", "8"})
-    private int concurrency;
+
+    @Override
+    protected List<Integer> concurrencies() {
+        return List.of(1, 8);
+    }
 
     private PageRankBaseConfig weightedConfig;
 
     @Override
-    public void setup() {
-        super.setup();
+    public void setup(String dataset) {
+        super.setup(dataset);
+    }
+
+    @Override
+    protected void benchmarkFunc(Integer concurrency) {
         weightedConfig = ImmutablePageRankStatsConfig
                 .builder()
                 .maxIterations(maxIterations)
@@ -29,10 +36,7 @@ public class WeightedPageRankGdsBenchmark extends WeightedPageRankBaseBenchmark 
                 .concurrency(concurrency)
                 .relationshipWeightProperty(REL_PROPERTY_NAME)
                 .build();
-    }
 
-    @Override
-    protected void benchmarkFunc() {
         PageRank algorithm = new PageRankFactory<>().build(
                 graph,
                 weightedConfig,

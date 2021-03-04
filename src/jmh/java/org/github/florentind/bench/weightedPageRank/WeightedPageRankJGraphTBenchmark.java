@@ -12,13 +12,13 @@ public class WeightedPageRankJGraphTBenchmark extends WeightedPageRankBaseBenchm
     Graph jGraph;
 
     @Override
-    public void setup() {
-        super.setup();
+    public void setup(String dataset) {
+        super.setup(dataset);
         jGraph = JGraphTConverter.convert(graph);
     }
 
     @Override
-    protected void benchmarkFunc() {
+    protected void benchmarkFunc(Integer concurrency) {
         new PageRank(jGraph, dampingFactor, maxIterations, tolerance).getScores();
     }
 }

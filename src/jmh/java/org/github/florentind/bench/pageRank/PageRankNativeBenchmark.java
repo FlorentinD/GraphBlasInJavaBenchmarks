@@ -4,25 +4,23 @@ package org.github.florentind.bench.pageRank;
 import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.graphalgos.pageRank.PageRankNative;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.TearDown;
-import org.openjdk.jmh.infra.Blackhole;
 
 import java.nio.Buffer;
+import java.util.List;
 
 public class PageRankNativeBenchmark extends PageRankBaseBenchmark {
     Buffer jniMatrix;
 
-    // TODO allow parameter combinations
-    //@Param({"1", "8"})
-    private int concurrency = 8;
+    @Override
+    protected List<Integer> concurrencies() {
+        return List.of(1, 8);
+    }
 
     private boolean by_col = true;
 
     @Override
-    public void setup() {
-        super.setup();
+    public void setup(String dataset) {
+        super.setup(dataset);
         GRBCORE.initNonBlocking();
         jniMatrix = ToNativeMatrixConverter.convert(graph, by_col);
     }
@@ -36,7 +34,7 @@ public class PageRankNativeBenchmark extends PageRankBaseBenchmark {
     }
 
     @Override
-    protected void benchmarkFunc() {
+    protected void benchmarkFunc(Integer concurrency) {
         PageRankNative.compute(jniMatrix, dampingFactor, tolerance, maxIterations, concurrency);
     }
 

@@ -9,13 +9,13 @@ public class PageRankEjmlBenchmark extends PageRankBaseBenchmark {
     DMatrixSparseCSC matrix;
 
     @Override
-    public void setup() {
-        super.setup();
+    public void setup(String dataset) {
+        super.setup(dataset);
         matrix = getAdjacencyMatrix();
     }
 
     @Override
-    protected void benchmarkFunc() {
+    protected void benchmarkFunc(Integer concurrency) {
         new PageRankEjml().compute(matrix, dampingFactor, tolerance, maxIterations);
     }
 
