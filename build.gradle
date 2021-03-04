@@ -120,3 +120,12 @@ jmh {
     // ! increase -Xmx and set -Xms to equal value on server if needed .. f.i. "-Xmx32g"
     jvmArgs = ["-Xms32g", "-Xmx32g", "-XX:+UseSuperWord"]
 }
+
+task simpleBenchmark(type:JavaExec) {
+    classpath = sourceSets.jmh.runtimeClasspath
+    environment "GRB_JAVA_DATASETS", "/home/florentin/masterThesis/graphblasOnJavaBenchmarks/datasets"
+    maxHeapSize="32G"
+    minHeapSize="32G"
+
+    main = project.hasProperty("mainClass") ? getProperty("mainClass") : "NULL"
+}

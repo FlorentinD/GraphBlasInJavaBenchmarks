@@ -41,7 +41,7 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
     }
 
     public void setup(String dataset) {
-        datasetManager = new DataSetManager("/home/florentin/masterThesis/graphblasOnJavaBenchmarks/datasets");
+        datasetManager = new DataSetManager();
         db = datasetManager.openDb(dataset);
 
         var hugeGraph = getCSRGraph();
@@ -73,6 +73,8 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
     }
 
     protected void run() {
+        List<BenchmarkResult> results = new ArrayList<>(datasets().size() * concurrencies().size());
+
         for (String dataset : datasets()) {
             setup(dataset);
 
@@ -80,10 +82,10 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
 
                 for (int i = 0; i < warmUpIterations; i++) {
                     benchmarkFunc(concurrency);
-                    System.out.println(String.format("warmup: %d/%d", i + 1, warmUpIterations));
+                    System.out.printf("warmup: %d/%d%n", i + 1, warmUpIterations);
                 }
 
-                List<Long> timings = new ArrayList(iterations);
+                List<Long> timings = new ArrayList<>(iterations);
                 System.out.println("Benchmark: " + this.getClass().getSimpleName());
 
                 for (int i = 0; i < iterations; i++) {
@@ -98,11 +100,40 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
                 System.out.println("concurrency = " + concurrency);
                 System.out.println("dataset = " + dataset);
                 System.out.println("timings = " + timings);
-                System.out.println("avg: " + timings.stream().reduce(0L, Long::sum) / timings.size());
+                long avg = timings.stream().reduce(0L, Long::sum) / timings.size();
+                System.out.println("avg: " + avg);
                 System.out.println("stats: " + timings.stream().mapToLong(Long::longValue).summaryStatistics().toString());
+
+                results.add(new BenchmarkResult(this.getClass().getSimpleName(), concurrency, dataset, avg));
 
                 tearDown();
             }
+        }
+        System.out.println("----------------------------");
+        System.out.println(results.get(0).header());
+        results.forEach((r) -> System.out.println(r.toString()));
+    }
+
+    class BenchmarkResult {
+        String benchmark;
+        Integer concurrency;
+        String dataSet;
+        long avgMs;
+
+        public BenchmarkResult(String benchmark, Integer concurrency, String dataSet, long avgMs) {
+            this.benchmark = benchmark;
+            this.concurrency = concurrency;
+            this.dataSet = dataSet;
+            this.avgMs = avgMs;
+        }
+
+        public String header() {
+            return "benchmark, concurrency, dataset, avg";
+        }
+
+        @Override
+        public String toString() {
+            return benchmark + ',' + concurrency + ',' + dataSet + "," + avgMs;
         }
     }
 }
