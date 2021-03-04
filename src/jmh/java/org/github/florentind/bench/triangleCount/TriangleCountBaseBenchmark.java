@@ -1,12 +1,12 @@
 package org.github.florentind.bench.triangleCount;
 
-import org.github.florentind.bench.EjmlGraphBaseBenchmark;
+import org.github.florentind.bench.SimpleEjmlGraphBaseBenchmark;
 import org.neo4j.graphalgo.Orientation;
 import org.neo4j.graphalgo.StoreLoaderBuilder;
 import org.neo4j.graphalgo.api.CSRGraph;
 import org.neo4j.graphalgo.core.Aggregation;
 
-public class TriangleCountBaseBenchmark extends EjmlGraphBaseBenchmark {
+public abstract class TriangleCountBaseBenchmark extends SimpleEjmlGraphBaseBenchmark {
     // !! undirected
     @Override
     protected CSRGraph getCSRGraph() {

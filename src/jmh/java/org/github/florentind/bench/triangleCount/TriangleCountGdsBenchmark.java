@@ -1,28 +1,34 @@
 package org.github.florentind.bench.triangleCount;
 
+import org.github.florentind.bench.pageRank.PageRankPregelBenchmark;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.neo4j.graphalgo.core.utils.progress.EmptyProgressEventTracker;
 import org.neo4j.graphalgo.triangle.ImmutableTriangleCountBaseConfig;
 import org.neo4j.graphalgo.triangle.IntersectingTriangleCountFactory;
 import org.neo4j.logging.NullLog;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.infra.Blackhole;
+
+import java.util.List;
 
 public class TriangleCountGdsBenchmark extends TriangleCountBaseBenchmark {
-    @Param({"1", "8"})
-    private int concurrency;
 
+    @Override
+    protected List<Integer> concurrencies() {
+        return List.of(1, 8);
+    }
 
-    @Benchmark
-    public void gdsNodeWise(Blackhole bh) {
+    @Override
+    protected void benchmarkFunc(Integer concurrency) {
         var config = ImmutableTriangleCountBaseConfig
                 .builder()
                 .concurrency(concurrency)
                 .build();
 
-        bh.consume(new IntersectingTriangleCountFactory<>()
+        new IntersectingTriangleCountFactory<>()
                 .build(graph, config, AllocationTracker.empty(), NullLog.getInstance(), EmptyProgressEventTracker.INSTANCE)
-                .compute());
+                .compute();
+    }
+
+    public static void main(String[] args) {
+        new TriangleCountGdsBenchmark().run();
     }
 }

@@ -12,32 +12,24 @@ import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.infra.Blackhole;
 
-public class BfsPregelBenchmark extends BfsBaseBenchmark {
+import java.util.List;
 
-    @Param({"1", "8"})
-    private int concurrency;
-
-    private BFSPregelConfig config;
-
-    private Pregel<BFSPregelConfig> bfsLevelJob;
-
-    private Pregel<BFSPregelConfig> bfsParentJob;
-
+public class BfsLevelPregelBenchmark extends BfsBaseBenchmark {
 
     @Override
-    public void setup() {
-        super.setup();
+    protected List<Integer> concurrencies() {
+        return List.of(1, 8);
+    }
 
-        config = ImmutableBFSPregelConfig.builder()
+    @Override
+    protected void benchmarkFunc(Integer concurrency) {
+        BFSPregelConfig config = ImmutableBFSPregelConfig.builder()
                 .maxIterations(MAX_ITERATIONS)
                 .startNode(0)
                 .concurrency(concurrency)
                 .build();
-    }
 
-    @org.openjdk.jmh.annotations.Benchmark
-    public void pregelBfsLevel(Blackhole bh) {
-        bfsLevelJob = Pregel.create(
+        var bfsLevelJob = Pregel.create(
                 graph,
                 config,
                 new BFSLevelPregel(),
@@ -45,19 +37,10 @@ public class BfsPregelBenchmark extends BfsBaseBenchmark {
                 AllocationTracker.empty()
         );
 
-        bh.consume(bfsLevelJob.run());
+        bfsLevelJob.run();
     }
 
-    @org.openjdk.jmh.annotations.Benchmark
-    public void pregelBfsParent(Blackhole bh) {
-        bfsParentJob = Pregel.create(
-                graph,
-                config,
-                new BFSParentPregel(),
-                Pools.DEFAULT,
-                AllocationTracker.empty()
-        );
-
-        bh.consume(bfsParentJob.run());
+    public static void main(String[] args) {
+        new BfsLevelPregelBenchmark().run();
     }
 }

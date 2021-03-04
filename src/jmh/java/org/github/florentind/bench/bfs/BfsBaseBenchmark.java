@@ -2,6 +2,7 @@ package org.github.florentind.bench.bfs;
 
 
 import org.github.florentind.bench.EjmlGraphBaseBenchmark;
+import org.github.florentind.bench.SimpleEjmlGraphBaseBenchmark;
 import org.neo4j.graphalgo.Orientation;
 import org.neo4j.graphalgo.api.CSRGraph;
 import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
@@ -12,7 +13,7 @@ import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 
-public class BfsBaseBenchmark extends EjmlGraphBaseBenchmark {
+public abstract class BfsBaseBenchmark extends SimpleEjmlGraphBaseBenchmark {
     // node in the middle (id-wise)
     int startNode;
 
@@ -20,9 +21,8 @@ public class BfsBaseBenchmark extends EjmlGraphBaseBenchmark {
     final static int MAX_ITERATIONS = Integer.MAX_VALUE;
 
     @Override
-    @Setup
-    public void setup() {
-        super.setup();
+    public void setup(String dataset) {
+        super.setup(dataset);
         startNode = Math.toIntExact(graph.nodeCount() / 2);
     }
 }

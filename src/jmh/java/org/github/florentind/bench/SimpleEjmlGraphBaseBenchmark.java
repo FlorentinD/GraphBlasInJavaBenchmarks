@@ -61,8 +61,6 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
 
     protected abstract void benchmarkFunc(Integer concurrency);
 
-    protected abstract Map<String, String> parameterDesc();
-
     protected List<Integer> concurrencies() {
         return List.of(1);
     }
