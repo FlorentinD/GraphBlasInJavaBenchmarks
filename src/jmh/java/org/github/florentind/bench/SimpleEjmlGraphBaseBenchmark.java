@@ -79,7 +79,11 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
             for (Integer concurrency : concurrencies()) {
 
                 for (int i = 0; i < warmUpIterations; i++) {
-                    benchmarkFunc(concurrency);
+                    try {
+                        benchmarkFunc(concurrency);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
                     System.out.printf("warmup: %d/%d%n", i + 1, warmUpIterations);
                 }
 
@@ -88,21 +92,24 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
 
                 for (int i = 0; i < iterations; i++) {
                     var start = System.nanoTime();
-                    benchmarkFunc(concurrency);
-                    var end = System.nanoTime();
-                    long duration = Math.round((end - start) / 1_000_000.0);
-                    System.out.println("Iteration: " + i + ", time: " + duration + "ms");
-                    timings.add(duration);
+                    try {
+                        benchmarkFunc(concurrency);
+                        var end = System.nanoTime();
+                        long duration = Math.round((end - start) / 1_000_000.0);
+                        System.out.println("Iteration: " + i + ", time: " + duration + "ms");
+                        timings.add(duration);
+                        break;
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
                 }
 
-                System.out.println("concurrency = " + concurrency);
-                System.out.println("dataset = " + dataset);
-                System.out.println("timings = " + timings);
-                long avg = timings.stream().reduce(0L, Long::sum) / timings.size();
-                System.out.println("avg: " + avg);
-                System.out.println("stats: " + timings.stream().mapToLong(Long::longValue).summaryStatistics().toString());
-
-                results.add(new BenchmarkResult(this.getClass().getSimpleName(), concurrency, dataset, avg));
+                if (timings.size() > 0) {
+                    long avg = timings.stream().reduce(0L, Long::sum) / timings.size();
+                    System.out.println("avg: " + avg);
+                    System.out.println("stats: " + timings.stream().mapToLong(Long::longValue).summaryStatistics().toString());
+                    results.add(new BenchmarkResult(this.getClass().getSimpleName(), concurrency, dataset, avg));
+                }
 
                 tearDown();
             }
