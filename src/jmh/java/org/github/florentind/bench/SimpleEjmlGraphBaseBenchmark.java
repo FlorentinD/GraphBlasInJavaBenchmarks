@@ -12,7 +12,6 @@ import org.neo4j.kernel.internal.GraphDatabaseAPI;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Benchmarks only based on EJML-Graphs
@@ -105,10 +104,11 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
                 }
 
                 if (timings.size() > 0) {
-                    long avg = timings.stream().reduce(0L, Long::sum) / timings.size();
-                    System.out.println("avg: " + avg);
+                    timings.sort(Long::compare);
+                    long median = timings.get(Math.round(timings.size() / 2));
+                    System.out.println("median: " + median);
                     System.out.println("stats: " + timings.stream().mapToLong(Long::longValue).summaryStatistics().toString());
-                    results.add(new BenchmarkResult(this.getClass().getSimpleName(), concurrency, dataset, avg));
+                    results.add(new BenchmarkResult(this.getClass().getSimpleName(), concurrency, dataset, median));
                 }
 
                 tearDown();
@@ -123,22 +123,22 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
         String benchmark;
         Integer concurrency;
         String dataSet;
-        long avgMs;
+        long median;
 
-        public BenchmarkResult(String benchmark, Integer concurrency, String dataSet, long avgMs) {
+        public BenchmarkResult(String benchmark, Integer concurrency, String dataSet, long median) {
             this.benchmark = benchmark;
             this.concurrency = concurrency;
             this.dataSet = dataSet;
-            this.avgMs = avgMs;
+            this.median = median;
         }
 
         public String header() {
-            return "benchmark, concurrency, dataset, avg";
+            return "benchmark, concurrency, dataset, median";
         }
 
         @Override
         public String toString() {
-            return benchmark + ',' + concurrency + ',' + dataSet + "," + avgMs;
+            return benchmark + ',' + concurrency + ',' + dataSet + "," + median;
         }
     }
 }
