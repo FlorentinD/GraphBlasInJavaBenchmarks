@@ -82,6 +82,7 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
                         benchmarkFunc(concurrency);
                     } catch (Throwable e) {
                         e.printStackTrace();
+                        break;
                     }
                     System.out.printf("warmup: %d/%d%n", i + 1, warmUpIterations);
                 }
@@ -111,8 +112,8 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
                     results.add(new BenchmarkResult(this.getClass().getSimpleName(), concurrency, dataset, median));
                 }
 
-                tearDown();
             }
+            tearDown();
         }
         System.out.println("----------------------------");
         System.out.println(results.get(0).header());

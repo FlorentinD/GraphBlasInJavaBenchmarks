@@ -6,6 +6,7 @@ import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
 import org.neo4j.graphalgo.core.Settings;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -40,10 +41,14 @@ public class DataSetManager {
         if (!DATA_SETS.containsKey(datasetId)) {
             throw new RuntimeException("Unknown dataset name " + datasetId);
         }
-
         Path datasetDir = dataSetDir.resolve(DATA_SETS.get(datasetId));
 
+
         System.out.println("Look for dataset at: " + datasetDir.toAbsolutePath().toString());
+
+        if(!Files.exists(datasetDir)) {
+            throw new IllegalArgumentException("Directory not existing " + datasetDir.toAbsolutePath().toString());
+        }
 
         DatabaseManagementService dbms = new DatabaseManagementServiceBuilder(datasetDir)
                 .setConfig(Settings.procedureUnrestricted(), List.of("gds.*"))
