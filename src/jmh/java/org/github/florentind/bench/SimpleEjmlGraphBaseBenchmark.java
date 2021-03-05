@@ -67,7 +67,7 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
 
 
     protected List<String> datasets() {
-        return List.of("LDBC01", "POKEC");
+        return List.of("Facebook", "LDBC01", "POKEC");
     }
 
     protected void run() {
@@ -98,9 +98,9 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
                         long duration = Math.round((end - start) / 1_000_000.0);
                         System.out.println("Iteration: " + i + ", time: " + duration + "ms");
                         timings.add(duration);
-                        break;
                     } catch (Throwable e) {
                         e.printStackTrace();
+                        break;
                     }
                 }
 

@@ -17,6 +17,7 @@ public class DataSetManager {
         put("LDBC01", "ldbc01.db");
         put("POKEC", "pokec_40.db");
         put("LiveJournal", "LiveJournal.db");
+        put("Facebook", "facebook.db");
     }};
 
     private final Path dataSetDir;

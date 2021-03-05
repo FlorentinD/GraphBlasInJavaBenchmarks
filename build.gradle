@@ -123,7 +123,8 @@ jmh {
 
 task simpleBenchmark(type:JavaExec) {
     classpath = sourceSets.jmh.runtimeClasspath
-    environment "GRB_JAVA_DATASETS", getProperty("datasetDir")
+    String datasetDir = project.hasProperty("datasetDir") ? getProperty("datasetDir") : ""
+    environment "GRB_JAVA_DATASETS", datasetDir
     maxHeapSize="32G"
     minHeapSize="32G"
 

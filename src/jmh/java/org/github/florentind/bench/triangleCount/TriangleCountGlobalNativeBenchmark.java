@@ -1,14 +1,13 @@
 package org.github.florentind.bench.triangleCount;
 
 import com.github.fabianmurariu.unsafe.GRBCORE;
-import org.github.florentind.bench.pageRank.PageRankPregelBenchmark;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.graphalgos.triangleCount.TriangleCountNative;
 
 import java.nio.Buffer;
 import java.util.List;
 
-public class TriangleCountNativeGlobalBenchmark extends TriangleCountBaseBenchmark {
+public class TriangleCountGlobalNativeBenchmark extends TriangleCountBaseBenchmark {
 
     Buffer jniMatrix;
 
@@ -37,6 +36,6 @@ public class TriangleCountNativeGlobalBenchmark extends TriangleCountBaseBenchma
     }
 
     public static void main(String[] args) {
-        new TriangleCountNativeGlobalBenchmark().run();
+        new TriangleCountGlobalNativeBenchmark().run();
     }
 }
