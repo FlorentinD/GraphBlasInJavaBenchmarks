@@ -31,15 +31,25 @@ public class MxMWithMaskNativeBenchmark extends SimpleMatrixOpsWithMaskBaseBench
         nativeMatrix = ToNativeMatrixConverter.convert(matrix);
         nativeResult = createMatrix(doubleType(), matrix.numRows, matrix.numCols);
         semiring = createSemiring(plusMonoidDouble(), timesBinaryOpDouble());
+    }
+
+    @Override
+    protected void beforeEach() {
+        super.beforeEach();
         descriptor = createDescriptor();
         setDescriptorValue(descriptor, GxB_AxB_METHOD, GxB_AxB_GUSTAVSON);
+    }
+
+    @Override
+    protected void afterEach() {
+        super.afterEach();
+        freeDescriptor(descriptor);
     }
 
     @TearDown
     public void tearDown() {
         freeMatrix(nativeResult);
         freeMatrix(nativeMatrix);
-        freeDescriptor(descriptor);
         freeSemiring(semiring);
         checkStatusCode(grbFinalize());
     }

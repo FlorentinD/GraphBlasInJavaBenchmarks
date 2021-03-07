@@ -58,6 +58,10 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
         graph.release();
     }
 
+    protected void beforeEach() { }
+
+    protected void afterEach() { }
+
     protected abstract void benchmarkFunc(Integer concurrency);
 
     protected List<Integer> concurrencies() {
@@ -80,7 +84,9 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
 
                 for (int i = 0; i < warmUpIterations; i++) {
                     try {
+                        beforeEach();
                         benchmarkFunc(concurrency);
+                        afterEach();
                     } catch (Throwable e) {
                         e.printStackTrace();
                         break;
@@ -93,11 +99,13 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
                 for (int i = 0; i < iterations; i++) {
                     var start = System.nanoTime();
                     try {
+                        beforeEach();
                         benchmarkFunc(concurrency);
                         var end = System.nanoTime();
                         long duration = Math.round((end - start) / 1_000_000.0);
                         System.out.println("Iteration: " + i + ", time: " + duration + "ms");
                         timings.add(duration);
+                        afterEach();
                     } catch (Throwable e) {
                         e.printStackTrace();
                         break;

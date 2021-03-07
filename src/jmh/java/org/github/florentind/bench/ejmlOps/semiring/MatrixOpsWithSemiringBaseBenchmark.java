@@ -40,7 +40,9 @@ public abstract class MatrixOpsWithSemiringBaseBenchmark extends SimpleMatrixOps
                     System.out.println("Benchmark: " + this.getClass().getSimpleName() + "semiring " + semiRing);
                     for (int i = 0; i < warmUpIterations; i++) {
                         try {
+                            beforeEach();
                             benchmarkFunc(concurrency, semiRing);
+                            afterEach();
                         } catch (Throwable e) {
                             e.printStackTrace();
                             break;
@@ -53,11 +55,13 @@ public abstract class MatrixOpsWithSemiringBaseBenchmark extends SimpleMatrixOps
                     for (int i = 0; i < iterations; i++) {
                         var start = System.nanoTime();
                         try {
+                            beforeEach();
                             benchmarkFunc(concurrency, semiRing);
                             var end = System.nanoTime();
                             long duration = Math.round((end - start) / 1_000_000.0);
                             System.out.println("Iteration: " + i + ", time: " + duration + "ms");
                             timings.add(duration);
+                            afterEach();
                         } catch (Throwable e) {
                             e.printStackTrace();
                             break;

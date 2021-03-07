@@ -31,7 +31,9 @@ public abstract class SimpleMatrixOpsWithMaskBaseBenchmark extends SimpleMatrixO
 
                         for (int i = 0; i < warmUpIterations; i++) {
                             try {
+                                beforeEach();
                                 benchmarkFunc(concurrency, structural, negated);
+                                afterEach();
                             } catch (Throwable e) {
                                 e.printStackTrace();
                                 break;
@@ -42,6 +44,7 @@ public abstract class SimpleMatrixOpsWithMaskBaseBenchmark extends SimpleMatrixO
                         List<Long> timings = new ArrayList<>(iterations);
 
                         for (int i = 0; i < iterations; i++) {
+                            beforeEach();
                             var start = System.nanoTime();
                             try {
                                 benchmarkFunc(concurrency, structural, negated);
@@ -49,6 +52,7 @@ public abstract class SimpleMatrixOpsWithMaskBaseBenchmark extends SimpleMatrixO
                                 long duration = Math.round((end - start) / 1_000_000.0);
                                 System.out.println("Iteration: " + i + ", time: " + duration + "ms");
                                 timings.add(duration);
+                                afterEach();
                             } catch (Throwable e) {
                                 e.printStackTrace();
                                 break;
