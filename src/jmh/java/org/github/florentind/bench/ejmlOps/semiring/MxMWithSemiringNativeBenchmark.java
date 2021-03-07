@@ -7,13 +7,10 @@ import com.github.fabianmurariu.unsafe.GRBOPSMAT;
 import org.apache.commons.lang3.tuple.Pair;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.TearDown;
-import org.openjdk.jmh.infra.Blackhole;
 
 import java.nio.Buffer;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.github.fabianmurariu.unsafe.GRBCORE.*;
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
@@ -29,38 +26,46 @@ public class MxMWithSemiringNativeBenchmark extends MatrixOpsWithSemiringBaseBen
 
     protected Buffer nativeMatrix;
     protected Buffer nativeResult;
-    protected Buffer semiring;
     Buffer descriptor;
 
-    @Param({PLUS_TIMES, OR_PAIR, OR_AND, MIN_MAX})
-    protected String semiRingName;
+    @Override
+    protected List<String> semiRings() {
+        return List.of(PLUS_TIMES, OR_PAIR, OR_AND, MIN_MAX);
+    }
 
     @Override
-    @Setup
-    public void setup() {
-        super.setup();
+    public void setup(String dataset) {
+        super.setup(dataset);
 
         GRBCORE.initNonBlocking();
         setGlobalInt(GxB_NTHREADS, 1);
         nativeMatrix = ToNativeMatrixConverter.convert(matrix);
         nativeResult = GRBCORE.createMatrix(GRAPHBLAS.doubleType(), matrix.numRows, matrix.numCols);
-        var monoids = semiRings.get(semiRingName);
-        semiring = GRBCORE.createSemiring(monoids.getLeft(), monoids.getRight());
         descriptor = createDescriptor();
         setDescriptorValue(descriptor, GxB_AxB_METHOD, GxB_AxB_GUSTAVSON);
     }
 
-    @Benchmark
-    public void mxmNative(Blackhole bh) {
-        checkStatusCode(GRBOPSMAT.mxm(nativeResult, null, null, semiring, nativeMatrix, nativeMatrix, descriptor));
-        bh.consume(GRBCORE.matrixWait(nativeResult));
+    private Buffer getSemiring(String semiring) {
+        var monoids = semiRings.get(semiring);
+        return GRBCORE.createSemiring(monoids.getLeft(), monoids.getRight());
     }
 
-    @TearDown
+    @Benchmark
+    public void benchmarkFunc(Integer concurrency, String semiring) {
+        checkStatusCode(GRBOPSMAT.mxm(nativeResult, null, null, getSemiring(semiring), nativeMatrix, nativeMatrix, descriptor));
+        GRBCORE.matrixWait(nativeResult);
+    }
+
+    @Override
     public void tearDown() {
+        super.tearDown();
         GRBCORE.freeMatrix(nativeResult);
         GRBCORE.freeMatrix(nativeMatrix);
         GRBCORE.freeDescriptor(descriptor);
         checkStatusCode(GRBCORE.grbFinalize());
+    }
+
+    public static void main(String[] args) {
+        new MxMWithSemiringNativeBenchmark().run();
     }
 }

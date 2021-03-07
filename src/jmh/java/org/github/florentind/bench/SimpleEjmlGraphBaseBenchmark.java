@@ -27,8 +27,8 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
         return EjmlUtil.getAdjacencyMatrix(graph);
     }
 
-    int warmUpIterations = 5;
-    int iterations = 10;
+    protected int warmUpIterations = 5;
+    protected int iterations = 10;
 
     protected CSRGraph getCSRGraph() {
         return (CSRGraph) new StoreLoaderBuilder()
@@ -106,7 +106,7 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
 
                 if (timings.size() > 0) {
                     timings.sort(Long::compare);
-                    long median = timings.get(Math.round(timings.size() / 2));
+                    long median = timings.get(Math.round(timings.size() / 2.0f));
                     System.out.println("median: " + median);
                     System.out.println("stats: " + timings.stream().mapToLong(Long::longValue).summaryStatistics().toString());
                     results.add(new BenchmarkResult(this.getClass().getSimpleName(), concurrency, dataset, median));
@@ -115,12 +115,16 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
             }
             tearDown();
         }
+        printResults(results);
+    }
+
+    protected void printResults(List<BenchmarkResult> results) {
         System.out.println("----------------------------");
         System.out.println(results.get(0).header());
         results.forEach((r) -> System.out.println(r.toString()));
     }
 
-    class BenchmarkResult {
+    protected class BenchmarkResult {
         String benchmark;
         Integer concurrency;
         String dataSet;
