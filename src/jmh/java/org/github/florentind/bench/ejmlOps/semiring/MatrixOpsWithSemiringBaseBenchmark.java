@@ -37,6 +37,7 @@ public abstract class MatrixOpsWithSemiringBaseBenchmark extends SimpleMatrixOps
 
             for (Integer concurrency : concurrencies()) {
                 for (String semiRing : semiRings()) {
+                    System.out.println("Benchmark: " + this.getClass().getSimpleName() + "semiring " + semiRing);
                     for (int i = 0; i < warmUpIterations; i++) {
                         try {
                             benchmarkFunc(concurrency, semiRing);
@@ -48,7 +49,6 @@ public abstract class MatrixOpsWithSemiringBaseBenchmark extends SimpleMatrixOps
                     }
 
                     List<Long> timings = new ArrayList<>(iterations);
-                    System.out.println("Benchmark: " + this.getClass().getSimpleName() + "semiring " + semiRing);
 
                     for (int i = 0; i < iterations; i++) {
                         var start = System.nanoTime();
@@ -82,10 +82,6 @@ public abstract class MatrixOpsWithSemiringBaseBenchmark extends SimpleMatrixOps
 
     class BenchmarkSemiringResult extends BenchmarkResult {
         String semiring;
-
-        public BenchmarkSemiringResult(String benchmark, Integer concurrency, String dataSet, long median) {
-            this(benchmark, concurrency, dataSet, "?", median);
-        }
 
         public BenchmarkSemiringResult(String simpleName, Integer concurrency, String dataset, String semiRing, long median) {
             super(simpleName, concurrency, dataset, median);

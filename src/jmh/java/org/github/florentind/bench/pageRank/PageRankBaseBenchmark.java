@@ -18,6 +18,7 @@ public abstract class PageRankBaseBenchmark extends SimpleEjmlGraphBaseBenchmark
         List<SimpleEjmlGraphBaseBenchmark> benchmarks = List.of(
                 new PageRankNativeBenchmark(),
                 new PageRankEjmlBenchmark(),
+                new PageRankPregelBenchmark(),
                 new PageRankJGraphTBenchmark(),
                 new PageRankGdsBenchmark()
         );

@@ -15,44 +15,44 @@ import static com.github.fabianmurariu.unsafe.GRBMONOID.plusMonoidDouble;
 import static com.github.fabianmurariu.unsafe.GRBOPSMAT.mxm;
 import static org.github.florentind.core.grapblas_native.NativeHelper.checkStatusCode;
 
-public class MxMWithMaskNativeBenchmark extends MxMWithMaskBaseBenchmark {
+public class MxMWithMaskNativeBenchmark extends SimpleMatrixOpsWithMaskBaseBenchmark {
 
     Buffer semiring;
     Buffer nativeMatrix;
-    Buffer nativeMask;
     Buffer nativeResult;
     Buffer descriptor;
 
     @Override
-    @Setup
-    public void setup() {
-        super.setup();
+    public void setup(String dataset) {
+        super.setup(dataset);
 
         initNonBlocking();
         setGlobalInt(GxB_NTHREADS, 1);
         nativeMatrix = ToNativeMatrixConverter.convert(matrix);
-        nativeMask = ToNativeMatrixConverter.convert(maskMatrix);
         nativeResult = createMatrix(doubleType(), matrix.numRows, matrix.numCols);
         semiring = createSemiring(plusMonoidDouble(), timesBinaryOpDouble());
         descriptor = createDescriptor();
         setDescriptorValue(descriptor, GxB_AxB_METHOD, GxB_AxB_GUSTAVSON);
-        if (negatedMask) setDescriptorValue(descriptor, GrB_MASK, GrB_COMP);
-        if (structuralMask) setDescriptorValue(descriptor, GrB_MASK, GrB_STRUCTURE);
-    }
-
-    @Benchmark
-    public void mxmNativeWithMask(Blackhole bh) {
-        checkStatusCode(mxm(nativeResult, nativeMask, null, semiring, nativeMatrix, nativeMatrix, descriptor));
-        bh.consume(matrixWait(nativeResult));
     }
 
     @TearDown
     public void tearDown() {
         freeMatrix(nativeResult);
         freeMatrix(nativeMatrix);
-        freeMatrix(nativeMask);
         freeDescriptor(descriptor);
         freeSemiring(semiring);
         checkStatusCode(grbFinalize());
+    }
+
+    @Override
+    protected void benchmarkFunc(Integer concurrency, Boolean structural, Boolean negated) {
+        if (negated) setDescriptorValue(descriptor, GrB_MASK, GrB_COMP);
+        if (structural) setDescriptorValue(descriptor, GrB_MASK, GrB_STRUCTURE);
+        mxm(nativeResult, nativeMatrix, null, semiring, nativeMatrix, nativeMatrix, descriptor);
+        matrixWait(nativeResult);
+    }
+
+    public static void main(String[] args) {
+        new MxMWithMaskNativeBenchmark().run();
     }
 }

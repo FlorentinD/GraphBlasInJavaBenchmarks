@@ -66,7 +66,7 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
 
 
     protected List<String> datasets() {
-        return List.of("Facebook", "LDBC01", "POKEC");
+        return List.of("Facebook", "LDBC01", "POKEC", "Slashdot0902");
     }
 
     public List<BenchmarkResult> run() {
@@ -76,6 +76,7 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
             setup(dataset);
 
             for (Integer concurrency : concurrencies()) {
+                System.out.println("Benchmark: " + this.getClass().getSimpleName() + "concurrency: " + concurrency);
 
                 for (int i = 0; i < warmUpIterations; i++) {
                     try {
@@ -88,7 +89,6 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
                 }
 
                 List<Long> timings = new ArrayList<>(iterations);
-                System.out.println("Benchmark: " + this.getClass().getSimpleName());
 
                 for (int i = 0; i < iterations; i++) {
                     var start = System.nanoTime();
