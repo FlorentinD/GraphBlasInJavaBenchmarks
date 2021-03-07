@@ -29,7 +29,7 @@ public abstract class MatrixOpsWithSemiringBaseBenchmark extends SimpleMatrixOps
     protected abstract void benchmarkFunc(Integer concurrency, String semiring);
 
     @Override
-    protected void run() {
+    public List<BenchmarkResult> run() {
         List<BenchmarkResult> results = new ArrayList<>(datasets().size() * concurrencies().size());
 
         for (String dataset : datasets()) {
@@ -77,6 +77,7 @@ public abstract class MatrixOpsWithSemiringBaseBenchmark extends SimpleMatrixOps
             tearDown();
         }
         printResults(results);
+        return results;
     }
 
     class BenchmarkSemiringResult extends BenchmarkResult {

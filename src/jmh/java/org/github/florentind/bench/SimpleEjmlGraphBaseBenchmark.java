@@ -69,7 +69,7 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
         return List.of("Facebook", "LDBC01", "POKEC");
     }
 
-    protected void run() {
+    public List<BenchmarkResult> run() {
         List<BenchmarkResult> results = new ArrayList<>(datasets().size() * concurrencies().size());
 
         for (String dataset : datasets()) {
@@ -116,9 +116,10 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
             tearDown();
         }
         printResults(results);
+        return results;
     }
 
-    protected void printResults(List<BenchmarkResult> results) {
+    protected static void printResults(List<BenchmarkResult> results) {
         System.out.println("----------------------------");
         System.out.println(results.get(0).header());
         results.forEach((r) -> System.out.println(r.toString()));

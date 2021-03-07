@@ -1,17 +1,10 @@
 package org.github.florentind.bench.bfs;
 
 
-import org.github.florentind.bench.EjmlGraphBaseBenchmark;
 import org.github.florentind.bench.SimpleEjmlGraphBaseBenchmark;
-import org.neo4j.graphalgo.Orientation;
-import org.neo4j.graphalgo.api.CSRGraph;
-import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
-import org.neo4j.graphalgo.beta.generator.RelationshipDistribution;
-import org.neo4j.graphalgo.config.RandomGraphGeneratorConfig;
-import org.neo4j.graphalgo.core.Aggregation;
-import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.annotations.Setup;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class BfsBaseBenchmark extends SimpleEjmlGraphBaseBenchmark {
     // node in the middle (id-wise)
@@ -24,5 +17,25 @@ public abstract class BfsBaseBenchmark extends SimpleEjmlGraphBaseBenchmark {
     public void setup(String dataset) {
         super.setup(dataset);
         startNode = Math.toIntExact(graph.nodeCount() / 2);
+    }
+
+    public static void main(String[] args) {
+        List<SimpleEjmlGraphBaseBenchmark> benchmarks = List.of(
+                new BfsLevelEjmlBenchmark(),
+                new BfsLevelJGraphTBenchmark(),
+                new BfsLevelNativeBenchmark(),
+                new BfsLevelPregelBenchmark(),
+                new BfsParentPregelBenchmark(),
+                new BfsParentEjmlBenchmark(),
+                new BfsParentNativeBenchmark()
+        );
+        List<BenchmarkResult> results = benchmarks.stream()
+                .map(SimpleEjmlGraphBaseBenchmark::run)
+                .reduce(new ArrayList<>(), (acc, result) -> {
+                    acc.addAll(result);
+                    return acc;
+                });
+
+        printResults(results);
     }
 }
