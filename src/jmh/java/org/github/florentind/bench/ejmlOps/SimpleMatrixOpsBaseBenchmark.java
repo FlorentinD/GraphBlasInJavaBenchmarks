@@ -10,7 +10,7 @@ public abstract class SimpleMatrixOpsBaseBenchmark extends SimpleEjmlGraphBaseBe
     protected DMatrixSparseCSC matrix;
 
     @Override
-    protected List<String> datasets() { return List.of("Slashdot0902");}
+    protected List<String> datasets() { return List.of("Slashdot0902", "Facebook");}
 
     @Override
     public void setup(String dataset) {

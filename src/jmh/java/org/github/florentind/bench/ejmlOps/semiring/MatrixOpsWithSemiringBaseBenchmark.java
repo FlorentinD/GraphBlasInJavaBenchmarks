@@ -48,7 +48,7 @@ public abstract class MatrixOpsWithSemiringBaseBenchmark extends SimpleMatrixOps
                     }
 
                     List<Long> timings = new ArrayList<>(iterations);
-                    System.out.println("Benchmark: " + this.getClass().getSimpleName());
+                    System.out.println("Benchmark: " + this.getClass().getSimpleName() + "semiring " + semiRing);
 
                     for (int i = 0; i < iterations; i++) {
                         var start = System.nanoTime();
