@@ -29,7 +29,7 @@ class EjmlAdjacencyCursorTest extends BaseTest {
     void setup() {
         EjmlGraph ejmlGraph = EjmlGraph.create(graph);
         adjacencyCursor = new EjmlAdjacencyCursor(ejmlGraph.matrix());
-        adjacencyCursor.init(0);
+        adjacencyCursor.init(0, 0);
     }
 
     @Test

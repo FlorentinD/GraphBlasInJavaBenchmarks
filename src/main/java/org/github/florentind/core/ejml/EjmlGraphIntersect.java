@@ -20,7 +20,12 @@
 package org.github.florentind.core.ejml;
 
 import org.ejml.data.DMatrixSparseCSC;
-import org.neo4j.graphalgo.core.huge.GraphIntersect;
+import org.neo4j.annotations.service.ServiceProvider;
+import org.neo4j.graphalgo.api.Graph;
+import org.neo4j.graphalgo.api.RelationshipIntersect;
+import org.neo4j.graphalgo.triangle.intersect.GraphIntersect;
+import org.neo4j.graphalgo.triangle.intersect.RelationshipIntersectConfig;
+import org.neo4j.graphalgo.triangle.intersect.RelationshipIntersectFactory;
 
 public class EjmlGraphIntersect extends GraphIntersect<EjmlAdjacencyCursor> {
 
@@ -40,5 +45,20 @@ public class EjmlGraphIntersect extends GraphIntersect<EjmlAdjacencyCursor> {
     @Override
     protected int degree(long node) {
         return adjacencyMatrix.col_idx[(int) node + 1] - adjacencyMatrix.col_idx[(int) node];
+    }
+
+    @ServiceProvider
+    public static final class EjmlGraphIntersectFactory implements RelationshipIntersectFactory {
+
+        @Override
+        public boolean canLoad(Graph graph) {
+            return graph instanceof EjmlGraph;
+        }
+
+        @Override
+        public RelationshipIntersect load(Graph graph, RelationshipIntersectConfig config) {
+            var EjmlGraph = (EjmlGraph) graph;
+            return new EjmlGraphIntersect(EjmlGraph.matrix(), config.maxDegree());
+        }
     }
 }

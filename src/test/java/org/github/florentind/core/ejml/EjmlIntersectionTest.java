@@ -8,6 +8,8 @@ import org.neo4j.graphalgo.StoreLoaderBuilder;
 import org.neo4j.graphalgo.api.Graph;
 import org.neo4j.graphalgo.api.RelationshipIntersect;
 import org.neo4j.graphalgo.core.huge.HugeGraph;
+import org.neo4j.graphalgo.triangle.intersect.ImmutableRelationshipIntersectConfig;
+import org.neo4j.graphalgo.triangle.intersect.RelationshipIntersectFactoryLocator;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
 
@@ -58,9 +60,11 @@ final class EjmlIntersectionTest extends AlgoTestBase {
             .build()
             .graph();
 
-        graph = EjmlGraph.create((HugeGraph) graph);
+        var ejmlGraph = EjmlGraph.create((HugeGraph) graph);
 
-        INTERSECT = graph.intersection();
+        INTERSECT = RelationshipIntersectFactoryLocator.lookup(ejmlGraph)
+                .orElseThrow(IllegalArgumentException::new)
+                .load(ejmlGraph, ImmutableRelationshipIntersectConfig.builder().build());
         START1 = graph.toMappedNodeId(neoStarts[0]);
         START2 = graph.toMappedNodeId(neoStarts[1]);
         TARGETS = Arrays.stream(neoTargets).map(graph::toMappedNodeId).toArray();

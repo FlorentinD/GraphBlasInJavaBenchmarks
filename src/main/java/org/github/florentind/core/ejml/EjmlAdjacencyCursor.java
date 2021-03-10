@@ -33,7 +33,7 @@ public class EjmlAdjacencyCursor implements AdjacencyCursor {
         this.adjacencyMatrix = adjacencyMatrix;
     }
 
-    public void init(long node) {
+    public void init(long node, int degree) {
         int nodeId = (int) node;
         sourceNodeId = nodeId;
         // first value accessed via next/peekVLong (hence init with offset one before)
@@ -41,7 +41,6 @@ public class EjmlAdjacencyCursor implements AdjacencyCursor {
         // as exclusive range
         maxOffset = adjacencyMatrix.col_idx[nodeId + 1] - 1;
     }
-
 
     @Override
     public int size() {

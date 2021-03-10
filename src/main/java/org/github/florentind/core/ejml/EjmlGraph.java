@@ -115,16 +115,6 @@ public final class EjmlGraph extends FilterGraph {
         return this;
     }
 
-    @Override
-    public RelationshipIntersect intersection(long maxDegree) {
-        return new EjmlGraphIntersect(transposedMatrix, maxDegree);
-    }
-
-    @Override
-    public RelationshipIntersect intersection() {
-        return this.intersection(9223372036854775807L);
-    }
-
     public DMatrixSparseCSC matrix() {
         return transposedMatrix;
     }
