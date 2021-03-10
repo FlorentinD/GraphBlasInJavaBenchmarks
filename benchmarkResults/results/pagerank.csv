@@ -1,0 +1,14 @@
+benchmark, concurrency, dataset, median
+PageRankNativeBenchmark,1,Facebook,6
+PageRankNativeBenchmark,8,Facebook,5
+PageRankNativeBenchmark,1,POKEC,5023
+PageRankNativeBenchmark,8,POKEC,1054
+PageRankEjmlBenchmark,1,Facebook,3
+PageRankEjmlBenchmark,1,POKEC,3716
+PageRankPregelBenchmark,1,Facebook,43
+PageRankPregelBenchmark,8,Facebook,95
+PageRankPregelBenchmark,1,POKEC,16596
+PageRankPregelBenchmark,8,POKEC,8213
+PageRankJGraphTBenchmark,1,Facebook,19
+PageRankJGraphTBenchmark,1,POKEC,22239
+
