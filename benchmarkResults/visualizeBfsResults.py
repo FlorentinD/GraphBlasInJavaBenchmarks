@@ -42,27 +42,27 @@ for id, variant in enumerate(bfsVariants):
     hueOrder = [i for i in allLibs if i in containedLibs]
 
     # TODO: multithreaded variant important?
-    singleThreadedDf = variant[variant["concurrency"] == 1]
 
-    baselineDf = singleThreadedDf[singleThreadedDf["library"].str.contains("EJML")]
-    for dataset in variant.dataset.unique():
-        ejmlBaseLine = baselineDf[baselineDf["dataset"] == dataset].iloc[0]["median"]
-        datasetDf = singleThreadedDf[singleThreadedDf["dataset"] == dataset]
-        # TODO get speed up into singleThreadedDf (also this is slowdown)
-        datasetDf["speedup"] = datasetDf["median"] / ejmlBaseLine
+    baselineDf = variant[variant["library"].str.contains("EJML")]
+    baselineDf = baselineDf[["dataset", "median"]]
+    baselineDf.rename(columns={"median":"baseline"}, inplace=True)
+    baselinedVariant = pd.merge(variant, baselineDf, how="inner", on="dataset")
+    baselinedVariant["speedup"] = baselinedVariant["baseline"] / baselinedVariant["median"]
 
-    barPlot = sns.barplot(ax=axes[id], x="dataset", y="median", hue="library", data=singleThreadedDf,
+    singleThreadedDf = baselinedVariant[baselinedVariant["concurrency"] == 1]
+
+    barPlot = sns.barplot(ax=axes[id], x="dataset", y="speedup", hue="library", data=singleThreadedDf,
                           hue_order=hueOrder, palette = libColors())
-    barPlot.set_ylabel("Runtime in ms", fontsize=12)
+    barPlot.set_ylabel("Speedup", fontsize=12)
     barPlot.set_xlabel("Dataset", fontsize=12)
     barPlot.set_title("{}-Variant".format(singleThreadedDf['variant'].iloc[0]))
-    barPlot.legend(bbox_to_anchor=(0.5, -0.4), loc='lower center', ncol=3, bbox_transform=fig.transFigure)
+    barPlot.legend(bbox_to_anchor=(0.5, -0.4), loc='lower center', ncol=4, bbox_transform=fig.transFigure)
 
     #plt.tight_layout(pad=1)
-    yscale = 'log'
-    barPlot.set_yscale(yscale)
+    #yscale = 'log'
+#    barPlot.set_yscale(yscale)
     if variant.variant.unique()[0] == "Parent":
         axes[id].get_legend().remove()
 
-plt.savefig("out/bfs_yscale_{}.pdf".format(yscale), bbox_inches='tight')
+plt.savefig("out/bfs.pdf", bbox_inches='tight')
 plt.show()

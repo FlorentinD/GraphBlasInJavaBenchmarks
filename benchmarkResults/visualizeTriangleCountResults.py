@@ -31,7 +31,7 @@ for (variant, df) in tcDfs.items():
                           , data=singleThreadedDf)
     barPlot.set_ylabel("Runtime in ms", fontsize=12)
     barPlot.set_xlabel("Dataset", fontsize=12)
-    barPlot.legend(bbox_to_anchor=(0.5, -0.4), loc='lower center', ncol=3, bbox_transform=fig.transFigure)
+    barPlot.legend(bbox_to_anchor=(0.5, -0.4), loc='lower center', ncol=4, bbox_transform=fig.transFigure)
     barPlot.set_yscale('log')
     plt.savefig("out/triangleCount_{}.pdf".format(variant), bbox_inches='tight')
     plt.show()
