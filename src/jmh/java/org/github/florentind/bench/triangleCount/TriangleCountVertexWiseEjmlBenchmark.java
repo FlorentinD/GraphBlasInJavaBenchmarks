@@ -2,7 +2,7 @@ package org.github.florentind.bench.triangleCount;
 
 import org.github.florentind.graphalgos.triangleCount.TriangleCountEjml;
 
-public class TriangleCountNodeWiseEjmlBenchmark extends TriangleCountBaseBenchmark {
+public class TriangleCountVertexWiseEjmlBenchmark extends TriangleCountBaseBenchmark {
     // not using getAdjacencyMatrix (as the graph is unweighted and therefore A_T == A, e.g. no need to transpose)
 
     @Override
@@ -12,6 +12,6 @@ public class TriangleCountNodeWiseEjmlBenchmark extends TriangleCountBaseBenchma
     }
 
     public static void main(String[] args) {
-        new TriangleCountNodeWiseEjmlBenchmark().run();
+        new TriangleCountVertexWiseEjmlBenchmark().run();
     }
 }

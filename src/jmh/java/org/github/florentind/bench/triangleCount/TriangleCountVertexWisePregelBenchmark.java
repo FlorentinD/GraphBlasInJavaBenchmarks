@@ -9,7 +9,7 @@ import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 
 import java.util.List;
 
-public class TriangleCountNodeWisePregelBenchmark extends TriangleCountBaseBenchmark {
+public class TriangleCountVertexWisePregelBenchmark extends TriangleCountBaseBenchmark {
 
     @Override
     protected List<Integer> concurrencies() {
@@ -33,6 +33,6 @@ public class TriangleCountNodeWisePregelBenchmark extends TriangleCountBaseBench
     }
 
     public static void main(String[] args) {
-        new TriangleCountNodeWisePregelBenchmark().run();
+        new TriangleCountVertexWisePregelBenchmark().run();
     }
 }

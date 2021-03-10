@@ -7,7 +7,7 @@ import org.github.florentind.graphalgos.triangleCount.TriangleCountNative;
 import java.nio.Buffer;
 import java.util.List;
 
-public class TriangleCountNodeWiseNativeBenchmark extends TriangleCountBaseBenchmark {
+public class TriangleCountVertexWiseNativeBenchmark extends TriangleCountBaseBenchmark {
 
     Buffer jniMatrix;
 
@@ -36,6 +36,6 @@ public class TriangleCountNodeWiseNativeBenchmark extends TriangleCountBaseBench
     }
 
     public static void main(String[] args) {
-        new TriangleCountNodeWiseNativeBenchmark().run();
+        new TriangleCountVertexWiseNativeBenchmark().run();
     }
 }
