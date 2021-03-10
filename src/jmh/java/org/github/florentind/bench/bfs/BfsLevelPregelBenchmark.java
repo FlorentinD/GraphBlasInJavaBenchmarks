@@ -1,6 +1,7 @@
 package org.github.florentind.bench.bfs;
 
 
+import org.neo4j.graphalgo.beta.pregel.Partitioning;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.bfs.BFSLevelPregel;
 import org.neo4j.graphalgo.beta.pregel.bfs.BFSParentPregel;
@@ -25,8 +26,9 @@ public class BfsLevelPregelBenchmark extends BfsBaseBenchmark {
     protected void benchmarkFunc(Integer concurrency) {
         BFSPregelConfig config = ImmutableBFSPregelConfig.builder()
                 .maxIterations(MAX_ITERATIONS)
-                .startNode(0)
+                .startNode(startNode)
                 .concurrency(concurrency)
+                .partitioning(Partitioning.DEGREE)
                 .build();
 
         var bfsLevelJob = Pregel.create(

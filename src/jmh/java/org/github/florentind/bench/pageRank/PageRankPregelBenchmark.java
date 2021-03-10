@@ -1,6 +1,7 @@
 package org.github.florentind.bench.pageRank;
 
 
+import org.neo4j.graphalgo.beta.pregel.Partitioning;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.pr.ImmutablePageRankPregelConfig;
 import org.neo4j.graphalgo.beta.pregel.pr.PageRankPregel;
@@ -30,6 +31,7 @@ public class PageRankPregelBenchmark extends PageRankBaseBenchmark {
         config = ImmutablePageRankPregelConfig.builder()
                 .maxIterations(maxIterations)
                 .dampingFactor(dampingFactor)
+                .partitioning(Partitioning.DEGREE)
                 .concurrency(concurrency)
                 .build();
 

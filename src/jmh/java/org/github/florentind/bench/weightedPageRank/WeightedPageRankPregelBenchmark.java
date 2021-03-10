@@ -2,6 +2,7 @@ package org.github.florentind.bench.weightedPageRank;
 
 
 import org.github.florentind.core.ejml.EjmlUtil;
+import org.neo4j.graphalgo.beta.pregel.Partitioning;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.pr.ImmutablePageRankPregelConfig;
 import org.neo4j.graphalgo.beta.pregel.pr.PageRankPregel;
@@ -39,6 +40,7 @@ public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchma
         config = ImmutablePageRankPregelConfig.builder()
                 .maxIterations(maxIterations)
                 .dampingFactor(dampingFactor)
+                .partitioning(Partitioning.DEGREE)
                 .concurrency(concurrency)
                 .relationshipWeightProperty(REL_PROPERTY_NAME)
                 .build();

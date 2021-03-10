@@ -2,6 +2,7 @@ package org.github.florentind.bench.bfs;
 
 
 import org.github.florentind.bench.pageRank.PageRankEjmlBenchmark;
+import org.neo4j.graphalgo.beta.pregel.Partitioning;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.bfs.BFSLevelPregel;
 import org.neo4j.graphalgo.beta.pregel.bfs.BFSParentPregel;
@@ -24,7 +25,8 @@ public class BfsParentPregelBenchmark extends BfsBaseBenchmark {
     protected void benchmarkFunc(Integer concurrency) {
         BFSPregelConfig config = ImmutableBFSPregelConfig.builder()
                 .maxIterations(MAX_ITERATIONS)
-                .startNode(0)
+                .startNode(startNode)
+                .partitioning(Partitioning.DEGREE)
                 .concurrency(concurrency)
                 .build();
 
