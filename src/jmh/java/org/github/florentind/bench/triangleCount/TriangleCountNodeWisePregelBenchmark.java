@@ -1,6 +1,5 @@
 package org.github.florentind.bench.triangleCount;
 
-import org.github.florentind.bench.pageRank.PageRankPregelBenchmark;
 import org.neo4j.graphalgo.beta.pregel.Partitioning;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.triangleCount.ImmutableTriangleCountPregelConfig;
@@ -10,7 +9,7 @@ import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
 
 import java.util.List;
 
-public class TriangleCountPregelBenchmark extends TriangleCountBaseBenchmark {
+public class TriangleCountNodeWisePregelBenchmark extends TriangleCountBaseBenchmark {
 
     @Override
     protected List<Integer> concurrencies() {
@@ -34,6 +33,6 @@ public class TriangleCountPregelBenchmark extends TriangleCountBaseBenchmark {
     }
 
     public static void main(String[] args) {
-        new TriangleCountPregelBenchmark().run();
+        new TriangleCountNodeWisePregelBenchmark().run();
     }
 }
