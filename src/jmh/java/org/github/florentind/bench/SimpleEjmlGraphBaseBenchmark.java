@@ -71,7 +71,7 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
 
 
     protected List<String> datasets() {
-        return List.of("Facebook", "LDBC01", "POKEC", "Slashdot0902");
+        return List.of("Facebook", "Patents", "POKEC", "Slashdot0902");
     }
 
     public List<BenchmarkResult> run() {
