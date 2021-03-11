@@ -15,9 +15,8 @@ import java.util.Map;
 
 public class DataSetManager {
     public static Map<String, String> DATA_SETS = new HashMap<>() {{
-        put("LDBC01", "ldbc01.db");
+        put("Patents", "patents.db");
         put("POKEC", "pokec_40.db");
-        put("LiveJournal", "LiveJournal.db");
         put("Facebook", "facebook.db");
         put("Slashdot0902", "slashdot0902.db");
     }};
