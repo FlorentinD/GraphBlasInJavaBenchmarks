@@ -45,6 +45,7 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
 
         var hugeGraph = getCSRGraph();
         System.out.println("nodeCount = " + hugeGraph.nodeCount());
+        System.out.println("relationships = " + hugeGraph.relationshipCount());
         graph = EjmlGraph.create(hugeGraph);
 
         // for usage of higher concurrency in gds benchmarks
