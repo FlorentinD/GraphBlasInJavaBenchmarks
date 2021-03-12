@@ -26,13 +26,25 @@ for (variant, df) in tcDfs.items():
     fig, ax = plt.subplots(figsize=(6,3))
     plt.setp(ax.get_xticklabels(), rotation=30)
 
-    singleThreadedDf = df[df["concurrency"] == 1]
-    barPlot = sns.barplot(x="dataset", y="median", hue="library", palette = libColors()
-                          , data=singleThreadedDf)
-    barPlot.set_ylabel("Runtime in ms", fontsize=12)
+    baselineDf = df[df["library"].str.contains("EJML")]
+    baselineDf = baselineDf[["dataset", "median"]]
+    baselineDf.rename(columns={"median": "baseline"}, inplace=True)
+    baselinedVariant = pd.merge(df, baselineDf, how="inner", on="dataset")
+    baselinedVariant["slowdown"] = baselinedVariant["median"] / baselinedVariant["baseline"]
+    singleThreadedDf = baselinedVariant[baselinedVariant["concurrency"] == 1]
+
+
+    allLibs = ["EJML", "Java-Native", "JGraphT", "GDS-Pregel"]
+    order=["Facebook", "Slashdot0902", "POKEC", "Patents"]
+    hue_order = [i for i in allLibs if i in singleThreadedDf.library.unique()]
+    barPlot = sns.barplot(x="dataset", y="slowdown", hue="library", palette = libColors()
+                          , data=singleThreadedDf, hue_order=hue_order, order=order)
+    barPlot.set_ylabel("Slowdown", fontsize=12)
     barPlot.set_xlabel("Dataset", fontsize=12)
     barPlot.legend(bbox_to_anchor=(0.5, -0.4), loc='lower center', ncol=4, bbox_transform=fig.transFigure)
-    barPlot.set_yscale('log')
+
+    if variant == "global":
+        barPlot.set_yscale('log')
     plt.savefig("out/triangleCount_{}.pdf".format(variant), bbox_inches='tight')
     plt.show()
 

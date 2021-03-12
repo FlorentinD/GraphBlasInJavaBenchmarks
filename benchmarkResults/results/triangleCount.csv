@@ -14,6 +14,8 @@ TriangleCountGlobalNativeBenchmark,1,POKEC,11424
 TriangleCountGlobalNativeBenchmark,8,POKEC,2523
 TriangleCountGlobalNativeBenchmark,1,Slashdot0902,142
 TriangleCountGlobalNativeBenchmark,8,Slashdot0902,40
+TriangleCountGlobalJGraphTBenchmark,1,Slashdot0902,106247
+TriangleCountGlobalJGraphTBenchmark,1,Facebook,322448
 TriangleCountVertexWiseNativeBenchmark,1,Facebook,50
 TriangleCountVertexWiseNativeBenchmark,8,Facebook,17
 TriangleCountVertexWiseNativeBenchmark,1,LDBC01,40236
