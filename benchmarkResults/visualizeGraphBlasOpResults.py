@@ -34,39 +34,37 @@ mask_parameters = ["negated", "structural"]
 
 # bar plot negated/non-negated
 negatedDf = maskResults[maskResults["structural"] == False]
-negatedDf = negatedDf.append(baseLineForMask)
+#negatedDf = negatedDf.append(baseLineForMask)
 negatedDf = pd.merge(negatedDf, baseLineForMaskSubset, how="inner", on="library")
 negatedDf["speedup"] = negatedDf["baseline"] / negatedDf["median"]
 
 fig, ax = plt.subplots()
-negatedPlot = sns.barplot(x="library", y="speedup", hue="negated", hue_order=["None", False, True],
+negatedPlot = sns.barplot(x="library", y="speedup", hue="negated", hue_order=[False, True],
                           palette=booleanColorMap(), data=negatedDf)
 # negatedPlot.title(title)
-negatedPlot.set_ylabel("Speedup", fontsize=12)
+negatedPlot.set_ylabel("Speedup to unmasked operation", fontsize=12)
 negatedPlot.set_xlabel("GraphBLAS library", fontsize=12)
-ax.legend(title='Mask negated')
 #ax.set_ylim([0, maxValue])
-negatedPlot.legend(bbox_to_anchor=(0.5, -0.1), loc='lower center', ncol=3, bbox_transform=fig.transFigure)
+negatedPlot.legend(bbox_to_anchor=(0.5, -0.1), loc='lower center', ncol=3, bbox_transform=fig.transFigure, title="Mask negated")
 outFile = "out/mxm_mask_negated.pdf"
 plt.savefig(outFile, bbox_inches='tight')
 plt.show()
 
 # title = "{} with structural Mask with {} entries per mask column \n (matrices dim: {}, negated: {})".format(graphBlasOperation, entriesPerMaskColumn, matrixDim)
 structuralDf = maskResults[(maskResults["negated"] == False)]
-structuralDf = structuralDf.append(baseLineForMask)
+#structuralDf = structuralDf.append(baseLineForMask)
 structuralDf = pd.merge(structuralDf, baseLineForMaskSubset, how="inner", on="library")
 structuralDf["speedup"] = structuralDf["baseline"] / structuralDf["median"]
 
 
 fig, ax = plt.subplots()
-structuralPlot = sns.barplot(x="library", y="speedup", hue="structural", hue_order=["None", True, False],
+structuralPlot = sns.barplot(x="library", y="speedup", hue="structural", hue_order=[True, False],
                              palette=booleanColorMap(), data=structuralDf)
 # structuralPlot.title(title)
-ax.legend(title='Mask structural')
 # ax.set_ylim([0, maxValue])
-structuralPlot.set_ylabel("Speedup", fontsize=12)
+structuralPlot.set_ylabel("Speedup to unmasked operation", fontsize=12)
 structuralPlot.set_xlabel("GraphBLAS library", fontsize=12)
-structuralPlot.legend(bbox_to_anchor=(0.5, -0.1), loc='lower center', ncol=3, bbox_transform=fig.transFigure)
+structuralPlot.legend(bbox_to_anchor=(0.5, -0.1), loc='lower center', ncol=3, bbox_transform=fig.transFigure, title="Mask structural")
 outFile = "out/mxm_mask_strutural.pdf"
 plt.savefig(outFile, bbox_inches='tight')
 plt.show()

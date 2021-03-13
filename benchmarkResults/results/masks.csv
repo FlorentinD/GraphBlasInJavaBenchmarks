@@ -1,9 +1,10 @@
 benchmark, concurrency, dataset, median, structural, negated
-MxMWithMaskEjmlBenchmark,1,Slashdot0902,3600,true,true
-MxMWithMaskEjmlBenchmark,1,Slashdot0902,815,true,false
-MxMWithMaskEjmlBenchmark,1,Slashdot0902,2779,false,true
-MxMWithMaskEjmlBenchmark,1,Slashdot0902,549,false,false
-MxMWithMaskNativeBenchmark,1,Slashdot0902,6554,true,true
-MxMWithMaskNativeBenchmark,1,Slashdot0902,651,true,false
-MxMWithMaskNativeBenchmark,1,Slashdot0902,6515,false,true
-MxMWithMaskNativeBenchmark,1,Slashdot0902,654,false,false
+MxMWithMaskEjmlBenchmark,1,Slashdot0902,2746,true,true
+MxMWithMaskEjmlBenchmark,1,Slashdot0902,517,true,false
+MxMWithMaskEjmlBenchmark,1,Slashdot0902,2715,false,true
+MxMWithMaskEjmlBenchmark,1,Slashdot0902,519,false,false
+MxMWithMaskNativeBenchmark,1,Slashdot0902,6274,true,true
+MxMWithMaskNativeBenchmark,1,Slashdot0902,718,true,false
+MxMWithMaskNativeBenchmark,1,Slashdot0902,6274,false,true
+MxMWithMaskNativeBenchmark,1,Slashdot0902,753,false,false
+

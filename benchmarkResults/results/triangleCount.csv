@@ -3,9 +3,11 @@ TriangleCountGlobalEjmlBenchmark,1,Facebook,19
 TriangleCountGlobalEjmlBenchmark,1,LDBC01,14231
 TriangleCountGlobalEjmlBenchmark,1,POKEC,6439
 TriangleCountGlobalEjmlBenchmark,1,Slashdot0902,126
+TriangleCountGlobalEjmlBenchmark,1,Patents,3455
 TriangleCountVertexWiseEjmlBenchmark,1,Facebook,47
 TriangleCountVertexWiseEjmlBenchmark,1,POKEC,14398
 TriangleCountVertexWiseEjmlBenchmark,1,Slashdot0902,226
+TriangleCountVertexWiseEjmlBenchmark,1,Patents,7658
 TriangleCountGlobalNativeBenchmark,1,Facebook,18
 TriangleCountGlobalNativeBenchmark,8,Facebook,8
 TriangleCountGlobalNativeBenchmark,1,LDBC01,7948
@@ -14,6 +16,8 @@ TriangleCountGlobalNativeBenchmark,1,POKEC,11424
 TriangleCountGlobalNativeBenchmark,8,POKEC,2523
 TriangleCountGlobalNativeBenchmark,1,Slashdot0902,142
 TriangleCountGlobalNativeBenchmark,8,Slashdot0902,40
+TriangleCountGlobalNativeBenchmark,1,Patents,4078
+TriangleCountGlobalNativeBenchmark,8,Patents,819
 TriangleCountGlobalJGraphTBenchmark,1,Slashdot0902,106247
 TriangleCountGlobalJGraphTBenchmark,1,Facebook,322448
 TriangleCountVertexWiseNativeBenchmark,1,Facebook,50
@@ -24,10 +28,15 @@ TriangleCountVertexWiseNativeBenchmark,1,POKEC,26717
 TriangleCountVertexWiseNativeBenchmark,8,POKEC,5815
 TriangleCountVertexWiseNativeBenchmark,1,Slashdot0902,253
 TriangleCountVertexWiseNativeBenchmark,8,Slashdot0902,78
+TriangleCountVertexWiseNativeBenchmark,1,Patents,12518
+TriangleCountVertexWiseNativeBenchmark,8,Patents,1998
 TriangleCountVertexWisePregelBenchmark,1,Facebook,125
 TriangleCountVertexWisePregelBenchmark,8,Facebook,78
 TriangleCountVertexWisePregelBenchmark,1,POKEC,29071
 TriangleCountVertexWisePregelBenchmark,8,POKEC,9484
 TriangleCountVertexWisePregelBenchmark,1,Slashdot0902,796
 TriangleCountVertexWisePregelBenchmark,8,Slashdot0902,307
+TriangleCountVertexWisePregelBenchmark,1,Patents,9506
+TriangleCountVertexWisePregelBenchmark,8,Patents,3199
+
 

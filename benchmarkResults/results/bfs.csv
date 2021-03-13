@@ -43,4 +43,15 @@ BfsParentNativeBenchmark,1,POKEC,771
 BfsParentNativeBenchmark,8,POKEC,435
 BfsParentNativeBenchmark,1,Slashdot0902,17
 BfsParentNativeBenchmark,8,Slashdot0902,16
+BfsLevelEjmlBenchmark,1,Patents,2295
+BfsLevelJGraphTBenchmark,1,Patents,14604
+BfsLevelNativeBenchmark,1,Patents,1047
+BfsLevelNativeBenchmark,8,Patents,375
+BfsLevelPregelBenchmark,1,Patents,6521
+BfsLevelPregelBenchmark,8,Patents,2213
+BfsParentPregelBenchmark,1,Patents,7497
+BfsParentPregelBenchmark,8,Patents,2349
+BfsParentEjmlBenchmark,1,Patents,2740
+BfsParentNativeBenchmark,1,Patents,1686
+BfsParentNativeBenchmark,8,Patents,805
 

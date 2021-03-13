@@ -23,4 +23,13 @@ PageRankJGraphTBenchmark,1,Facebook,19
 PageRankJGraphTBenchmark,1,POKEC,22239
 PageRankJGraphTBenchmark,1,LDBC01,9595
 PageRankJGraphTBenchmark,1,Slashdot0902,306
+PageRankNativeBenchmark,1,Patents,5003
+PageRankNativeBenchmark,8,Patents,1120
+PageRankEjmlBenchmark,1,Patents,3145
+PageRankPregelBenchmark,1,Patents,24653
+PageRankPregelBenchmark,8,Patents,10655
+PageRankJGraphTBenchmark,1,Patents,16710
+PageRankGdsBenchmark,1,Patents,4111
+PageRankGdsBenchmark,8,Patents,3550
+
 
