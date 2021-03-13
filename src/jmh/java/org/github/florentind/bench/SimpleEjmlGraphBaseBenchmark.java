@@ -59,7 +59,14 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
         graph.release();
     }
 
-    protected void beforeEach() { }
+    protected void beforeEach() {
+        System.gc();
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
     protected void afterEach() { }
 
@@ -71,7 +78,7 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
 
 
     protected List<String> datasets() {
-        return List.of("Facebook", "Patents", "POKEC", "Slashdot0902");
+        return List.of("Slashdot0902");
     }
 
     public List<BenchmarkResult> run() {
@@ -98,9 +105,9 @@ public abstract class SimpleEjmlGraphBaseBenchmark {
                 List<Long> timings = new ArrayList<>(iterations);
 
                 for (int i = 0; i < iterations; i++) {
+                    beforeEach();
                     var start = System.nanoTime();
                     try {
-                        beforeEach();
                         benchmarkFunc(concurrency);
                         var end = System.nanoTime();
                         long duration = Math.round((end - start) / 1_000_000.0);

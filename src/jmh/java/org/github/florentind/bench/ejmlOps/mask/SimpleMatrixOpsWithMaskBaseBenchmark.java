@@ -45,9 +45,9 @@ public abstract class SimpleMatrixOpsWithMaskBaseBenchmark extends SimpleMatrixO
 
                         for (int i = 0; i < iterations; i++) {
                             beforeEach();
+                            benchmarkFunc(concurrency, structural, negated);
                             var start = System.nanoTime();
                             try {
-                                benchmarkFunc(concurrency, structural, negated);
                                 var end = System.nanoTime();
                                 long duration = Math.round((end - start) / 1_000_000.0);
                                 System.out.println("Iteration: " + i + ", time: " + duration + "ms");

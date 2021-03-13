@@ -53,9 +53,9 @@ public abstract class MatrixOpsWithSemiringBaseBenchmark extends SimpleMatrixOps
                     List<Long> timings = new ArrayList<>(iterations);
 
                     for (int i = 0; i < iterations; i++) {
+                        beforeEach();
                         var start = System.nanoTime();
                         try {
-                            beforeEach();
                             benchmarkFunc(concurrency, semiRing);
                             var end = System.nanoTime();
                             long duration = Math.round((end - start) / 1_000_000.0);
