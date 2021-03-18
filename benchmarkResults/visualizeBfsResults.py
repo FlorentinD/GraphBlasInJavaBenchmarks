@@ -37,8 +37,10 @@ allLibs = ["JGraphT", "GDS-Pregel", "EJML", "Java-Native"]
 #fig, axes = plt.subplots(1, 2, figsize=(6,3), sharey=True, sharex=True)
 
 for id, variant in enumerate(bfsVariants):
-    fig, ax = plt.subplots(figsize=(6, 3))
-    plt.setp(ax.get_xticklabels(), rotation=30)
+    fig, ax = plt.subplots(figsize=(16, 9))
+    plt.yticks(fontsize=22)
+    plt.xticks(fontsize=22)
+    #plt.setp(ax.get_xticklabels(), rotation=30)
 
     containedLibs = variant.library.unique()
     hueOrder = [i for i in allLibs if i in containedLibs]
@@ -55,10 +57,11 @@ for id, variant in enumerate(bfsVariants):
 
     barPlot = sns.barplot(ax=ax, x="dataset", y="slowdown", hue="library", data=singleThreadedDf,
                           hue_order=hueOrder, palette = libColors(), order=order)
-    barPlot.set_ylabel("Slowdown to our work", fontsize=12)
-    barPlot.set_xlabel("Dataset", fontsize=12)
+    barPlot.set_ylabel("Relative performance", fontsize=24)
+    barPlot.set_xlabel("Dataset", fontsize=24)
     #barPlot.set_title("{}-Variant".format(singleThreadedDf['variant'].iloc[0]))
-    barPlot.legend(bbox_to_anchor=(0.5, -0.4), loc='lower center', ncol=4, bbox_transform=fig.transFigure)
+    barPlot.legend(bbox_to_anchor=(0.5, -0.1), loc='lower center', ncol=4, bbox_transform=fig.transFigure,
+                   title_fontsize=24,fontsize=22)
 
     #plt.tight_layout(pad=1)
     #yscale = 'log'

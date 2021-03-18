@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from benchmarkResults.helper import getUnit, libColors
 
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(16, 9))
+plt.yticks(fontsize=22)
+plt.xticks(fontsize=22)
 
 benchmarkResult = pd.read_csv("results/pagerank.csv", skipinitialspace=True)
 
@@ -27,10 +29,11 @@ singleThreadedDf = baselinedVariant[baselinedVariant["concurrency"] == 1]
 hue_order = ["JGraphT", "GDS-Pregel", "EJML", "Java-Native"]
 order=["Facebook", "Slashdot0902", "POKEC", "Patents"]
 barPlot = sns.barplot(ax=ax, data=singleThreadedDf, x="dataset", y="slowdown", hue="library", palette=libColors(), order=order, hue_order=hue_order)
-barPlot.set_ylabel("Slowdown", fontsize=12)
-barPlot.set_xlabel("Dataset", fontsize=12)
+barPlot.set_ylabel("Relative performance", fontsize=24)
+barPlot.set_xlabel("Dataset", fontsize=24)
 #barPlot.set_yscale('log')
-barPlot.legend(bbox_to_anchor=(0.5, -0.1), loc='lower center', ncol=4, bbox_transform=fig.transFigure)
+barPlot.legend(bbox_to_anchor=(0.5, -0.07), loc='lower center', ncol=4, bbox_transform=fig.transFigure,
+               title_fontsize=24,fontsize=22)
 outFile = "out/pageRanks.pdf"
 plt.savefig(outFile, bbox_inches='tight')
 # nodeCountPlot.set_yscale('log')

@@ -23,8 +23,10 @@ import seaborn as sns
 from benchmarkResults.helper import libColors, getUnit
 
 for (variant, df) in tcDfs.items():
-    fig, ax = plt.subplots(figsize=(6,3))
-    plt.setp(ax.get_xticklabels(), rotation=30)
+    fig, ax = plt.subplots(figsize=(16,9))
+    plt.yticks(fontsize=22)
+    plt.xticks(fontsize=22)
+    #plt.setp(ax.get_xticklabels(), rotation=30)
 
     baselineDf = df[df["library"].str.contains("EJML")]
     baselineDf = baselineDf[["dataset", "median"]]
@@ -39,9 +41,10 @@ for (variant, df) in tcDfs.items():
     hue_order = [i for i in allLibs if i in singleThreadedDf.library.unique()]
     barPlot = sns.barplot(x="dataset", y="slowdown", hue="library", palette = libColors()
                           , data=singleThreadedDf, hue_order=hue_order, order=order)
-    barPlot.set_ylabel("Slowdown", fontsize=12)
-    barPlot.set_xlabel("Dataset", fontsize=12)
-    barPlot.legend(bbox_to_anchor=(0.5, -0.4), loc='lower center', ncol=4, bbox_transform=fig.transFigure)
+    barPlot.set_ylabel("Relative performance", fontSize=24)
+    barPlot.set_xlabel("Dataset", fontSize=24)
+    barPlot.legend(bbox_to_anchor=(0.5, -0.07), loc='lower center', ncol=4, bbox_transform=fig.transFigure,
+                   title_fontsize=24,fontsize=22)
 
     if variant == "global":
         barPlot.set_yscale('log')

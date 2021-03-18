@@ -38,14 +38,17 @@ negatedDf = maskResults[maskResults["structural"] == False]
 negatedDf = pd.merge(negatedDf, baseLineForMaskSubset, how="inner", on="library")
 negatedDf["speedup"] = negatedDf["baseline"] / negatedDf["median"]
 
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(16, 9))
+plt.yticks(fontsize=24)
+plt.xticks(fontsize=24)
 negatedPlot = sns.barplot(x="library", y="speedup", hue="negated", hue_order=[False, True],
                           palette=booleanColorMap(), data=negatedDf)
 # negatedPlot.title(title)
-negatedPlot.set_ylabel("Speedup to unmasked operation", fontsize=12)
-negatedPlot.set_xlabel("GraphBLAS library", fontsize=12)
+negatedPlot.set_ylabel("Relative performance", fontsize=24)
+negatedPlot.set_xlabel("GraphBLAS library", fontsize=24)
 #ax.set_ylim([0, maxValue])
-negatedPlot.legend(bbox_to_anchor=(0.5, -0.1), loc='lower center', ncol=3, bbox_transform=fig.transFigure, title="Mask negated")
+negatedPlot.legend(bbox_to_anchor=(0.5, -0.15), loc='lower center', ncol=3,
+                   bbox_transform=fig.transFigure, title="Mask negated", title_fontsize=24,fontsize=22)
 outFile = "out/mxm_mask_negated.pdf"
 plt.savefig(outFile, bbox_inches='tight')
 plt.show()
@@ -57,14 +60,16 @@ structuralDf = pd.merge(structuralDf, baseLineForMaskSubset, how="inner", on="li
 structuralDf["speedup"] = structuralDf["baseline"] / structuralDf["median"]
 
 
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(16, 9))
+plt.yticks(fontsize=16)
+plt.xticks(fontsize=16)
 structuralPlot = sns.barplot(x="library", y="speedup", hue="structural", hue_order=[True, False],
                              palette=booleanColorMap(), data=structuralDf)
 # structuralPlot.title(title)
 # ax.set_ylim([0, maxValue])
-structuralPlot.set_ylabel("Speedup to unmasked operation", fontsize=12)
-structuralPlot.set_xlabel("GraphBLAS library", fontsize=12)
-structuralPlot.legend(bbox_to_anchor=(0.5, -0.1), loc='lower center', ncol=3, bbox_transform=fig.transFigure, title="Mask structural")
+structuralPlot.set_ylabel("Relative performance", fontsize=24)
+structuralPlot.set_xlabel("GraphBLAS library", fontsize=24)
+structuralPlot.legend(bbox_to_anchor=(0.5, -0.02), loc='lower center', ncol=3, bbox_transform=fig.transFigure, title="Mask structural")
 outFile = "out/mxm_mask_strutural.pdf"
 plt.savefig(outFile, bbox_inches='tight')
 plt.show()
@@ -79,11 +84,14 @@ baselineDf.rename(columns={"median":"baseline"}, inplace=True)
 baselinedVariant = pd.merge(semiringResults, baselineDf, how="inner", on="semiring")
 baselinedVariant["speedup"] = baselinedVariant["baseline"] / baselinedVariant["median"]
 
-fig, ax = plt.subplots(figsize=(6, 3))
-plt.setp(ax.get_xticklabels(), rotation=30)
+fig, ax = plt.subplots(figsize=(16, 9))
+plt.yticks(fontsize=22)
+plt.xticks(fontsize=22)
+#plt.setp(ax.get_xticklabels(), rotation=30)
 semiringPlot = sns.barplot(data=baselinedVariant, x="semiring", y="speedup", hue="library", hue_order=["EJML", "Java-Native", "EJML(inlined)"])
-semiringPlot.set_ylabel("Speedup", fontsize=12)
-semiringPlot.set_xlabel("GraphBLAS Library", fontsize=12)
-semiringPlot.legend(bbox_to_anchor=(0.5, -0.45), loc='lower center', ncol=2, bbox_transform=fig.transFigure)
+semiringPlot.set_ylabel("Relative performance", fontsize=24)
+semiringPlot.set_xlabel("GraphBLAS Library", fontsize=24)
+semiringPlot.legend(bbox_to_anchor=(0.5, -0.1), loc='lower center', ncol=3,
+                    bbox_transform=fig.transFigure, title_fontsize=24, fontsize=24)
 plt.savefig("out/mxmWithSemiring.pdf", bbox_inches='tight')
 plt.show()
