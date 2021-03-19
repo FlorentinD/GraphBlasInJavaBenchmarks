@@ -41,7 +41,7 @@ for (variant, df) in tcDfs.items():
     hue_order = [i for i in allLibs if i in singleThreadedDf.library.unique()]
     barPlot = sns.barplot(x="dataset", y="slowdown", hue="library", palette = libColors()
                           , data=singleThreadedDf, hue_order=hue_order, order=order)
-    barPlot.set_ylabel("Relative performance", fontSize=24)
+    barPlot.set_ylabel("Relative runtime", fontSize=24)
     barPlot.set_xlabel("Dataset", fontSize=24)
     barPlot.legend(bbox_to_anchor=(0.5, -0.07), loc='lower center', ncol=4, bbox_transform=fig.transFigure,
                    title_fontsize=24,fontsize=22)

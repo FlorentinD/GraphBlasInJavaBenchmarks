@@ -57,7 +57,7 @@ for id, variant in enumerate(bfsVariants):
 
     barPlot = sns.barplot(ax=ax, x="dataset", y="slowdown", hue="library", data=singleThreadedDf,
                           hue_order=hueOrder, palette = libColors(), order=order)
-    barPlot.set_ylabel("Relative performance", fontsize=24)
+    barPlot.set_ylabel("Relative runtime", fontsize=24)
     barPlot.set_xlabel("Dataset", fontsize=24)
     #barPlot.set_title("{}-Variant".format(singleThreadedDf['variant'].iloc[0]))
     barPlot.legend(bbox_to_anchor=(0.5, -0.1), loc='lower center', ncol=4, bbox_transform=fig.transFigure,
