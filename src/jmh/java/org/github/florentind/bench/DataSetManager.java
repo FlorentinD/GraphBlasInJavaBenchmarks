@@ -3,9 +3,16 @@ package org.github.florentind.bench;
 import org.neo4j.configuration.GraphDatabaseSettings;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
+import org.neo4j.graphalgo.Orientation;
+import org.neo4j.graphalgo.StoreLoaderBuilder;
+import org.neo4j.graphalgo.api.CSRGraph;
+import org.neo4j.graphalgo.core.Aggregation;
 import org.neo4j.graphalgo.core.Settings;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -70,12 +77,56 @@ public class DataSetManager {
     }
 
     public static void main(String[] args) {
-        DataSetManager dbManager = new DataSetManager("/home/florentin/masterThesis/graphblasOnJavaBenchmarks/datasets/");
-        var db = dbManager.openDb("LDBC01");
-
+        DataSetManager dbManager = new DataSetManager();
+        var db = dbManager.openDb("POKEC");
         var tx = db.beginTx();
         System.out.println(tx.execute("Match (n) return count(n) as nodeCount").resultAsString());
         tx.close();
-        dbManager.closeDb(db);
+
+        // undirected for TriangleCount
+        var hugeGraph = (CSRGraph) new StoreLoaderBuilder()
+                .api(db)
+                .globalOrientation(Orientation.UNDIRECTED)
+                .globalAggregation(Aggregation.SINGLE)
+                .build()
+                .graphStore()
+                .getUnion();
+
+
+        try {
+            exportToCsv(dbManager.dataSetDir.resolve("pokec_undirected.csv").toAbsolutePath().toString(), hugeGraph);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            dbManager.closeDb(db);
+        }
+    }
+
+    private static void exportToCsv(String outPath, CSRGraph hugeGraph) throws IOException {
+        var writer = new FileWriter(outPath);
+        PrintWriter out = new PrintWriter(writer);
+        out.printf("%d %d\n", hugeGraph.nodeCount(), hugeGraph.relationshipCount());
+
+        if (!hugeGraph.hasRelationshipProperty()) {
+            String lineFormat = "%d %d \n";
+            hugeGraph.forEachNode(nodeId -> {
+                hugeGraph.forEachRelationship(nodeId, (src, trg) -> {
+                    out.printf(lineFormat, src, trg);
+                    return true;
+                });
+                return true;
+            });
+        } else {
+            String lineFormat = "%d %d %f \n";
+            hugeGraph.forEachNode(nodeId -> {
+                hugeGraph.forEachRelationship(nodeId, 1.0,(src, trg, weight) -> {
+                    out.printf(lineFormat, src, trg, weight);
+                    return true;
+                });
+                return true;
+            });
+        }
+
+        out.flush();
     }
 }

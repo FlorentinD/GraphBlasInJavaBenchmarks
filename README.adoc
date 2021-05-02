@@ -59,7 +59,7 @@ mvn clean install -Dgpg.skip
 # (3) copy jar into /libs folder
 
 # run benchmarks (exclude, include benchmarks via build.gradle)
-# Specify the dataset directory containing neo4j db dumps
+# Specify the dataset directory containing neo4j db dumps of your dataset
 # Change the org.github.florentind.bench.DataSetManager.DATA_SETS map according to your datasets
 cd GraphBlasInJavaBenchmarks/
 /gradlew -PmainClass=benchmarkClass -PdatasetDir=.. simpleBenchmark
