@@ -12,6 +12,17 @@ void check_status(GrB_Info status)
     }
 }
 
+int compare_doubles(const void *a, const void *b)
+{
+    double *x = (double *)a;
+    double *y = (double *)b;
+    if (*x < *y)
+        return -1;
+    else if (*x > *y)
+        return 1;
+    return 0;
+}
+
 // load an unweighted matrix
 // expected firstline: nodeCount relCount
 GrB_Matrix *load_csv(FILE *fp)
@@ -70,26 +81,33 @@ int64_t computeTotalSandia(const GrB_Matrix A)
     return triangles;
 }
 
-void benchmarkGlobalTc(const GrB_Matrix adj) {
+void benchmarkGlobalTc(const GrB_Matrix adj)
+{
     // same as in java benchmarks
-    size_t warm_ups = 5; 
+    size_t warm_ups = 5;
     size_t iterations = 10;
+
+    double durations[iterations];
 
     for (size_t i = 0; i < warm_ups; i++)
     {
-        printf("Warmup %ld/%ld", i, warm_ups);
+        printf("Warmup %ld/%ld \n", i, warm_ups);
         computeTotalSandia(adj);
     }
 
-    
-    
     for (size_t i = 0; i < iterations; i++)
     {
         clock_t start = clock();
         computeTotalSandia(adj);
         clock_t end = clock();
-        printf("Iteration: %ld, Runtime: %f ms\n", i,(double)(end - start) * 1000.0 / CLOCKS_PER_SEC);
+        double duration = (double)(end - start) * 1000.0 / CLOCKS_PER_SEC;
+        printf("Iteration: %ld, Runtime: %f ms\n", i, duration);
+        durations[i] = duration;
     }
+
+    qsort(durations, iterations, sizeof(*durations), compare_doubles);
+
+    printf("Median: %f \n", durations[iterations/2]);
 }
 
 int main(int argc, char **argv)
@@ -129,7 +147,6 @@ int main(int argc, char **argv)
     GrB_Matrix *adj = load_csv(fp);
 
     benchmarkGlobalTc(*adj);
-
 
     GrB_Matrix_free(adj);
     GrB_finalize();
