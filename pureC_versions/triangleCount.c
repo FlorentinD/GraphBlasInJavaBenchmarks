@@ -65,10 +65,7 @@ int64_t computeTotalSandia(const GrB_Matrix A)
 
     // compute lower triangle
     check_status(GrB_Matrix_nrows(&nodeCount, A));
-    // FIX thrown segmentation fault ...
     check_status(GrB_Matrix_new(&L, GrB_BOOL, nodeCount, nodeCount));
-    if (L == NULL)
-        return -1;
     check_status(GxB_select(L, NULL, NULL, GxB_TRIL, A, NULL, NULL));
 
     check_status(GrB_Matrix_new(&C, GrB_INT64, nodeCount, nodeCount));
@@ -91,7 +88,7 @@ void benchmarkGlobalTc(const GrB_Matrix adj)
 
     for (size_t i = 0; i < warm_ups; i++)
     {
-        printf("Warmup %ld/%ld \n", i, warm_ups);
+        printf("Warmup %ld/%ld \n", i + 1, warm_ups);
         computeTotalSandia(adj);
     }
 
@@ -100,6 +97,66 @@ void benchmarkGlobalTc(const GrB_Matrix adj)
         clock_t start = clock();
         computeTotalSandia(adj);
         clock_t end = clock();
+        double duration = (double)(end - start) * 1000.0 / CLOCKS_PER_SEC;
+        printf("Iteration: %ld, Runtime: %f ms\n", i, duration);
+        durations[i] = duration;
+    }
+
+    qsort(durations, iterations, sizeof(*durations), compare_doubles);
+
+    printf("Median: %f \n", durations[iterations/2]);
+}
+
+GrB_Vector computeVertexWiseSandia(const GrB_Matrix A)
+{
+    GrB_Matrix L;
+    GrB_Matrix C;
+    GrB_Index nodeCount;
+    GrB_Semiring plusPairSemiring = GxB_PLUS_PAIR_INT64;
+    GrB_Vector triangles;
+    uint64_t globalTriangles = 0;
+
+    // compute lower triangle
+    check_status(GrB_Matrix_nrows(&nodeCount, A));
+    check_status(GrB_Matrix_new(&L, GrB_BOOL, nodeCount, nodeCount));
+    check_status(GxB_select(L, NULL, NULL, GxB_TRIL, A, NULL, NULL));
+
+    check_status(GrB_Matrix_new(&C, GrB_INT64, nodeCount, nodeCount));
+    check_status(GrB_mxm(C, A, NULL, plusPairSemiring, A, L, NULL));
+    
+    check_status(GrB_Vector_new(&triangles, GrB_INT64, nodeCount));
+    check_status(GrB_reduce(triangles, NULL, NULL, GrB_PLUS_INT64, C, NULL));
+
+    check_status(GrB_reduce(&globalTriangles, NULL, GrB_PLUS_MONOID_INT64, triangles, NULL));
+
+    check_status(GrB_Matrix_free(&L));
+    check_status(GrB_Matrix_free(&C));
+
+    return triangles;
+}
+
+void benchmarkVertexWiseTc(const GrB_Matrix adj)
+{
+    // same as in java benchmarks
+    size_t warm_ups = 5;
+    size_t iterations = 10;
+
+    double durations[iterations];
+    GrB_Vector triangleVector;
+
+    for (size_t i = 0; i < warm_ups; i++)
+    {
+        printf("Warmup %ld/%ld \n", i + 1, warm_ups);
+        triangleVector = computeVertexWiseSandia(adj);
+        check_status(GrB_Vector_free(&triangleVector));
+    }
+
+    for (size_t i = 0; i < iterations; i++)
+    {
+        clock_t start = clock();
+        triangleVector = computeVertexWiseSandia(adj);
+        clock_t end = clock();
+        check_status(GrB_Vector_free(&triangleVector));
         double duration = (double)(end - start) * 1000.0 / CLOCKS_PER_SEC;
         printf("Iteration: %ld, Runtime: %f ms\n", i, duration);
         durations[i] = duration;
@@ -146,7 +203,8 @@ int main(int argc, char **argv)
     printf("Load graph at %s\n", file);
     GrB_Matrix *adj = load_csv(fp);
 
-    benchmarkGlobalTc(*adj);
+    benchmarkVertexWiseTc(*adj);
+    //benchmarkGlobalTc(*adj);
 
     GrB_Matrix_free(adj);
     GrB_finalize();
