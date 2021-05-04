@@ -4,39 +4,41 @@ package org.github.florentind.bench.pageRank;
 import com.github.fabianmurariu.unsafe.GRBCORE;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.graphalgos.pageRank.PageRankNative;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.TearDown;
-import org.openjdk.jmh.infra.Blackhole;
 
 import java.nio.Buffer;
+import java.util.List;
 
 public class PageRankNativeBenchmark extends PageRankBaseBenchmark {
     Buffer jniMatrix;
 
-    @Param({"1", "8"})
-    private int concurrency;
+    @Override
+    protected List<Integer> concurrencies() {
+        return List.of(1, 8);
+    }
 
-    @Param({"true"})
-    private boolean by_col;
+    private boolean by_col = true;
 
-    @Setup
-    public void setup() {
-        super.setup();
+    @Override
+    public void setup(String dataset) {
+        super.setup(dataset);
         GRBCORE.initNonBlocking();
         jniMatrix = ToNativeMatrixConverter.convert(graph, by_col);
     }
 
-    @org.openjdk.jmh.annotations.Benchmark
-    public void jni(Blackhole bh) {
-        bh.consume(PageRankNative.compute(jniMatrix, dampingFactor, tolerance, maxIterations, concurrency));
-    }
-
-    @TearDown
+    @Override
     public void tearDown() {
         super.tearDown();
 
         GRBCORE.freeMatrix(jniMatrix);
         GRBCORE.grbFinalize();
+    }
+
+    @Override
+    protected void benchmarkFunc(Integer concurrency) {
+        PageRankNative.compute(jniMatrix, dampingFactor, tolerance, maxIterations, concurrency);
+    }
+
+    public static void main(String[] args) {
+        new PageRankNativeBenchmark().run();
     }
 }

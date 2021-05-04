@@ -20,6 +20,10 @@ repositories {
     mavenLocal()
     mavenCentral()
     gradlePluginPortal()
+    // for pregel-bootstrap
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 dependencies {
@@ -36,25 +40,31 @@ dependencies {
 
     compileOnly         group: 'org.ejml',                 name: 'ejml-all',        version: ver.ejml
     // TODO: this is locally installed !
-    implementation      group: 'com.github.fabianmurariu',  name: 'graphblas-java-native',   version: ver.'graphblas-java-native'
-    implementation      group: 'org.jgrapht',            name: 'jgrapht-core',      version: ver.jgrapht
-    implementation      group: 'org.jgrapht',            name: 'jgrapht-opt',      version: ver.jgrapht
-    implementation      group: 'org.neo4j.gds',            name: 'core',            version: ver.gds
+    implementation      group: 'com.github.fabianmurariu',  name: 'graphblas-package',  version: ver.'graphblas-package'
+    implementation      group: 'org.jgrapht',           name: 'jgrapht-core',          version: ver.jgrapht
+    implementation      group: 'org.jgrapht',           name: 'jgrapht-opt',           version: ver.jgrapht
+    implementation      group: 'org.neo4j.gds',         name: 'core',                version: ver.gds
+    implementation      group: 'org.neo4j.gds',         name: 'proc',                version: ver.gds
+    implementation      group: 'org.neo4j.gds',         name: 'proc-embeddings',     version: ver.gds
+    implementation      group: 'org.neo4j.gds',         name: 'alpha-embeddings',    version: ver.gds
     // TODO: find out why this is needed for the benchmarks
     implementation      group: 'org.neo4j.gds',            name: 'test-utils',      version: ver.gds
 
     // jmh dependencies
     // TODO: try out which ones can be removed
-    jmhAnnotationProcessor group: 'org.neo4j.gds',         name: 'annotations',         version: ver.gds
-    jmhAnnotationProcessor group: 'org.immutables',        name: 'value',               version: ver.'immutables'
-    jmhCompileOnly         group: 'org.immutables',           name: 'builder',            version: ver.'immutables'
+    jmhAnnotationProcessor group: 'org.neo4j.gds',      name: 'annotations',         version: ver.gds
+    jmhAnnotationProcessor group: 'org.immutables',     name: 'value',               version: ver.'immutables'
+    jmhCompileOnly         group: 'org.immutables',     name: 'builder',            version: ver.'immutables'
+    jmhCompileOnly         group: 'org.immutables',     name: 'value-annotations',   version: ver.'immutables'
 
-    jmhCompileOnly         group: 'org.immutables',        name: 'value-annotations',   version: ver.'immutables'
-    jmhImplementation      group: 'org.neo4j.gds',         name: 'proc',                version: ver.gds
-    jmhImplementation      group: 'org.neo4j.gds',         name: 'alpha-algo',          version: ver.gds
-    jmhImplementation      group: 'org.neo4j.gds',         name: 'core',                version: ver.gds
-    jmhCompile             group: 'org.neo4j.gds',         name: 'pregel-example',      version: ver.gds
-    jmhCompile             group: 'org.neo4j.gds',         name: 'algo',                version: ver.gds
+    jmhImplementation      group: 'org.neo4j.gds',      name: 'proc',                version: ver.gds
+    jmhImplementation      group: 'org.neo4j.gds',      name: 'proc-embeddings',     version: ver.gds
+    jmhImplementation      group: 'org.neo4j.gds',      name: 'alpha-algo',          version: ver.gds
+    jmhImplementation      group: 'org.neo4j.gds',      name: 'alpha-embeddings',    version: ver.gds
+//    jmhImplementation      group: 'org.neo4j.gds',         name: 'core',                version: ver.gds
+    //jmhImplementation      group: 'org.neo4j.gds',         name: 'neo4j-kernel-adapter',                version: ver.gds
+//    jmhCompile             name: 'pregel-bootstrap'
+    jmhCompile             group: 'org.neo4j.gds',      name: 'algo',                version: ver.gds
 
 
     jmh group: 'com.github.rvesse',       name: 'airline',                  version: ver.'airline'
@@ -75,10 +85,10 @@ dependencies {
     testCompileOnly group: 'org.immutables',    name: 'builder',            version: ver.'immutables'
     testCompileOnly group: 'org.jetbrains',     name: 'annotations',        version: ver.'jetbrains-annotations'
     testCompileOnly  group: 'org.neo4j.gds',    name: 'test-utils',          version: ver.gds
-    testCompileOnly  group: 'org.neo4j.gds',    name: 'alpha-algo',          version: ver.gds
+    testCompileOnly  group: 'org.neo4j.gds',    name: 'algo',          version: ver.gds
 
     // pregel/jmh tests (should be moved to a seperate jmhTest folder?!)
-    testCompile         group: 'org.neo4j.gds',                   name: 'pregel-example',      version: ver.gds
+    testCompile         name: 'pregel-bootstrap'
 }
 
 test {
@@ -87,9 +97,19 @@ test {
     }
 }
 
+jmhJar {
+    manifest {
+        attributes([
+                'Implementation-Version': ver.'neo4j'
+        ])
+
+    }
+}
+
 jmh {
     zip64 = true
     forceGC = true
+
     // regExp which benchmarks to run
     // ejmlSparseBfsLevel
     include = ['.*jGraphTBfsLevel*']
@@ -99,4 +119,14 @@ jmh {
 
     // ! increase -Xmx and set -Xms to equal value on server if needed .. f.i. "-Xmx32g"
     jvmArgs = ["-Xms32g", "-Xmx32g", "-XX:+UseSuperWord"]
+}
+
+task simpleBenchmark(type:JavaExec) {
+    classpath = sourceSets.jmh.runtimeClasspath
+    String datasetDir = project.hasProperty("datasetDir") ? getProperty("datasetDir") : ""
+    environment "GRB_JAVA_DATASETS", datasetDir
+    maxHeapSize="32G"
+    minHeapSize="32G"
+
+    main = project.hasProperty("mainClass") ? getProperty("mainClass") : "NULL"
 }

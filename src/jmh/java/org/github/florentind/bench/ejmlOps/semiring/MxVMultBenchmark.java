@@ -18,7 +18,7 @@ public class MxVMultBenchmark extends MxVMultBaseBenchmark {
 
     @Override
     @Setup
-    public void setup() throws Throwable {
+    public void setup() {
         super.setup();
         sparseInputVector = new DVectorSparse(denseInputVector, 0);
         sparse1DimMatrix = CommonOps_DSCC.transpose(sparseInputVector.oneDimMatrix, null, null);

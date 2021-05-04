@@ -50,7 +50,7 @@ public class MxMWithDifferentMethodsNativeBenchmark extends MatrixOpsBaseBenchma
 
     @Override
     @Setup
-    public void setup() throws Throwable {
+    public void setup() {
         super.setup();
 
         GRBCORE.initNonBlocking();

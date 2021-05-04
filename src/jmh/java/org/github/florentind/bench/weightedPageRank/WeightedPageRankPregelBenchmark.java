@@ -2,6 +2,7 @@ package org.github.florentind.bench.weightedPageRank;
 
 
 import org.github.florentind.core.ejml.EjmlUtil;
+import org.neo4j.graphalgo.beta.pregel.Partitioning;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.pr.ImmutablePageRankPregelConfig;
 import org.neo4j.graphalgo.beta.pregel.pr.PageRankPregel;
@@ -11,14 +12,15 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.infra.Blackhole;
 
+import java.util.List;
+
 public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchmark {
 
-    @Param({"1", "8"})
-    private int concurrency;
 
-    // skipping 5M version (takes too long)
-    @Param({"0.1M;20", "0.5M;20", "1M;20", "1M;5", "1M;10", "1M;15"})
-    protected String nodeCountIterationCombinations;
+    @Override
+    protected List<Integer> concurrencies() {
+        return List.of(1,8);
+    }
 
     private PageRankPregel.PageRankPregelConfig config;
 
@@ -26,22 +28,23 @@ public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchma
 
     @Override
     @Setup
-    public void setup() {
-        super.setup();
-
-        config = ImmutablePageRankPregelConfig.builder()
-                .maxIterations(maxIterations)
-                .dampingFactor(dampingFactor)
-                .concurrency(concurrency)
-                .relationshipWeightProperty(REL_PROPERTY_NAME)
-                .build();
+    public void setup(String dataset) {
+        super.setup(dataset);
 
         // as Pregel implementation has no good way to normalize the weights
         EjmlUtil.normalizeOutgoingWeights(graph);
     }
 
-    @org.openjdk.jmh.annotations.Benchmark
-    public void pregel(Blackhole bh) {
+    @Override
+    protected void benchmarkFunc(Integer concurrency) {
+        config = ImmutablePageRankPregelConfig.builder()
+                .maxIterations(maxIterations)
+                .dampingFactor(dampingFactor)
+                .partitioning(Partitioning.DEGREE)
+                .concurrency(concurrency)
+                .relationshipWeightProperty(REL_PROPERTY_NAME)
+                .build();
+
         // init Pregel structures beforehand
         pregel = Pregel.create(
                 graph,
@@ -51,6 +54,6 @@ public class WeightedPageRankPregelBenchmark extends WeightedPageRankBaseBenchma
                 AllocationTracker.empty()
         );
 
-        bh.consume(pregel.run());
+        pregel.run();
     }
 }

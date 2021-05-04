@@ -1,68 +1,34 @@
 package org.github.florentind.bench.pageRank;
 
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.github.florentind.bench.EjmlGraphBaseBenchmark;
-import org.neo4j.graphalgo.Orientation;
-import org.neo4j.graphalgo.api.CSRGraph;
-import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
-import org.neo4j.graphalgo.beta.generator.RandomGraphGeneratorBuilder;
-import org.neo4j.graphalgo.beta.generator.RelationshipDistribution;
-import org.neo4j.graphalgo.config.RandomGraphGeneratorConfig;
-import org.neo4j.graphalgo.core.Aggregation;
-import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
-import org.openjdk.jmh.annotations.Param;
+import org.github.florentind.bench.SimpleEjmlGraphBaseBenchmark;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
-public class PageRankBaseBenchmark extends EjmlGraphBaseBenchmark {
-    protected static HashMap<String, Pair<Integer, Integer>> nodeCountIterationsPairs = new HashMap<>() {{
-        put("0.1M;20", Pair.of(100_000, 20));
-        put("0.5M;20", Pair.of(500_000, 20));
-        put("1M;20", Pair.of(1_000_000, 20));
-        put("5M;20", Pair.of(5_000_000, 20));
-        put("1M;5", Pair.of(1_000_000, 5));
-        put("1M;10", Pair.of(1_000_000, 10));
-        put("1M;15", Pair.of(1_000_000, 15));
-    }};
+public abstract class PageRankBaseBenchmark extends SimpleEjmlGraphBaseBenchmark {
 
-    @Param({"0.1M;20", "0.5M;20", "1M;20", "5M;20", "1M;5", "1M;10", "1M;15"})
-    protected String nodeCountIterationCombinations;
+    protected int maxIterations = 20;
 
-    protected int nodeCount;
+    protected float dampingFactor = 0.85f;
 
-    @Param({"4"})
-    protected int avgDegree;
+    protected float tolerance = 1e-32f;
 
-    protected int maxIterations;
+    public static void main(String[] args) {
+        List<SimpleEjmlGraphBaseBenchmark> benchmarks = List.of(
+                new PageRankNativeBenchmark(),
+                new PageRankEjmlBenchmark(),
+                new PageRankPregelBenchmark(),
+                new PageRankJGraphTBenchmark(),
+                new PageRankGdsBenchmark()
+        );
+        List<BenchmarkResult> results = benchmarks.stream()
+                .map(SimpleEjmlGraphBaseBenchmark::run)
+                .reduce(new ArrayList<>(), (acc, result) -> {
+                    acc.addAll(result);
+                    return acc;
+                });
 
-    @Param({"0.85"})
-    protected float dampingFactor;
-
-    @Param({"Undirected"})
-    protected String orientation;
-
-    @Param({"1e-32"})
-    protected float tolerance;
-
-    protected RandomGraphGeneratorBuilder getGraphBuilder() {
-        return RandomGraphGenerator.builder()
-                .nodeCount(nodeCount)
-                .averageDegree(avgDegree)
-                .seed(42L)
-                .aggregation(Aggregation.MAX)
-                .orientation(Orientation.of(orientation))
-                .allocationTracker(AllocationTracker.empty())
-                .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.NO)
-                .relationshipDistribution(RelationshipDistribution.POWER_LAW);
-    }
-
-    @Override
-    protected CSRGraph getCSRGraph() {
-        Pair<Integer, Integer> nodeCountIterationsPair = nodeCountIterationsPairs.get(nodeCountIterationCombinations);
-        nodeCount = nodeCountIterationsPair.getLeft();
-        maxIterations = nodeCountIterationsPair.getRight();
-
-        return getGraphBuilder().build().generate();
+        printResults(results);
     }
 }

@@ -1,42 +1,40 @@
 package org.github.florentind.bench.pageRank;
 
 
+import org.neo4j.graphalgo.beta.pregel.Partitioning;
 import org.neo4j.graphalgo.beta.pregel.Pregel;
 import org.neo4j.graphalgo.beta.pregel.pr.ImmutablePageRankPregelConfig;
 import org.neo4j.graphalgo.beta.pregel.pr.PageRankPregel;
 import org.neo4j.graphalgo.core.concurrency.Pools;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.infra.Blackhole;
+
+import java.util.List;
 
 public class PageRankPregelBenchmark extends PageRankBaseBenchmark {
 
-    @Param({"1", "8"})
-    private int concurrency;
-
-    // skipping 5M version (takes too long)
-    @Param({"0.1M;20", "0.5M;20", "1M;20", "1M;5", "1M;10", "1M;15"})
-    protected String nodeCountIterationCombinations;
+    @Override
+    protected List<Integer> concurrencies() {
+        return List.of(1, 8);
+    }
 
     private PageRankPregel.PageRankPregelConfig config;
 
     private Pregel<PageRankPregel.PageRankPregelConfig> pregel;
 
     @Override
-    public void setup() {
-        super.setup();
+    public void setup(String dataset) {
+        super.setup(dataset);
+    }
 
+    @Override
+    protected void benchmarkFunc(Integer concurrency) {
         config = ImmutablePageRankPregelConfig.builder()
                 .maxIterations(maxIterations)
                 .dampingFactor(dampingFactor)
+                .partitioning(Partitioning.DEGREE)
                 .concurrency(concurrency)
                 .build();
 
-
-    }
-
-    @org.openjdk.jmh.annotations.Benchmark
-    public void pregel(Blackhole bh) {
         // init Pregel structures beforehand
         pregel = Pregel.create(
                 graph,
@@ -46,6 +44,10 @@ public class PageRankPregelBenchmark extends PageRankBaseBenchmark {
                 AllocationTracker.empty()
         );
 
-        bh.consume(pregel.run());
+        pregel.run();
+    }
+
+    public static void main(String[] args) {
+        new PageRankPregelBenchmark().run();
     }
 }

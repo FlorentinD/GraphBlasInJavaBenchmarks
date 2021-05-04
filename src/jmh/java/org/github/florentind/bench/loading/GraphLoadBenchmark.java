@@ -2,6 +2,7 @@ package org.github.florentind.bench.loading;
 
 
 import org.github.florentind.bench.BaseBenchmark;
+import org.github.florentind.bench.EjmlGraphBaseBenchmark;
 import org.github.florentind.core.ejml.EjmlGraph;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.core.jgrapht.JGraphTConverter;
@@ -21,46 +22,17 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.fabianmurariu.unsafe.GRBCORE.*;
 
-public class GraphLoadBenchmark extends BaseBenchmark {
-
-    @Param({"1000000"})
-    int nodeCount;
-
-    @Param({"2","4","6","8"})
-    int avgDegree;
-
-    @Param({"POWER_LAW"})
-    String degreeDistribution;
-
-    @Param({"true", "false"})
-    boolean weighted;
-
-    @Param({"Undirected"})
-    protected String orientation;
+public class GraphLoadBenchmark extends EjmlGraphBaseBenchmark {
 
     @Param({"1"})
     int concurrency;
 
     protected HugeGraph graph;
 
+    @Override
     @Setup
     public void setup() {
-
-        RandomGraphGeneratorBuilder builder = RandomGraphGenerator.builder()
-                .nodeCount(nodeCount)
-                .averageDegree(avgDegree)
-                .seed(42L)
-                .aggregation(Aggregation.MAX)
-                .orientation(Orientation.of(orientation))
-                .allocationTracker(AllocationTracker.empty())
-                .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.NO)
-                .relationshipDistribution(RelationshipDistribution.valueOf(degreeDistribution));
-
-        if (weighted) {
-            builder.relationshipPropertyProducer(PropertyProducer.random("weight", 0, 1));
-        }
-
-        graph = builder.build().generate();
+        super.setup();
 
         initBlocking();
         setGlobalInt(GxB_NTHREADS, concurrency);

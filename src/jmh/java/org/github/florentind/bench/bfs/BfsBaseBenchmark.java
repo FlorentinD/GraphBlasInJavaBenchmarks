@@ -1,57 +1,41 @@
 package org.github.florentind.bench.bfs;
 
 
-import org.github.florentind.bench.EjmlGraphBaseBenchmark;
-import org.neo4j.graphalgo.Orientation;
-import org.neo4j.graphalgo.api.CSRGraph;
-import org.neo4j.graphalgo.beta.generator.RandomGraphGenerator;
-import org.neo4j.graphalgo.beta.generator.RelationshipDistribution;
-import org.neo4j.graphalgo.config.RandomGraphGeneratorConfig;
-import org.neo4j.graphalgo.core.Aggregation;
-import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.annotations.Setup;
+import org.github.florentind.bench.SimpleEjmlGraphBaseBenchmark;
 
-public class BfsBaseBenchmark extends EjmlGraphBaseBenchmark {
-    @Param({"100000", "500000", "1000000",  "5000000"})
-    int nodeCount;
+import java.util.ArrayList;
+import java.util.List;
 
-    @Param({"4"})
-    int avgDegree;
-
+public abstract class BfsBaseBenchmark extends SimpleEjmlGraphBaseBenchmark {
     // node in the middle (id-wise)
     int startNode;
 
     // as JGraphT supports no max-iterations parameter
     final static int MAX_ITERATIONS = Integer.MAX_VALUE;
 
-    @Param({"POWER_LAW"})
-    protected String degreeDistribution;
-
-    @Param({"UNDIRECTED"})
-    protected String orientation;
-
     @Override
-    @Setup
-    public void setup() {
-        super.setup();
-        startNode = nodeCount / 2;
+    public void setup(String dataset) {
+        super.setup(dataset);
+        startNode = Math.toIntExact(graph.nodeCount() / 2);
     }
 
+    public static void main(String[] args) {
+        List<SimpleEjmlGraphBaseBenchmark> benchmarks = List.of(
+                new BfsLevelEjmlBenchmark(),
+                new BfsLevelJGraphTBenchmark(),
+                new BfsLevelNativeBenchmark(),
+                new BfsLevelPregelBenchmark(),
+                new BfsParentPregelBenchmark(),
+                new BfsParentEjmlBenchmark(),
+                new BfsParentNativeBenchmark()
+        );
+        List<BenchmarkResult> results = benchmarks.stream()
+                .map(SimpleEjmlGraphBaseBenchmark::run)
+                .reduce(new ArrayList<>(), (acc, result) -> {
+                    acc.addAll(result);
+                    return acc;
+                });
 
-    @Override
-    protected CSRGraph getCSRGraph() {
-        return RandomGraphGenerator.builder()
-                .nodeCount(nodeCount)
-                .averageDegree(avgDegree)
-                .seed(42L)
-                .aggregation(Aggregation.MAX)
-                .orientation(Orientation.valueOf(orientation))
-                .relationshipDistribution(RelationshipDistribution.valueOf(degreeDistribution))
-                .allocationTracker(AllocationTracker.empty())
-                .allowSelfLoops(RandomGraphGeneratorConfig.AllowSelfLoops.NO)
-                .relationshipDistribution(RelationshipDistribution.POWER_LAW)
-                .build().generate();
-
+        printResults(results);
     }
 }

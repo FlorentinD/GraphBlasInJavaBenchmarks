@@ -18,7 +18,7 @@ public class MxVMultBaseBenchmark extends MatrixOpsBaseBenchmark {
 
     @Override
     @Setup
-    public void setup() throws Throwable {
+    public void setup() {
         super.setup();
         denseInputVector = new double[matrix.numRows];
         output = new double[matrix.numRows];

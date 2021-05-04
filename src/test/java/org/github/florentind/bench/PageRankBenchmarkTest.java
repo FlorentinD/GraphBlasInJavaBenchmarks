@@ -18,6 +18,7 @@ import org.neo4j.graphalgo.beta.pregel.pr.ImmutablePageRankPregelConfig;
 import org.neo4j.graphalgo.beta.pregel.pr.PageRankPregel;
 import org.neo4j.graphalgo.core.concurrency.Pools;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
+import org.neo4j.graphalgo.core.utils.progress.EmptyProgressEventTracker;
 import org.neo4j.graphalgo.pagerank.ImmutablePageRankStreamConfig;
 import org.neo4j.graphalgo.pagerank.PageRank;
 import org.neo4j.graphalgo.pagerank.PageRankFactory;
@@ -119,7 +120,8 @@ public class PageRankBenchmarkTest extends BaseBenchmarkTest {
                 EjmlGraph.create(graph),
                 config,
                 AllocationTracker.empty(),
-                NullLog.getInstance()
+                NullLog.getInstance(),
+                EmptyProgressEventTracker.INSTANCE
         );
 
         pageRank.compute();

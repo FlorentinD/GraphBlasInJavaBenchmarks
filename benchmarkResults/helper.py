@@ -5,21 +5,10 @@ import math
 def libColors():
     return {
         "EJML": "tab:blue",
-        "EJML-Global": "tab:purple",
-        "EJML-VertexWise": "tab:blue",
-        "EJML-Sparse": "tab:purple",
-        "EJML-Dense": "tab:blue",
-        "EJML-Dense-Sparse": "tab:cyan",
         "JGraphT": "tab:brown",
-        "JGraphT-Global": "tab:brown",
         "GDS": "tab:olive",
-        "GDS-VertexWise": "tab:olive",
         "Java-Native":"tab:red",
-        "Java-Native (SuiteSparse)":"tab:red",
-        "Java-Native-Global": "tab:orange",
-        "Java-Native-VertexWise": "tab:red",
         "GDS-Pregel": "tab:green",
-        "GDS-Pregel-VertexWise": "tab:green"
     }
 
 def booleanColorMap():

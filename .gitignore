@@ -2,7 +2,7 @@
 .gradle
 /build/
 /src/main/generated/org/florentind/core/ejml/
-/out/
+/benchmarkResults/out/
 /.jqwik-database
 /venv/
 /benchmarkResults/*.jpg
@@ -10,4 +10,7 @@
 server-connect.adoc
 
 benchmarkResults/__pycache__/
-/benchmarkResults/out/
+/datasets/
+
+libs/
+datasets/

@@ -1,0 +1,10 @@
+benchmark, concurrency, dataset, median, semiring
+MxMWithSemiringEjml(inlined)Benchmark,1,Slashdot0902,2654,(PLUS;TIMES)
+MxMWithSemiringEjmlBenchmark,1,Slashdot0902,2812,(PLUS;TIMES)
+MxMWithSemiringEjmlBenchmark,1,Slashdot0902,2618,(OR;Pair)
+MxMWithSemiringEjmlBenchmark,1,Slashdot0902,3415,(OR;AND)
+MxMWithSemiringEjmlBenchmark,1,Slashdot0902,3224,(Min;Max)
+MxMWithSemiringNativeBenchmark,1,Slashdot0902,4383,(PLUS;TIMES)
+MxMWithSemiringNativeBenchmark,1,Slashdot0902,4820,(OR;Pair)
+MxMWithSemiringNativeBenchmark,1,Slashdot0902,5057,(OR;AND)
+MxMWithSemiringNativeBenchmark,1,Slashdot0902,4571,(Min;Max)

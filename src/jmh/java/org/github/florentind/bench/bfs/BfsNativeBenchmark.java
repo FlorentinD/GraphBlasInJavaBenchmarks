@@ -5,17 +5,17 @@ import com.github.fabianmurariu.unsafe.GRBOPSMAT;
 import org.github.florentind.core.grapblas_native.ToNativeMatrixConverter;
 import org.github.florentind.graphalgos.bfs.BfsNative;
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.infra.Blackhole;
 
 import java.nio.Buffer;
+import java.util.List;
 
-public class BfsNativeBenchmark extends BfsBaseBenchmark {
+public abstract class BfsNativeBenchmark extends BfsBaseBenchmark {
 
-    @Param({"1", "8"})
-    private int concurrency;
+    @Override
+    protected List<Integer> concurrencies() {
+        return List.of(1, 8);
+    }
 
 //    @Param({"true", "false"})
 //    private boolean isCSC;
@@ -23,28 +23,15 @@ public class BfsNativeBenchmark extends BfsBaseBenchmark {
     protected Buffer jniMatrix;
 
     @Override
-    @Setup
-    public void setup() {
-        super.setup();
+    public void setup(String dataset) {
+        super.setup(dataset);
         GRBCORE.initNonBlocking();
         //jniMatrix = ToNativeMatrixConverter.convert(graph, isCSC);
         jniMatrix = ToNativeMatrixConverter.convert(graph);
         GRBOPSMAT.transpose(jniMatrix, null, null, jniMatrix, null);
     }
 
-
-    @Benchmark
-    public void jniBfsLevel(Blackhole bh) {
-        bh.consume(new BfsNative().computeLevel(jniMatrix, startNode, MAX_ITERATIONS, concurrency));
-    }
-
-    @Benchmark
-    public void jniBfsParent(Blackhole bh) {
-        bh.consume(new BfsNative().computeParent(jniMatrix, startNode, MAX_ITERATIONS, concurrency));
-    }
-
     @Override
-    @TearDown
     public void tearDown() {
         super.tearDown();
         GRBCORE.freeMatrix(jniMatrix);

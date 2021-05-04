@@ -45,13 +45,13 @@ public interface EjmlRelationships {
      * If no property exists, the value will be 1.
      */
     static EjmlRelationships of(CSRGraph graph) {
-        Relationships.Topology relationships = graph.relationshipTopology();
+        var relationships = graph.relationshipTopologies();
 
         int nodeCount = Math.toIntExact(graph.nodeCount());
         DMatrixSparseTriplet tripleStore = new DMatrixSparseTriplet(
             nodeCount,
             nodeCount,
-            Math.toIntExact(relationships.elementCount())
+            Math.toIntExact(relationships.values().stream().mapToLong(Relationships.Topology::elementCount).sum())
         );
 
         BitSet targetIds = new BitSet(nodeCount);

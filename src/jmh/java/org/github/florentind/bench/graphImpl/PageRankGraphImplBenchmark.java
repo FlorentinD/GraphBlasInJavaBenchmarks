@@ -8,6 +8,7 @@ import org.neo4j.graphalgo.beta.generator.RelationshipDistribution;
 import org.neo4j.graphalgo.config.RandomGraphGeneratorConfig;
 import org.neo4j.graphalgo.core.Aggregation;
 import org.neo4j.graphalgo.core.utils.mem.AllocationTracker;
+import org.neo4j.graphalgo.core.utils.progress.EmptyProgressEventTracker;
 import org.neo4j.graphalgo.pagerank.ImmutablePageRankStatsConfig;
 import org.neo4j.graphalgo.pagerank.PageRank;
 import org.neo4j.graphalgo.pagerank.PageRankBaseConfig;
@@ -51,25 +52,26 @@ public class PageRankGraphImplBenchmark extends GraphImplBaseBenchmark {
     public void setup() {
         super.setup();
 
-        unweightedConfig =  ImmutablePageRankStatsConfig
-            .builder()
-            .concurrency(concurrency)
-            .build();
+        unweightedConfig = ImmutablePageRankStatsConfig
+                .builder()
+                .concurrency(concurrency)
+                .build();
 
         weightedConfig = ImmutablePageRankStatsConfig
-            .builder()
-            .from(unweightedConfig)
-            .relationshipWeightProperty(RELATIONSHIP_PROPERTY)
-            .build();
+                .builder()
+                .from(unweightedConfig)
+                .relationshipWeightProperty(RELATIONSHIP_PROPERTY)
+                .build();
     }
 
     @org.openjdk.jmh.annotations.Benchmark
     public void unweighted(Blackhole bh) {
         PageRank algorithm = new PageRankFactory<>().build(
-            graph,
-            unweightedConfig,
-            AllocationTracker.empty(),
-            NullLog.getInstance()
+                graph,
+                unweightedConfig,
+                AllocationTracker.empty(),
+                NullLog.getInstance(),
+                EmptyProgressEventTracker.INSTANCE
         );
 
         bh.consume(algorithm.compute());
@@ -78,10 +80,11 @@ public class PageRankGraphImplBenchmark extends GraphImplBaseBenchmark {
     @org.openjdk.jmh.annotations.Benchmark
     public void weighted(Blackhole bh) {
         PageRank algorithm = new PageRankFactory<>().build(
-            graph,
-            weightedConfig,
-            AllocationTracker.empty(),
-            NullLog.getInstance()
+                graph,
+                weightedConfig,
+                AllocationTracker.empty(),
+                NullLog.getInstance(),
+                EmptyProgressEventTracker.INSTANCE
         );
 
         bh.consume(algorithm.compute());
